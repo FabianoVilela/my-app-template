@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "react-native-unistyles-v3": {
+      "source": "jpudysz/react-native-unistyles",
+      "sourceType": "github",
+      "skillPath": "skills/react-native-unistyles-v3/SKILL.md",
+      "computedHash": "c4320595b592336a15d25d5e963dce48ab337dbcbec80a5eb7e4a79a2dab8c09"
+    }
+  }
+}
