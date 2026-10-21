@@ -1,4 +1,23 @@
-This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+# Agent instructions
+
+## Project and scope
+
+This repository is an Expo/React Native reference template using TypeScript, Expo Router, and pnpm. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
+
+- These instructions apply to the whole repository.
+- Before creating, moving, or changing application code, read and follow [docs/architecture/AGENTS.md](docs/architecture/AGENTS.md). Its architectural rules apply to all of `src/` by this explicit reference; its directory location alone does not give it that scope.
+- Before creating, renaming, moving, or editing project files, read and follow [docs/conventions/AGENTS.md](docs/conventions/AGENTS.md). Its naming, organization and code-style conventions apply throughout the repository by this explicit reference, subject to the exceptions documented there; its directory location alone does not give it that scope.
+- Read any additional `AGENTS.md` files along the path to files being changed. More specific instructions take precedence within their scope.
+- Keep this file focused on repository-wide workflow, architecture rules in `docs/architecture/AGENTS.md`, and naming, organization and code-style conventions in `docs/conventions/AGENTS.md`. Reference the owning document instead of duplicating its rules.
+- Preserve unrelated changes and existing behavior. The numbered modules are template placeholders; do not invent business features to populate them.
+
+## Documentation lookup
+
+- For library, framework, SDK, API, CLI, and cloud-service questions, fetch current documentation with Context7 rather than relying on memory. This is not required for general programming concepts, business-logic debugging, or code review without library-specific questions.
+- Use `pnpm dlx ctx7@latest library <official-name> "<specific-question>"` first, then `pnpm dlx ctx7@latest docs <returned-library-id> "<specific-question>"`. Resolve first unless the user supplies a library ID. Use at most three Context7 commands per question.
+- Run Context7 requests outside the default sandbox through the environment's approval mechanism. Do not send credentials or private data in documentation queries.
+- On a quota error, report it and suggest `pnpm dlx ctx7@latest login` or `CONTEXT7_API_KEY`; do not silently substitute remembered API details.
+- Use the Expo MCP for relevant Expo documentation and diagnostics when available. If it is unavailable, report the limitation and consult official documentation directly.
 
 ## Expo has changed — do not trust your training data
 
@@ -10,18 +29,22 @@ Expo ships breaking changes every SDK release. APIs you remember are likely rena
 
 ## Commands
 
-Use `pnpm` instead of `npx` if the project uses pnpm (`pnpm-lock.yaml` present).
+Run commands from the repository root. Use pnpm, matching `pnpm-lock.yaml`, and prefix shell commands with `rtk` as required by the working environment. Use `rtk proxy <command>` for commands without a dedicated wrapper.
 
 ```bash
-pnpm expo install <package>  # ALWAYS use instead of npm/yarn/pnpm/bun add — resolves SDK-compatible versions
-pnpm expo start              # start the dev server
-pnpm expo lint               # lint
-npx tsc --noEmit            # typecheck
-pnpm expo-doctor             # diagnose dependency and config issues
-pnpm expo install --fix      # fix incompatible package versions
+rtk pnpm install                 # install existing dependencies
+rtk pnpm start                   # start the Expo dev server
+rtk pnpm lint                    # lint using the existing Biome configuration
+rtk pnpm typecheck               # TypeScript, no emit
+rtk pnpm format:check            # check formatting
+rtk pnpm expo install <package>  # install SDK-compatible dependencies
+rtk pnpm expo install --fix      # fix incompatible versions when relevant
 ```
 
-Run lint and typecheck before declaring any task done.
+- Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
+- Run `rtk pnpm lint` and `rtk pnpm typecheck` before declaring a task done. Report failures or checks that could not run.
+- Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
+- There is currently no test script or configured test runner. Do not claim tests ran; add meaningful tests when implementing behavior and a suitable test setup exists or is part of the task.
 
 ## Navigation & Routing
 
@@ -39,3 +62,10 @@ Docs: https://docs.expo.dev/eas/index.md
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `pnpm expo run:ios|android` locally, or `eas build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Change verification
+
+- Keep changes limited to the requested task. Update the architecture or conventions instructions when intentionally changing the rules they own.
+- Check `git diff --check` and inspect the final diff. Ensure new placeholder directories contain a `.gitkeep` so Git can preserve them.
+- Summarize the changed paths, validation results, and material limitations. Create commits, builds, or deployments only when requested.
+- Instruction-file format and scope reference: [AGENTS.md](https://agents.md/).
