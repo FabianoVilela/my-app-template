@@ -78,6 +78,14 @@ The following rules concern source imports, including type imports. Runtime call
 - Translate external formats and errors at the adapter boundary when needed. Core contracts must not expose vendor-specific response or error types.
 - Share technical mechanisms in root infrastructure only when they are actually reused. Keep business-specific adapters with their module.
 
+## HTTP integrations
+
+- Use the shared `HttpClient` contract in `infrastructure/http/` for HTTP execution. Keep imports of the `axios` package inside its concrete adapter; public request, response and error types must be library-independent.
+- Group related endpoints in module infrastructure services. Receive the HTTP client explicitly when constructing a service, and define consumed capabilities in application contracts without HTTP imports. Do not add pass-through use cases or a second gateway object solely to wrap a service.
+- Select default clients and inject overrides in bootstrap when there are real services to assemble. Preserve instance lifetimes; do not create default clients through eager module-level exports or import bootstrap from services.
+- Keep endpoint-specific error decisions and payload validation in module infrastructure. Do not introduce global status-to-`null` conversions, automatic retries, refresh or UI reactions in the transport.
+- Follow the [HTTP client guide](http-client.md) for the implemented transport contract, composition examples, optional configuration and extension points. Keep example product code in documentation; preserve the numbered template modules.
+
 ## Bootstrap: composition and startup
 
 - Use `bootstrap/` as the application's composition root: select concrete adapters, supply them to application operations and compose the providers used by the UI. Use manual factories and explicit dependencies; a dependency-injection framework is not required.

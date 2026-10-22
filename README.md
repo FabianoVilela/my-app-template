@@ -41,6 +41,17 @@ This command will move the starter code to the **example** directory and create 
 - If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
+## Project architecture
+
+- [Application architecture](docs/architecture/AGENTS.md)
+- [Project conventions](docs/conventions/AGENTS.md)
+- [HTTP client, module services and dependency composition](docs/architecture/http-client.md)
+
+The JSON HTTP client is ready to use through an Axios adapter. API configuration
+is optional until a derived project connects a backend; see `.env.example` and
+the HTTP guide. The template does not create business services or contact an API
+at startup.
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:
