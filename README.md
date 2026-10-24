@@ -159,6 +159,20 @@ still require review. See the [project conventions](docs/conventions/AGENTS.md)
 and [Biome override guide](docs/conventions/biome.md) for coverage, exceptions and
 examples.
 
+## Local Git hooks
+
+`pnpm install` installs Husky hooks automatically through `prepare`. In an
+existing checkout, run `pnpm prepare` to reinstall them.
+
+- Before a commit, lint-staged checks staged files with Biome without rewriting them.
+- Commit messages must follow Conventional Commits, for example
+  `chore(tooling): configure local git hooks`.
+- Before a push, TypeScript, application tests and rename script tests must pass.
+
+See the [Git workflow guide](docs/git-workflow.md) for commands, partial staging
+and troubleshooting. These hooks are local; CI/CD and remote merge policies are
+not configured. Commitizen is not required.
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:

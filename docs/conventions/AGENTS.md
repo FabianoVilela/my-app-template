@@ -96,6 +96,14 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 - Jest routes colocated `.test.ts` files to Node and `.test.tsx` files to Expo's native environment. Use `.test.tsx` for hook tests that need React even when they contain no JSX. Shared test infrastructure and navigation integration tests live in root `tests/`, which Biome also checks. See the [testing guide](../testing.md).
 - Preserve the empty business modules; follow the architecture's [behavior verification rules](../architecture/AGENTS.md#verification-when-implementing-behavior) when adding tests.
 
+## Commit messages
+
+- Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): `<type>[optional scope]: <description>`. Write descriptions in English and describe the actual staged change.
+- Follow `commitlint.config.cjs`, which extends `@commitlint/config-conventional`. Scope is optional; use a short area name such as `http`, `router` or `tooling` when useful.
+- Examples: `fix(http): handle empty responses`, `test(router): cover initial navigation`, and `chore(tooling): configure local git hooks`.
+- Mark breaking changes with `!` after the type/scope or a `BREAKING CHANGE:` footer. Review the impact rather than inferring it solely from the message format.
+- Commitlint validates the message structure; review whether the description matches the diff. Keep hook commands and agent workflow instructions in the root `AGENTS.md`.
+
 ## Maintaining these instructions
 
 - Write project documentation in English, including instruction files, guides and examples.
