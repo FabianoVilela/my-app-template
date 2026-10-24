@@ -7,13 +7,13 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 1. Install dependencies
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. Start the app
 
    ```bash
-   npx expo start
+   pnpm start
    ```
 
 In the output, you'll find options to open the app in a
@@ -30,7 +30,7 @@ You can start developing by editing the files inside the **src/app** directory. 
 When you're ready, run:
 
 ```bash
-npm run reset-project
+pnpm reset-project
 ```
 
 This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
@@ -46,15 +46,15 @@ This command will move the starter code to the **example** directory and create 
 Use Node.js 22.13 or newer and run from the repository root:
 
 ```bash
-rtk pnpm rename-app "Minha Aplicação" --dry-run
-rtk pnpm rename-app "Minha Aplicação"
+pnpm rename-app "Minha Aplicação" --dry-run
+pnpm rename-app "Minha Aplicação"
 ```
 
 With npm, use `--` immediately after the script name to forward all arguments:
 
 ```bash
-rtk proxy npm run rename-app -- "My App" --dry-run
-rtk proxy npm run rename-app -- "My App" \
+npm run rename-app -- "My App" --dry-run
+npm run rename-app -- "My App" \
   --ios-bundle-id com.myapp \
   --android-package com.myapp \
   --dry-run
@@ -95,7 +95,7 @@ reserved words receive an `app` prefix in schemes and native identifier segments
 Use explicit options when needed:
 
 ```bash
-rtk pnpm rename-app "Minha Aplicação" \
+pnpm rename-app "Minha Aplicação" \
   --slug minha-aplicacao \
   --scheme minhaaplicacao \
   --ios-bundle-id br.com.example.minhaaplicacao \
@@ -116,7 +116,7 @@ and [Continuous Native Generation](https://docs.expo.dev/workflow/continuous-nat
 Expo Router handles the [React Native root registration](https://reactnative.dev/docs/appregistry);
 keep `main: "expo-router/entry"`. Native projects are generated from `app.json`.
 If `ios/` or `android/` already exists, preserve manual native changes, regenerate
-with `rtk pnpm expo prebuild --clean`, and rebuild. A new native build is required
+with `pnpm expo prebuild --clean`, and rebuild. A new native build is required
 for the updated native name, identifiers and scheme to take effect.
 
 Changing an application ID creates a separate store identity. For an existing
@@ -128,7 +128,7 @@ services separately if their names or registered identifiers need to change.
 Run the script's integration checks with the built-in Node.js test runner:
 
 ```bash
-rtk pnpm test:rename-app
+pnpm test:rename-app
 ```
 
 ## Project architecture
@@ -145,8 +145,8 @@ at startup.
 ## Quality checks
 
 ```bash
-rtk pnpm check
-rtk pnpm typecheck
+pnpm check
+pnpm typecheck
 ```
 
 Run both before merging changes. `check` verifies lint, formatting and import

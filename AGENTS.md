@@ -29,23 +29,23 @@ Expo ships breaking changes every SDK release. APIs you remember are likely rena
 
 ## Commands
 
-Run commands from the repository root. Use pnpm, matching `pnpm-lock.yaml`, and prefix shell commands with `rtk` as required by the working environment. Use `rtk proxy <command>` for commands without a dedicated wrapper.
+Run commands from the repository root and use pnpm, matching `pnpm-lock.yaml`. RTK is optional and is not a project dependency: use it to run shell commands when the `rtk` executable is available on `PATH`; otherwise run the commands directly. Use `rtk proxy <command>` for commands without a dedicated wrapper when RTK is available.
 
 ```bash
-rtk pnpm install                 # install existing dependencies
-rtk pnpm start                   # start the Expo dev server
-rtk pnpm lint                    # lint using the existing Biome configuration
-rtk pnpm check                   # lint, formatting and import organization
-rtk pnpm typecheck               # TypeScript, no emit
-rtk pnpm format:check            # check formatting
-rtk pnpm expo install <package>  # install SDK-compatible dependencies
-rtk pnpm expo install --fix      # fix incompatible versions when relevant
+pnpm install                 # install existing dependencies
+pnpm start                   # start the Expo dev server
+pnpm lint                    # lint using the existing Biome configuration
+pnpm check                   # lint, formatting and import organization
+pnpm typecheck               # TypeScript, no emit
+pnpm format:check            # check formatting
+pnpm expo install <package>  # install SDK-compatible dependencies
+pnpm expo install --fix      # fix incompatible versions when relevant
 ```
 
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
-- Run `rtk pnpm lint`, `rtk pnpm check` and `rtk pnpm typecheck` before declaring a task done. CI should run at least `rtk pnpm check` and `rtk pnpm typecheck`. Report failures or checks that could not run.
+- Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI should run at least `pnpm check` and `pnpm typecheck`. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
-- There is currently no test script or configured test runner. Do not claim tests ran; add meaningful tests when implementing behavior and a suitable test setup exists or is part of the task.
+- The rename-app script has integration checks through Node.js's built-in test runner (`pnpm test:rename-app`); the app itself has no general test runner configured. Add meaningful tests when implementing behavior, and do not add another test framework solely to populate this template.
 
 ## Navigation & Routing
 
