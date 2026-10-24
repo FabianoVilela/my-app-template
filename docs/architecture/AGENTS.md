@@ -75,7 +75,7 @@ The following rules concern source imports, including type imports. Runtime call
 ## Adapters and composition
 
 - Put module-specific endpoints, external payloads, persistence details and data conversions inside that module's infrastructure.
-- Translate external formats and errors at the adapter boundary when needed. Core contracts must not expose vendor-specific response or error types.
+- Preserve schema-required field names in infrastructure DTOs and request payloads. Translate external formats and errors at the adapter boundary when needed; application-owned models follow the [project naming conventions](../conventions/AGENTS.md#identifiers). Core contracts must not expose vendor-specific response or error types.
 - Share technical mechanisms in root infrastructure only when they are actually reused. Keep business-specific adapters with their module.
 
 ## HTTP integrations
@@ -117,7 +117,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 ## Verification when implementing behavior
 
-- Follow the root instructions for lint and typecheck. These commands do not currently enforce the import boundaries described here; inspect dependencies during review.
+- Follow the root verification instructions. Biome checks import cycles, including type-only cycles, and explicitly annotated private/package exports. Layer and module import boundaries, public API usage and semantic responsibilities still require review.
 - When a test setup is available, follow [test naming and placement](../conventions/AGENTS.md#tests). Exercise domain and application through injected fakes without mounting React or contacting live services.
 - Test adapter translations and important user journeys in proportion to the behavior changed. Keep end-to-end journeys separate when an end-to-end runner is introduced.
 - Do not add a test framework, a dependency or an architectural enforcement tool solely to populate this skeleton.
@@ -129,4 +129,3 @@ The following rules concern source imports, including type imports. Runtime call
 - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Ports and Adapters](https://alistair.cockburn.us/hexagonal-architecture)
 - [Bounded Context](https://martinfowler.com/bliki/BoundedContext.html)
-- [AGENTS.md format and directory scope](https://agents.md/)

@@ -1,0 +1,148 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.7/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["assert", "info", "warn", "error"]
+          }
+        },
+        "noArrayIndexKey": "info",
+        "noFocusedTests": "warn",
+        "noExplicitAny": "warn",
+        "noEmptyBlockStatements": "warn"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteStyle": "single",
+      "quoteProperties": "asNeeded"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["src/domain/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/infra/*", "@/infra/**"],
+                    "message": "Clean Architecture: the 'domain' layer cannot import from the 'infra' layer. Domain is the innermost layer and should not know about infrastructure details."
+                  },
+                  {
+                    "group": ["@/ui/*", "@/ui/**"],
+                    "message": "Clean Architecture: the 'domain' layer cannot import from the 'ui' layer. Domain is the innermost layer and should not know about presentation details."
+                  },
+                  {
+                    "group": ["@/app/*", "@/app/**"],
+                    "message": "Clean Architecture: the 'domain' layer cannot import from the 'app' layer. Domain is the innermost layer and should not know about the application layer."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/app/*", "@/app/**"],
+                    "message": "Clean Architecture: the 'shared' layer cannot import from the 'app' layer."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/infra/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/ui/*", "@/ui/**"],
+                    "message": "Clean Architecture: the 'infra' layer cannot import from the 'ui' layer. Infra should not depend on presentation details."
+                  },
+                  {
+                    "group": ["@/app/*", "@/app/**"],
+                    "message": "Clean Architecture: the 'infra' layer cannot import from the 'app' layer."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/ui/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/app/*", "@/app/**"],
+                    "message": "Clean Architecture: the 'ui' layer cannot import from the 'app' layer."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

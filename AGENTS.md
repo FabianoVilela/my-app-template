@@ -35,6 +35,7 @@ Run commands from the repository root. Use pnpm, matching `pnpm-lock.yaml`, and 
 rtk pnpm install                 # install existing dependencies
 rtk pnpm start                   # start the Expo dev server
 rtk pnpm lint                    # lint using the existing Biome configuration
+rtk pnpm check                   # lint, formatting and import organization
 rtk pnpm typecheck               # TypeScript, no emit
 rtk pnpm format:check            # check formatting
 rtk pnpm expo install <package>  # install SDK-compatible dependencies
@@ -42,7 +43,7 @@ rtk pnpm expo install --fix      # fix incompatible versions when relevant
 ```
 
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
-- Run `rtk pnpm lint` and `rtk pnpm typecheck` before declaring a task done. Report failures or checks that could not run.
+- Run `rtk pnpm lint`, `rtk pnpm check` and `rtk pnpm typecheck` before declaring a task done. CI should run at least `rtk pnpm check` and `rtk pnpm typecheck`. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
 - There is currently no test script or configured test runner. Do not claim tests ran; add meaningful tests when implementing behavior and a suitable test setup exists or is part of the task.
 

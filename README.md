@@ -37,7 +37,7 @@ This command will move the starter code to the **example** directory and create 
 
 ### Other setup steps
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
+- Biome is already configured for linting, formatting and import organization. See the quality checks below.
 - If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
@@ -51,6 +51,21 @@ The JSON HTTP client is ready to use through an Axios adapter. API configuration
 is optional until a derived project connects a backend; see `.env.example` and
 the HTTP guide. The template does not create business services or contact an API
 at startup.
+
+## Quality checks
+
+```bash
+rtk pnpm check
+rtk pnpm typecheck
+```
+
+Run both before merging changes. `check` verifies lint, formatting and import
+organization; `lint` is available for lint-only checks. Biome keeps defaults
+explicit and checks import cycles (including type-only cycles), filename casing
+and named exports with route exceptions. Layer and module import boundaries
+still require review. See the [project conventions](docs/conventions/AGENTS.md)
+and [Biome override guide](docs/conventions/biome.md) for coverage, exceptions and
+examples.
 
 ## Learn more
 

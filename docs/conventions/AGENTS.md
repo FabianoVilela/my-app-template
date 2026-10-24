@@ -41,7 +41,9 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 - Name component props `<ComponentName>Props`, such as `OrderCardProps`. Use descriptive types without redundant `I` or `T` prefixes, such as `OrderRepository` rather than `IOrderRepository`.
 - Use affirmative boolean names such as `isLoading`, `hasItems`, `canSubmit` and `shouldRetry`. Name callbacks `on<Action>` in props and local event handlers `handle<Action>`, such as `onCancel` and `handleCancel`.
 - Use `camelCase` for ordinary constants and `UPPER_SNAKE_CASE` for module-level fixed configuration constants, such as `MAX_RETRY_COUNT`. Do not uppercase every `const` binding.
-- Keep external payload field names at integration boundaries when required by their schema; map them to internal conventions in the owning adapter when a conversion is needed.
+- Use ASCII characters in source identifiers and file basenames. Review the English-language requirement separately; ASCII validation cannot determine a name's language.
+- Preserve field names required by external schemas in infrastructure DTOs and request payloads; map them to internal conventions in the owning adapter when a conversion is needed. Keep `camelCase` for application-owned properties, including internal objects in infrastructure. Follow the architecture's [adapter responsibilities](../architecture/AGENTS.md#adapters-and-composition).
+- Biome relaxes property casing in `infrastructure/` and `modules/*/infrastructure/` to accommodate external schemas. This exception covers object literal properties and properties of types/interfaces throughout those directories, so review whether each external-style name is actually required. Variables, type names and filenames retain their normal checks; ASCII validation remains enabled.
 
 ## Imports and exports
 
@@ -49,6 +51,7 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 - Use existing `@/` aliases for imports across source directories and `@/assets/` for root assets; use relative imports for nearby files in the same directory or local subtree. Do not add alternative aliases for the same paths.
 - Use `import type` for imports used only as types. Let Biome organize imports and formatting instead of maintaining a competing manual order.
 - Prefer direct imports from defining files within a module. Add explicit public entry points only for real consumers, following the architecture's [module boundary rules](../architecture/AGENTS.md#module-boundaries-and-shared-code). Avoid broad `export *` barrels that mix layers or create cycles.
+- Biome requires named exports throughout `src/`, except for default exports in `src/app/`. Tool configuration outside `src/` keeps framework-required exports. Add a narrow override if a source integration genuinely requires another default export.
 
 ## Expo Router filenames
 
@@ -72,6 +75,9 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 - Preserve TypeScript strict mode. Prefer inferred local types and explicit public contracts; use `unknown` and narrow it for untrusted values rather than introducing `any` or unchecked assertions.
 - Prefer function components with typed props. Keep one primary component per file; small private helpers may remain in that file. Extract reusable hooks and components when they have a clear responsibility.
+- Define components at module scope, rather than inside other components, and treat props as read-only. Use boolean conditions in JSX when a numeric value could otherwise leak into rendered output, such as `items.length > 0 && <ItemsList />`.
+- Use JSX boolean shorthand for literal `true`, such as `disabled` rather than `disabled={true}`. Keep `false` and dynamic expressions explicit. A local Biome GritQL plugin enforces this convention as an error; keep the inverse `noImplicitBoolean` rule disabled. See the [Biome guide](biome.md#jsx-boolean-shorthand) for its coverage.
+- React Compiler is enabled in the app configuration. Review Biome's compiler warnings; its experimental lint rule uses `compilationMode: "infer"` to analyze components and hooks. Keep experimental rule selection explicit rather than enabling every domain rule with `all`; see the [Biome guide](biome.md#react-and-react-native-checks) for the configured rules and severities.
 - Keep styles close to their component. Use descriptive `camelCase` style keys such as `container`, `headerTitle` and `submitButton`. Split into a nearby `<component>.styles.ts` only when it improves readability.
 - Reuse existing theme tokens and shared UI before adding repeated colors, spacing or typography. Follow the project's existing styling setup; do not introduce a styling library solely to apply these conventions.
 - Give interactive controls meaningful accessible names, roles and states; add a label when visible content does not provide one. A `testID` does not replace accessibility semantics. Follow [React Native accessibility](https://reactnative.dev/docs/accessibility).
@@ -91,6 +97,8 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 ## Maintaining these instructions
 
+- Write project documentation in English, including instruction files, guides and examples.
 - Keep rules actionable and examples aligned with the repository. Update this document when intentionally changing a convention; update architecture only when responsibilities or dependency rules change.
 - Use standard Markdown, relative links for repository documents and explicit scope references. Keep workflow commands in the root instructions and avoid copying them here. Follow the [AGENTS.md guidance](https://agents.md/).
-- Biome and TypeScript are the existing automated checks. Naming, file placement and architectural boundaries still require review; do not claim that current tooling enforces every convention in this document.
+- Preserve explicit defaults when editing [biome.json](../../biome.json). Update the configuration and this document together when a convention changes; keep technical explanations and examples in the [Biome guide](biome.md). Add a narrowly scoped exception when an integration genuinely requires one.
+- Biome and TypeScript are the existing automated checks. Biome checks source filenames in `kebab-case`, dynamic route parameter filenames in `camelCase`, basic identifier casing, type imports, named exports, explicit `any` and unused imports/variables. Review directory names, English terminology, semantic prefixes such as `is`/`has`, `on`/`handle`, file placement and public API intent separately. Layer and module import boundaries also require review. Follow these conventions even when Biome accepts additional naming forms.

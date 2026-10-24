@@ -1,29 +1,87 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "plugins": ["./scripts/biome/use-jsx-boolean-shorthand.grit"],
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["src/**", "*.json"]
+    "includes": [
+      "src/**",
+      "*.json",
+      "*.jsonc",
+      "*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}",
+      "scripts/**"
+    ],
+    "ignoreUnknown": false
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 80
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "recommended"
+      "preset": "recommended",
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "noNestedComponentDefinitions": "error",
+        "noReactPropAssignments": "error",
+        "noPrivateImports": {
+          "level": "warn",
+          "options": {
+            "defaultVisibility": "public"
+          }
+        }
+      },
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noLeakedRender": "error",
+        "noEmptyBlockStatements": "warn",
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["assert", "info", "warn", "error"]
+          }
+        },
+        "noImportCycles": {
+          "level": "error",
+          "options": {
+            "ignoreTypes": false
+          }
+        }
+      },
+      "style": {
+        "useImportType": "error",
+        "noNestedTernary": "error"
+      },
+      "nursery": {
+        "noReactNativeDeepImports": "error",
+        "noReactNativeRawText": "error",
+        "useReactNativePlatformComponents": "error",
+        "noReactNativeLiteralColors": "off",
+        "useReactCompiler": {
+          "level": "warn",
+          "options": {
+            "compilationMode": "infer"
+          }
+        }
+      }
     },
     "domains": {
-      "reactNative": "all"
+      "react": "recommended",
+      "reactNative": "recommended"
     }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded"
     }
   },
   "assist": {
@@ -33,5 +91,90 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "error",
+            "useFilenamingConvention": {
+              "level": "error",
+              "options": {
+                "filenameCases": ["kebab-case"],
+                "strictCase": true,
+                "requireAscii": true
+              }
+            },
+            "useNamingConvention": {
+              "level": "error",
+              "options": {
+                "strictCase": false,
+                "requireAscii": true
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/app/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/infrastructure/**", "src/modules/*/infrastructure/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useNamingConvention": {
+              "level": "error",
+              "options": {
+                "strictCase": false,
+                "requireAscii": true,
+                "conventions": [
+                  {
+                    "selector": {
+                      "kind": "objectLiteralProperty"
+                    },
+                    "match": ".*"
+                  },
+                  {
+                    "selector": {
+                      "kind": "typeProperty"
+                    },
+                    "match": ".*"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/app/**/\\[*.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": {
+              "level": "error",
+              "options": {
+                "filenameCases": ["camelCase"],
+                "match": "\\[(?:[.][.][.])?([a-zA-Z][a-zA-Z0-9]*)\\][.](.+)",
+                "strictCase": true,
+                "requireAscii": true
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
