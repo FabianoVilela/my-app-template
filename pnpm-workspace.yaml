@@ -5,3 +5,7 @@ minimumReleaseAgeExclude:
   - expo-modules-jsi@58.0.15
   - expo-router@58.0.23
   - expo@58.0.14
+allowBuilds:
+  # Optional native accelerators have platform packages/fallbacks; no scripts needed.
+  '@parcel/watcher': false
+  unrs-resolver: false

@@ -12,7 +12,8 @@
       "*.json",
       "*.jsonc",
       "*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}",
-      "scripts/**"
+      "scripts/**",
+      "tests/**"
     ],
     "ignoreUnknown": false
   },

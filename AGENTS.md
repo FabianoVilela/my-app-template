@@ -38,6 +38,11 @@ pnpm lint                    # lint using the existing Biome configuration
 pnpm check                   # lint, formatting and import organization
 pnpm typecheck               # TypeScript, no emit
 pnpm format:check            # check formatting
+pnpm test                    # unit, HTTP integration and native component tests
+pnpm test:watch              # watch application tests
+pnpm test:coverage           # application tests with coverage reports
+pnpm test:ci                 # application tests in CI with coverage
+pnpm test:rename-app         # rename script integration tests (Node.js runner)
 pnpm expo install <package>  # install SDK-compatible dependencies
 pnpm expo install --fix      # fix incompatible versions when relevant
 ```
@@ -45,7 +50,8 @@ pnpm expo install --fix      # fix incompatible versions when relevant
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
 - Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI should run at least `pnpm check` and `pnpm typecheck`. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
-- The rename-app script has integration checks through Node.js's built-in test runner (`pnpm test:rename-app`); the app itself has no general test runner configured. Add meaningful tests when implementing behavior, and do not add another test framework solely to populate this template.
+- Application tests use Jest 30 with separate Node and Expo projects. The rename-app script keeps its integration checks through Node.js's built-in test runner (`pnpm test:rename-app`). Follow the [testing guide](docs/testing.md) for environments, HTTP mocking and commands. Add meaningful tests when implementing behavior; preserve the empty business modules.
+- Before writing or changing React Native Testing Library tests, read the installed version's guide at `node_modules/@testing-library/react-native/docs/guides/llm-guidelines.md`. Use its asynchronous APIs and existing matchers; keep Biome as the project's linter.
 
 ## Navigation & Routing
 

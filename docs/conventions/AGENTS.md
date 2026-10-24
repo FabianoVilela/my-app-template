@@ -93,7 +93,8 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 - When a suitable runner is configured, name unit and component tests `<basename>.test.ts` or `<basename>.test.tsx` and colocate them with the code they verify, within the same architectural layer and outside `src/app/`.
 - Keep end-to-end journeys in a separate directory chosen for the installed runner. Name test cases after observable behavior; prefer accessible queries and use stable, descriptive `kebab-case` test IDs when IDs are needed.
-- The template currently has no test runner. These naming rules do not authorize adding one solely to populate directories; follow the root verification instructions and architecture's [behavior verification rules](../architecture/AGENTS.md#verification-when-implementing-behavior).
+- Jest routes colocated `.test.ts` files to Node and `.test.tsx` files to Expo's native environment. Use `.test.tsx` for hook tests that need React even when they contain no JSX. Shared test infrastructure and navigation integration tests live in root `tests/`, which Biome also checks. See the [testing guide](../testing.md).
+- Preserve the empty business modules; follow the architecture's [behavior verification rules](../architecture/AGENTS.md#verification-when-implementing-behavior) when adding tests.
 
 ## Maintaining these instructions
 

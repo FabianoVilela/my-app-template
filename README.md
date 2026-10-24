@@ -38,7 +38,7 @@ This command will move the starter code to the **example** directory and create 
 ### Other setup steps
 
 - Biome is already configured for linting, formatting and import organization. See the quality checks below.
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
+- Jest, Expo component/navigation testing and MSW HTTP mocking are configured. See the [testing guide](docs/testing.md).
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
 ## Rename the app
@@ -147,9 +147,11 @@ at startup.
 ```bash
 pnpm check
 pnpm typecheck
+pnpm test:ci
+pnpm test:rename-app
 ```
 
-Run both before merging changes. `check` verifies lint, formatting and import
+Run these before merging changes. `check` verifies lint, formatting and import
 organization; `lint` is available for lint-only checks. Biome keeps defaults
 explicit and checks import cycles (including type-only cycles), filename casing
 and named exports with route exceptions. Layer and module import boundaries
