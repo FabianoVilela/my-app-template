@@ -29,6 +29,7 @@ src/
 │   ├── module-2/                 # Same internal structure
 │   └── module-3/                 # Same internal structure
 ├── infrastructure/
+│   ├── date/
 │   ├── http/
 │   ├── storage/
 │   └── observability/
@@ -85,6 +86,12 @@ The following rules concern source imports, including type imports. Runtime call
 - Select default clients and inject overrides in bootstrap when there are real services to assemble. Preserve instance lifetimes; do not create default clients through eager module-level exports or import bootstrap from services.
 - Keep endpoint-specific error decisions and payload validation in module infrastructure. Do not introduce global status-to-`null` conversions, automatic retries, refresh or UI reactions in the transport.
 - Follow the [HTTP client guide](http-client.md) for the implemented transport contract, composition examples, optional configuration and extension points. Keep example product code in documentation; preserve the numbered template modules.
+
+## Date operations
+
+- Use the library-independent `DateAdapter` contract in `shared/lib/date-adapter.ts`. Keep `dayjs` and plugin imports inside the concrete adapter in `infrastructure/date/`; do not expose library instances, types, tokens or errors through the contract.
+- Inject date operations explicitly where needed. Domain and application may import the pure contract, but must not import the concrete adapter. Select implementations in bootstrap when there are real consumers; do not introduce an eager singleton or example business features.
+- Follow the [date adapter guide](date-adapter.md) for supported formats, strict parsing, calendar arithmetic, time-zone behavior, errors and composition.
 
 ## Bootstrap: composition and startup
 

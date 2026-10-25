@@ -36,7 +36,7 @@ pnpm test --runTestsByPath src/infrastructure/http/axios-http-client.test.ts
 
 | Project | Files | Environment and purpose |
 | --- | --- | --- |
-| `node` | `src/**/*.test.ts` | Node for pure domain/application behavior and HTTP adapters |
+| `node` | `src/**/*.test.ts` | Node for pure domain/application behavior and infrastructure adapters |
 | `native` | `src/**/*.test.tsx`, `tests/**/*.test.tsx` | `jest-expo` for components, React hooks and Router integration |
 
 Colocate tests with the code they exercise, in the same architectural layer.
@@ -86,6 +86,25 @@ is required. MSW 3 imports HTTP utilities from `msw/http`, delay from
 decoding, empty responses, HEAD, HTTP errors, malformed JSON, network failures,
 timeouts and cancellation without mocking Axios itself. New module services can
 reuse this setup while application operations continue to use injected fakes.
+
+## Date adapter
+
+`dayjs-date-adapter.test.ts` exercises the real adapter through the pure
+`DateAdapter` contract. It checks strict parsing, project formats, leap years,
+calendar arithmetic, precision, invalid inputs, UTC serialization and immutability
+in local and UTC modes. No Day.js mocks or native setup are needed. See the
+[date adapter guide](architecture/date-adapter.md) for its behavioral contract.
+
+Use separate processes to verify local behavior across time zones, including
+daylight saving transitions:
+
+```bash
+TZ=UTC pnpm test --runTestsByPath src/infrastructure/date/dayjs-date-adapter.test.ts
+TZ=America/New_York pnpm test --runTestsByPath src/infrastructure/date/dayjs-date-adapter.test.ts
+```
+
+Consumer tests should inject `DateAdapter` fakes instead of importing Day.js.
+Keep any clock dependency separate and explicit; the adapter does not read now.
 
 ## Components and navigation
 
