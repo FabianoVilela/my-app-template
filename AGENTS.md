@@ -5,8 +5,8 @@
 This repository is an Expo/React Native reference template using TypeScript, Expo Router, and pnpm. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
 - These instructions apply to the whole repository.
-- Before creating, moving, or changing application code, read and follow [docs/architecture/AGENTS.md](docs/architecture/AGENTS.md). Its architectural rules apply to all of `src/` by this explicit reference; its directory location alone does not give it that scope.
-- Before creating, renaming, moving, or editing project files, read and follow [docs/conventions/AGENTS.md](docs/conventions/AGENTS.md). Its naming, organization and code-style conventions apply throughout the repository by this explicit reference, subject to the exceptions documented there; its directory location alone does not give it that scope.
+- For application changes under `src/`, read and follow [Application architecture](docs/architecture/AGENTS.md) for responsibilities and dependency boundaries. This reference explicitly applies those rules throughout `src/`.
+- When creating, renaming, moving or editing project files, follow [Project conventions](docs/conventions/AGENTS.md) for naming, organization and style. This reference explicitly applies those conventions throughout the repository, subject to their documented exceptions.
 - Read any additional `AGENTS.md` files along the path to files being changed. More specific instructions take precedence within their scope.
 - Keep this file focused on repository-wide workflow, architecture rules in `docs/architecture/AGENTS.md`, and naming, organization and code-style conventions in `docs/conventions/AGENTS.md`. Reference the owning document instead of duplicating its rules.
 - Preserve unrelated changes and existing behavior. The numbered modules are template placeholders; do not invent business features to populate them.
@@ -15,17 +15,11 @@ This repository is an Expo/React Native reference template using TypeScript, Exp
 
 - For library, framework, SDK, API, CLI, and cloud-service questions, fetch current documentation with Context7 rather than relying on memory. This is not required for general programming concepts, business-logic debugging, or code review without library-specific questions.
 - Use `pnpm dlx ctx7@latest library <official-name> "<specific-question>"` first, then `pnpm dlx ctx7@latest docs <returned-library-id> "<specific-question>"`. Resolve first unless the user supplies a library ID. Use at most three Context7 commands per question.
-- Run Context7 requests outside the default sandbox through the environment's approval mechanism. Do not send credentials or private data in documentation queries.
+- Run documentation lookups with the access available in the current environment. Request additional access only when the host requires and supports it. Do not send credentials or private data in queries.
 - On a quota error, report it and suggest `pnpm dlx ctx7@latest login` or `CONTEXT7_API_KEY`; do not silently substitute remembered API details.
 - Use the Expo MCP for relevant Expo documentation and diagnostics when available. If it is unavailable, report the limitation and consult official documentation directly.
 
-## Expo has changed — do not trust your training data
-
-Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
-
-1. Read the major version of the `expo` package in `package.json`.
-2. Fetch the matching versioned docs: `https://docs.expo.dev/versions/v<major>.0.0/`
-3. For anything else, fetch https://docs.expo.dev/llms.txt — an index of all Expo docs with corrections to common LLM misconceptions. Follow its links to the specific page you need; never answer from memory.
+- Before changing Expo or React Native APIs, read the `expo` major version in `package.json` and consult the matching SDK documentation at `https://docs.expo.dev/versions/v<major>.0.0/`. For topics outside that SDK reference, use [Expo's documentation index](https://docs.expo.dev/llms.txt) to find the relevant official page. Reuse documentation already fetched for the same version and task.
 
 ## Commands
 
@@ -53,38 +47,25 @@ pnpm expo install --fix      # fix incompatible versions when relevant
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
 - Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI should run at least `pnpm check` and `pnpm typecheck`. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
-- Application tests use Jest 30 with separate Node and Expo projects. The rename-app script keeps its integration checks through Node.js's built-in test runner (`pnpm test:rename-app`). Follow the [testing guide](docs/testing.md) for environments, HTTP mocking and commands. Add meaningful tests when implementing behavior; preserve the empty business modules.
-- Before writing or changing React Native Testing Library tests, read the installed version's guide at `node_modules/@testing-library/react-native/docs/guides/llm-guidelines.md`. Use its asynchronous APIs and existing matchers; keep Biome as the project's linter.
+- Before adding or changing tests, follow the [testing guide](docs/testing.md) for environments, installed-version guidance, HTTP mocking and commands. Add meaningful tests when implementing behavior.
 
 ## Local Git workflow
 
-- Husky installs local Git hooks through `pnpm install` (`prepare`). Run `pnpm prepare` to reinstall them in an existing checkout.
 - `pre-commit` checks staged files with Biome through lint-staged, without changing files. Fix failures explicitly and stage the intended changes again.
 - `commit-msg` validates Conventional Commits using `commitlint.config.cjs`. Read the resolved rules with `pnpm commitlint --print-config json` before writing a message when needed. Follow the [commit conventions](docs/conventions/AGENTS.md#commit-messages).
 - `pre-push` runs `pnpm check:push`, including TypeScript, application tests and the rename script tests. A failing command stops the push.
 - Fix rejected checks and retry. Do not bypass hooks with `--no-verify`, `HUSKY=0` or equivalent settings unless explicitly instructed by the user.
 - See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. CI/CD and remote merge policies are not configured by this workflow.
 
-## Navigation & Routing
-
-- Use **Expo Router** for all navigation. Routes live in `src/app/` — every file there is a screen, `_layout.tsx` files define navigators. Keep non-route code (components, hooks, utils) outside `src/app/`.
-- Import `Link`, `router`, and `useLocalSearchParams` from `expo-router`.
-- Docs: https://docs.expo.dev/router/introduction.md
-
-## Building with EAS
-
-Use EAS to build, sign, and submit the app in the cloud (`eas build`, `eas submit`) and to ship over-the-air updates (`eas update`) — no local Xcode or Android Studio required. Run EAS CLI as `pnpm eas-cli <command>` in pnpm projects, or `npx eas-cli@latest <command>` otherwise; substitute that for bare `eas` in docs examples.
-Docs: https://docs.expo.dev/eas/index.md
-
 ## Rules
 
-- If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `pnpm expo run:ios|android` locally, or `eas build --profile development`.
+- This template uses generated, Git-ignored `ios/` and `android/` directories (Continuous Native Generation). Configure native behavior in `app.json` and config plugins; do not create or edit generated native files by hand, even when local builds have created those directories.
+- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build. Use `pnpm ios` or `pnpm android` when a local build is requested.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
 
 ## Change verification
 
 - Keep changes limited to the requested task. Update the architecture or conventions instructions when intentionally changing the rules they own.
-- Check `git diff --check` and inspect the final diff. Ensure new placeholder directories contain a `.gitkeep` so Git can preserve them.
+- Check `git diff --check` and inspect the final diff.
 - Summarize the changed paths, validation results, and material limitations. Create commits, builds, or deployments only when requested.
 - Instruction-file format and scope reference: [AGENTS.md](https://agents.md/).

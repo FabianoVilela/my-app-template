@@ -6,5 +6,5 @@ pattern literal_true() {
 }
 
 JsxAttribute(initializer=JsxAttributeInitializerClause(value=JsxExpressionAttributeValue(expression=literal_true()))) as $attribute where {
-  register_diagnostic(span=$attribute, message="Use JSX boolean shorthand: omit ={true} from this prop.", severity="warn")
+  register_diagnostic(span=$attribute, message="Use JSX boolean shorthand: omit ={true} from this prop.", severity="error")
 }

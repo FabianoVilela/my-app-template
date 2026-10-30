@@ -254,10 +254,13 @@ replays. Error normalization already has one owner in the adapter.
 
 ## Verification and adapter replacement
 
-There is no configured test runner in the template. Do not add one just to fill
-the architecture. When introducing a runner for real behavior, verify JSON bodies
-and query serialization, success/no-content responses, malformed JSON, HTTP error
-bodies, cancellation, timeout, network failures and dependency substitution.
+The template already uses Jest with a Node project for HTTP integration tests.
+Follow the [testing guide](../testing.md#http-integration) and run
+`pnpm test --runTestsByPath src/infrastructure/http/axios-http-client.test.ts`
+when changing the transport. Extend the existing tests for new behavior rather
+than adding another runner. Verify JSON bodies and query serialization,
+success/no-content responses, malformed JSON, HTTP error bodies, cancellation,
+timeout, network failures and dependency substitution.
 Verify supported platforms as well; transport errors and redirects can differ.
 
 Replacing Axios requires another `HttpClient` implementation and changing the

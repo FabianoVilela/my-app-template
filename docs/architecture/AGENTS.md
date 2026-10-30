@@ -2,7 +2,7 @@
 
 ## Scope and intent
 
-The root [AGENTS.md](../../AGENTS.md) explicitly requires these instructions for application code throughout `src/`. Its location under `docs/architecture/` does not automatically give it scope over `src/`.
+The root [AGENTS.md](../../AGENTS.md) explicitly applies these instructions to application code throughout `src/`.
 
 For file and directory names, identifier style, imports and exports, route notation, platform suffixes and test filenames, follow [Project conventions](../conventions/AGENTS.md). This document owns layer responsibilities, dependency direction and module boundaries.
 
@@ -42,10 +42,6 @@ src/
 - For new product modules, create only the directories needed by their current responsibilities. The complete template tree is an illustration, not a requirement to populate every layer.
 - These business modules under `src/modules/` are not Expo native modules. Do not change Expo native-module discovery or native-project configuration to accommodate them.
 
-## Module boundaries
-
-- Use business capabilities as module boundaries. Screens and individual actions usually belong inside an existing module. A module is not automatically a DDD Bounded Context.
-
 ## Responsibilities and allowed dependencies
 
 The following rules concern source imports, including type imports. Runtime calls to an injected adapter do not authorize importing its concrete implementation into the application core.
@@ -76,7 +72,7 @@ The following rules concern source imports, including type imports. Runtime call
 ## Adapters and composition
 
 - Put module-specific endpoints, external payloads, persistence details and data conversions inside that module's infrastructure.
-- Preserve schema-required field names in infrastructure DTOs and request payloads. Translate external formats and errors at the adapter boundary when needed; application-owned models follow the [project naming conventions](../conventions/AGENTS.md#identifiers). Core contracts must not expose vendor-specific response or error types.
+- Translate external formats and errors at the adapter boundary when needed; follow the [project naming conventions](../conventions/AGENTS.md#identifiers) for external DTO fields and application-owned models. Core contracts must not expose vendor-specific response or error types.
 - Share technical mechanisms in root infrastructure only when they are actually reused. Keep business-specific adapters with their module.
 
 ## HTTP integrations
@@ -100,12 +96,13 @@ The following rules concern source imports, including type imports. Runtime call
 - Create composition and startup files only when needed; follow the filename examples in [Project conventions](../conventions/AGENTS.md#files-and-directories). Use React components or hooks when preparation requires React lifecycle behavior.
 - Keep module-specific providers and consumer hooks in their module's presentation layer. Bootstrap mounts those providers; screens use the module's hooks. Keep SDK initialization implementations in the relevant infrastructure adapter and coordinate their activation from bootstrap when needed.
 - `bootstrap/` may import concrete module adapters and presentation providers for assembly. Modules, shared code and infrastructure must not import bootstrap. Supply assembled operations through props or focused providers rather than a global service locator.
-- Let `app/_layout.tsx` mount the composed providers and navigation, delegating substantial assembly and startup coordination to bootstrap. Do not place non-route helper files inside `app/`.
+- Let `src/app/_layout.tsx` mount the composed providers and navigation, delegating substantial assembly and startup coordination to bootstrap.
 - Give resources an explicit lifetime: app-wide, session-specific or feature-specific as needed. Preserve instances across ordinary renders, and reset or release resources when their owning lifecycle ends.
 - Wait only for preparation required by the initial UI. Avoid eagerly initializing every module, SDK or native capability, or blocking startup on unrelated remote data. Define failure and retry behavior for required asynchronous preparation.
 
 ## Module boundaries and shared code
 
+- Use business capabilities as module boundaries. Screens and individual actions usually belong inside an existing module. A module is not automatically a DDD Bounded Context.
 - Keep a module's implementation private. Introduce explicit public entry points when it has real consumers; do not create empty `index.ts` files now.
 - Other modules must not reach into private screens, hooks, adapters or repository implementations.
 - Public APIs must preserve layer rules. A core consumer must not import a barrel that re-exports React UI or concrete infrastructure; expose a focused pure contract entry point if necessary.
@@ -116,7 +113,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 ## Presentation, routing and mobile behavior
 
-- Keep non-route files outside `src/app/`. Routes adapt navigation input to module screens; do not implement business rules in routes or layouts.
+- Use Expo Router for navigation. Keep non-route files outside `src/app/`; routes adapt navigation input to module screens, and `_layout.tsx` files configure navigators. Do not implement business rules in routes or layouts.
 - Keep UI state close to its consumers. Treat remote-data caching separately from business rules and workflow orchestration.
 - Hooks may connect application operations to React and manage request/UI lifecycle. Move business decisions out of hooks into domain or application.
 - Use platform-specific UI or adapter files where the platform requires different behavior. Do not spread device checks into the core.
@@ -125,7 +122,7 @@ The following rules concern source imports, including type imports. Runtime call
 ## Verification when implementing behavior
 
 - Follow the root verification instructions. Biome checks import cycles, including type-only cycles, and explicitly annotated private/package exports. Layer and module import boundaries, public API usage and semantic responsibilities still require review.
-- When a test setup is available, follow [test naming and placement](../conventions/AGENTS.md#tests). Exercise domain and application through injected fakes without mounting React or contacting live services.
+- Follow [test naming and placement](../conventions/AGENTS.md#tests). Exercise domain and application through injected fakes without mounting React or contacting live services.
 - Test adapter translations and important user journeys in proportion to the behavior changed. Keep end-to-end journeys separate when an end-to-end runner is introduced.
 - Do not add a test framework, a dependency or an architectural enforcement tool solely to populate this skeleton.
 

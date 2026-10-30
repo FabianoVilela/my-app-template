@@ -25,17 +25,7 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-pnpm reset-project
-```
-
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
-
-### Other setup steps
+## Other setup steps
 
 - Biome is already configured for linting, formatting and import organization. See the quality checks below.
 - Jest, Expo component/navigation testing and MSW HTTP mocking are configured. See the [testing guide](docs/testing.md).
@@ -120,7 +110,7 @@ with `pnpm expo prebuild --clean`, and rebuild. A new native build is required
 for the updated native name, identifiers and scheme to take effect.
 
 Changing an application ID creates a separate store identity. For an existing
-published app, pass its current IDs explicitly to preserve them. Linked EAS
+published app, pass its current IDs explicitly to preserve them. Remote build
 projects, store records, signing credentials, Firebase/OAuth registrations and
 remote service configuration are not renamed by this local script. Update those
 services separately if their names or registered identifiers need to change.

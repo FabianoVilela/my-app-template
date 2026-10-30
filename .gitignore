@@ -43,3 +43,8 @@ example
 /ios
 /android
 .env
+
+/.claude
+/.harness-eval
+.cursor
+.windsurf

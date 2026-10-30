@@ -129,7 +129,7 @@ the deprecated `react-test-renderer`; no additional matcher library is needed.
 Maestro is the recommended next step once the app has meaningful user journeys.
 Its CLI and emulator/simulator setup are separate from pnpm dependencies. Keep
 future journeys in `.maestro/` and test an installed app build, with deterministic
-backend data. No Maestro flows, EAS builds or device tests are configured yet.
+backend data. No Maestro flows or device tests are configured yet.
 
 ## References
 
@@ -137,4 +137,3 @@ backend data. No Maestro flows, EAS builds or device tests are configured yet.
 - [Expo Router testing](https://docs.expo.dev/router/reference/testing/)
 - [Testing Library quick start](https://oss.callstack.com/react-native-testing-library/docs/start/quick-start)
 - [MSW Node integration](https://mswjs.io/guides/integrations/node)
-- [E2E tests with Maestro and EAS Workflows](https://docs.expo.dev/eas/workflows/examples/e2e-tests/)

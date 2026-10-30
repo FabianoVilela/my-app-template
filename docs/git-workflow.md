@@ -16,11 +16,8 @@ hook files in POSIX shell syntax. No global installation of these tools is neede
 
 ## Checks
 
-| Hook | Command | Behavior |
-| --- | --- | --- |
-| `pre-commit` | `pnpm check:staged` | Biome checks staged files selected by lint-staged, using the existing Biome includes and ignores. |
-| `commit-msg` | `pnpm commitlint --edit "$1"` | Validates the commit message against `@commitlint/config-conventional`. |
-| `pre-push` | `pnpm check:push` | Runs `pnpm typecheck`, `pnpm test` and `pnpm test:rename-app` in sequence; stops at the first failure. |
+Hook commands and required behavior are defined in the root
+[Local Git workflow](../AGENTS.md#local-git-workflow).
 
 Checks do not apply automatic fixes. Use `pnpm check:fix` explicitly when needed,
 review its changes and stage only the intended content. Files outside Biome's
@@ -41,14 +38,6 @@ provide remote enforcement.
 ## Commit messages
 
 Follow the [project commit conventions](conventions/AGENTS.md#commit-messages).
-Scope is optional. Examples:
-
-```text
-fix(http): handle empty responses
-test(router): cover initial navigation
-docs: clarify project setup
-chore(tooling): configure local git hooks
-```
 
 Inspect the effective rules or validate a candidate before committing:
 

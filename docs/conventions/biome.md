@@ -125,21 +125,7 @@ on those files.
 
 ### Named exports
 
-`noDefaultExport: "error"` favors explicit, consistent exported names:
-
-```tsx
-export function UserCard() {
-  return null;
-}
-```
-
-The default-export form is reported outside `src/app/`:
-
-```tsx
-export default function UserCard() {
-  return null;
-}
-```
+`noDefaultExport: "error"` enforces named exports outside `src/app/`.
 
 The rule also reports `export { UserCard as default }`. It checks the current
 file's ESM exports; consuming a dependency's default export remains valid,
@@ -150,13 +136,6 @@ rule's coverage. Biome provides no automatic fix for this rule.
 
 `useFilenamingConvention` selects `kebab-case`, with `strictCase: true` and
 `requireAscii: true`.
-
-| Filename | Result |
-| --- | --- |
-| `user-profile.ts`, `user-card.tsx` | Accepted |
-| `http-client.native.ts`, `user-card.test.tsx` | Accepted |
-| `UserProfile.ts`, `userProfile.ts`, `user_profile.ts` | Reported |
-| `user-é.ts` | Reported: non-ASCII character |
 
 The rule recognizes special filename notation such as `_layout.tsx` and
 `+not-found.tsx`. Lowercase extension segments allow platform and test suffixes.
@@ -172,13 +151,6 @@ consumers; route renames also require considering URLs and deep links.
 
 `useNamingConvention` uses Biome's built-in conventions, with
 `strictCase: false` and `requireAscii: true`.
-
-| Declaration | Relevant forms accepted by the rule |
-| --- | --- |
-| Classes, interfaces and type aliases | `PascalCase` |
-| Functions, variables and parameters | `camelCase` or `PascalCase` |
-| Module-level `const`/`var` bindings | Also permit `UPPER_SNAKE_CASE` |
-| Ordinary object/type properties | Normally `camelCase`; some readonly members permit constant casing |
 
 The rule accepts names such as `UserProfile`, `loadUser`, `userId` and
 `DEFAULT_TIMEOUT_MS` in their corresponding declarations. It reports ordinary
@@ -202,13 +174,7 @@ names and semantic conventions independently of lint results.
 ## Route exports
 
 The `src/app/**` override turns only `noDefaultExport` off. This allows the
-default component exports required by the project's route/layout convention:
-
-```tsx
-export default function OrdersScreen() {
-  return null;
-}
-```
+default component exports required by the project's route/layout convention.
 
 The other source naming rules remain active. Disabling this rule permits default
 exports; it does not verify that every route has the required default export.

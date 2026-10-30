@@ -2,9 +2,7 @@
 
 ## Scope and ownership
 
-The root [AGENTS.md](../../AGENTS.md) explicitly requires these conventions when creating, renaming, moving or editing project files throughout the repository. Their location under `docs/conventions/` does not automatically give them that scope. More specific `AGENTS.md` instructions take precedence within their directory scope; explicit user instructions take precedence over these documents.
-
-This document owns naming, file organization and code style. Follow [Application architecture](../architecture/AGENTS.md) for layer responsibilities, allowed dependencies and module boundaries, and the root instructions for commands, documentation lookup and verification.
+The root [AGENTS.md](../../AGENTS.md) applies these naming, organization and style conventions throughout the repository. Follow [Application architecture](../architecture/AGENTS.md) for dependency boundaries and the root instructions for workflow. More specific instructions take precedence within their scope; explicit user instructions take precedence over these documents.
 
 Rules such as `kebab-case`, named exports and handler names are project choices, not universal React Native or Expo requirements. Framework-required filenames and exports take precedence. Apply these conventions to new and changed code; avoid unrelated mass renames or formatting changes.
 
@@ -12,7 +10,6 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 
 - Use English for new code identifiers, filenames and directory names. Keep business terminology consistent; user-visible text follows the product's language requirements.
 - Use lowercase `kebab-case` for ordinary source directories and file basenames. Use `.tsx` for files containing JSX and `.ts` for other TypeScript files.
-- Prefer descriptive names over generic `data.ts`, `helpers.ts` or `manager.ts`. Add a suffix only when it communicates an actual responsibility.
 
 | Purpose | Filename or directory | Exported identifier example |
 | --- | --- | --- |
@@ -28,7 +25,7 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 | Provider composition | `app-providers.tsx` | `AppProviders` |
 | Coordinated startup | `startup.ts` | `startup` |
 
-- These examples describe names, not files or abstractions to create. Preserve the numbered template modules until real product requirements replace them.
+- These examples describe names, not files or abstractions to create.
 - Keep related implementation files together within their architectural layer. Start with a file; introduce a component subdirectory only when related files make it useful. Do not create a folder and `index.tsx` wrapper for every component.
 - Preserve empty template directories with `.gitkeep`. Remove the placeholder when adding real files directly to its directory. Create new directories only for current responsibilities.
 - Preserve tool-required names such as `AGENTS.md`, `README.md`, `package.json`, `pnpm-lock.yaml`, `tsconfig.json` and Expo configuration files. Do not rename generated files or vendor asset bundles to enforce `kebab-case`.
@@ -47,15 +44,13 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 
 ## Imports and exports
 
-- Prefer named exports for application code. Use a default component export for Expo Router screens and layouts, and preserve default exports required by tool configuration or external APIs.
+- Use named exports in `src/`, with default component exports for Expo Router screens and layouts in `src/app/`. Preserve defaults required by tool configuration or external APIs; add a narrow Biome override if a source integration requires another exception.
 - Use existing `@/` aliases for imports across source directories and `@/assets/` for root assets; use relative imports for nearby files in the same directory or local subtree. Do not add alternative aliases for the same paths.
-- Use `import type` for imports used only as types. Let Biome organize imports and formatting instead of maintaining a competing manual order.
-- Prefer direct imports from defining files within a module. Add explicit public entry points only for real consumers, following the architecture's [module boundary rules](../architecture/AGENTS.md#module-boundaries-and-shared-code). Avoid broad `export *` barrels that mix layers or create cycles.
-- Biome requires named exports throughout `src/`, except for default exports in `src/app/`. Tool configuration outside `src/` keeps framework-required exports. Add a narrow override if a source integration genuinely requires another default export.
+- Follow the architecture's [module boundary rules](../architecture/AGENTS.md#module-boundaries-and-shared-code) for direct imports, public entry points and barrels.
 
 ## Expo Router filenames
 
-- Keep route files in `src/app/`; keep components, hooks, styles, constants, tests and other non-route helpers outside it, in the locations defined by the architecture.
+- Follow the architecture's [routing boundaries](../architecture/AGENTS.md#presentation-routing-and-mobile-behavior) for route and helper placement.
 - Use `kebab-case` for static route segments, such as `order-history.tsx`. Route filenames define public URLs and deep links; treat renames as navigation changes and update affected links and consumers.
 - Preserve special notation: `index.tsx` for a directory's default route, `_layout.tsx` for its layout, `[orderId].tsx` for a dynamic parameter, `[...slug].tsx` for a catch-all and `(tabs)/` for a route group. Use `camelCase` for dynamic parameter identifiers and preserve their spelling in consumers.
 - Preserve the `+` notation for special Router files, such as `+not-found.tsx`; consult the installed Router version's documentation before introducing other special files. Do not create these files as placeholders.
@@ -94,13 +89,11 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 - When a suitable runner is configured, name unit and component tests `<basename>.test.ts` or `<basename>.test.tsx` and colocate them with the code they verify, within the same architectural layer and outside `src/app/`.
 - Keep end-to-end journeys in a separate directory chosen for the installed runner. Name test cases after observable behavior; prefer accessible queries and use stable, descriptive `kebab-case` test IDs when IDs are needed.
 - Jest routes colocated `.test.ts` files to Node and `.test.tsx` files to Expo's native environment. Use `.test.tsx` for hook tests that need React even when they contain no JSX. Shared test infrastructure and navigation integration tests live in root `tests/`, which Biome also checks. See the [testing guide](../testing.md).
-- Preserve the empty business modules; follow the architecture's [behavior verification rules](../architecture/AGENTS.md#verification-when-implementing-behavior) when adding tests.
 
 ## Commit messages
 
 - Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): `<type>[optional scope]: <description>`. Write descriptions in English and describe the actual staged change.
 - Follow `commitlint.config.cjs`, which extends `@commitlint/config-conventional`. Scope is optional; use a short area name such as `http`, `router` or `tooling` when useful.
-- Examples: `fix(http): handle empty responses`, `test(router): cover initial navigation`, and `chore(tooling): configure local git hooks`.
 - Mark breaking changes with `!` after the type/scope or a `BREAKING CHANGE:` footer. Review the impact rather than inferring it solely from the message format.
 - Commitlint validates the message structure; review whether the description matches the diff. Keep hook commands and agent workflow instructions in the root `AGENTS.md`.
 
