@@ -32,7 +32,7 @@ pnpm lint                    # lint using the existing Biome configuration
 pnpm check                   # lint, formatting and import organization
 pnpm check:staged            # check staged files through lint-staged
 pnpm check:push              # types, application tests and rename script tests
-pnpm commitlint              # validate a commit message from stdin
+pnpm commitlint:check        # validate a commit message from stdin
 pnpm typecheck               # TypeScript, no emit
 pnpm format:check            # check formatting
 pnpm test                    # unit, HTTP integration and native component tests
@@ -52,7 +52,7 @@ pnpm expo install --fix      # fix incompatible versions when relevant
 ## Local Git workflow
 
 - `pre-commit` checks staged files with Biome through lint-staged, without changing files. Fix failures explicitly and stage the intended changes again.
-- `commit-msg` validates Conventional Commits using `commitlint.config.cjs`. Read the resolved rules with `pnpm commitlint --print-config json` before writing a message when needed. Follow the [commit conventions](docs/conventions/AGENTS.md#commit-messages).
+- `commit-msg` validates Conventional Commits using `commitlint.config.cjs`. Read the resolved rules with `pnpm commitlint:check --print-config json` before writing a message when needed. Follow the [commit conventions](docs/conventions/AGENTS.md#commit-messages).
 - `pre-push` runs `pnpm check:push`, including TypeScript, application tests and the rename script tests. A failing command stops the push.
 - Fix rejected checks and retry. Do not bypass hooks with `--no-verify`, `HUSKY=0` or equivalent settings unless explicitly instructed by the user.
 - See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. CI/CD and remote merge policies are not configured by this workflow.

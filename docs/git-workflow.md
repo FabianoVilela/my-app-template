@@ -42,8 +42,8 @@ Follow the [project commit conventions](conventions/AGENTS.md#commit-messages).
 Inspect the effective rules or validate a candidate before committing:
 
 ```bash
-pnpm commitlint --print-config json
-printf '%s\n' 'chore(tooling): configure local git hooks' | pnpm commitlint
+pnpm commitlint:check --print-config json
+printf '%s\n' 'chore(tooling): configure local git hooks' | pnpm commitlint:check
 ```
 
 Humans and agents use the same validator. No interactive commit assistant is
