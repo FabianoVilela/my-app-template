@@ -44,7 +44,4 @@ example
 /android
 .env
 
-/.claude
 /.harness-eval
-.cursor
-.windsurf
