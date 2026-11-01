@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.4/schema.json",
   "plugins": ["./scripts/biome/use-jsx-boolean-shorthand.grit"],
   "vcs": {
     "enabled": true,
@@ -37,7 +37,9 @@
           "options": {
             "defaultVisibility": "public"
           }
-        }
+        },
+        "noReactNativeRawText": "error",
+        "useReactNativePlatformComponents": "error"
       },
       "suspicious": {
         "noExplicitAny": "error",
@@ -54,17 +56,15 @@
           "options": {
             "ignoreTypes": false
           }
-        }
+        },
+        "noReactNativeDeepImports": "error"
       },
       "style": {
         "useImportType": "error",
-        "noNestedTernary": "error"
+        "noNestedTernary": "error",
+        "noReactNativeLiteralColors": "off"
       },
       "nursery": {
-        "noReactNativeDeepImports": "error",
-        "noReactNativeRawText": "error",
-        "useReactNativePlatformComponents": "error",
-        "noReactNativeLiteralColors": "off",
         "useReactCompiler": {
           "level": "warn",
           "options": {
