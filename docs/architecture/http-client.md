@@ -5,6 +5,11 @@ and an Axios adapter. It does not create a client on import, contact a backend a
 startup, or include example business features. The products code below is a guide
 for a derived project, not a module to add to the template.
 
+For temporal payloads, follow the [date/time policy](date-adapter.md#utc-and-device-display).
+Module schemas and mappings distinguish UTC instants, calendar-only dates and
+zoned schedules. Display conversion belongs to presentation; the shared transport
+does not infer time zones or automatically convert date fields.
+
 ## Files and responsibilities
 
 | File | Responsibility |

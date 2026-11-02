@@ -35,15 +35,14 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 
 - Use `PascalCase` for React components, classes, types and interfaces; use `camelCase` for functions, variables, object properties and parameters.
 - Name custom hooks `use` followed by a capital letter, such as `useOrders`. Reserve this prefix for functions that use React hooks; name pure helpers after their operation.
-- Prefix application-owned shared facade hooks with `useApp` (for example, `useAppTranslation`, `useAppLocale`, `useAppFormatting`, and `useAppTheme`). Prefix their public components, providers and associated types with `App` (for example, `AppTranslatedText`, `AppTranslationProvider`, and `AppTranslatedTextProps`). This distinguishes application contracts from library APIs and communicates where application policy is applied.
-- Use matching kebab-case filenames, such as `use-app-translation.ts` and `app-translated-text.tsx`. Keep vendor types and configuration out of facade signatures; renaming or re-exporting a vendor hook alone does not create an independent facade.
-- This convention applies to shared application facades, not every custom hook, interface or component. Keep business-specific names such as `useOrders` and `OrderRepository`, and existing capability contracts such as `LocalStorage` and `DateAdapter`. Use `useAppStore` only for a clearly defined app-wide state capability; prefer responsibility-specific store names otherwise. Do not create wrappers solely to add the prefix or rename unrelated existing code.
+- Prefix shared application facade hooks with `useApp`, and their public components, providers and associated types with `App`, using matching kebab-case filenames (`use-app-translation.ts`, `app-translated-text.tsx`). Keep vendor types and configuration out of facade signatures.
+- Apply these prefixes only to shared application facades. Keep business names such as `useOrders` and existing contracts such as `LocalStorage` and `DateAdapter`. Name stores by responsibility; reserve `useAppStore` for an app-wide capability. Do not create wrappers or rename unrelated code solely to add a prefix.
 - Name component props `<ComponentName>Props`, such as `OrderCardProps`. Use descriptive types without redundant `I` or `T` prefixes, such as `OrderRepository` rather than `IOrderRepository`.
 - Use affirmative boolean names such as `isLoading`, `hasItems`, `canSubmit` and `shouldRetry`. Name callbacks `on<Action>` in props and local event handlers `handle<Action>`, such as `onCancel` and `handleCancel`.
 - Use `camelCase` for ordinary constants and `UPPER_SNAKE_CASE` for module-level fixed configuration constants, such as `MAX_RETRY_COUNT`. Do not uppercase every `const` binding.
 - Use ASCII characters in source identifiers and file basenames. Review the English-language requirement separately; ASCII validation cannot determine a name's language.
 - Preserve field names required by external schemas in infrastructure DTOs and request payloads; map them to internal conventions in the owning adapter when a conversion is needed. Keep `camelCase` for application-owned properties, including internal objects in infrastructure. Follow the architecture's [adapter responsibilities](../architecture/AGENTS.md#adapters-and-composition).
-- Biome relaxes property casing in `infrastructure/` and `modules/*/infrastructure/` to accommodate external schemas. This exception covers object literal properties and properties of types/interfaces throughout those directories, so review whether each external-style name is actually required. Variables, type names and filenames retain their normal checks; ASCII validation remains enabled.
+- Biome relaxes property casing throughout infrastructure directories for external schemas; review whether each exception is required. Other naming checks still apply. See [override coverage](biome.md#infrastructure-property-names).
 
 ## Imports and exports
 
@@ -71,66 +70,22 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 ## TypeScript, components and styles
 
-- Keep directly related statements together and use a single blank line to separate logical stages and adjacent function declarations. Apply judgment based on readability rather than inserting a blank line after every statement. For example:
+- Keep related statements together; use a single blank line between logical stages and adjacent function declarations. For example:
 
   ```ts
   async function loadItem(id: string) {
     const response = await fetchItem(id);
     const item = parseItem(response);
 
-    if (item.isAvailable) {
-      showItem(item);
-    }
+    return item;
   }
   ```
 
-  ```tsx
-  export function ProfileScreen() {
-    const auth = useAuth();
-    const [error, setError] = useState("");
-    const [isPending, setPending] = useState(false);
-    const pending = useRef(false);
-    const mounted = useRef(false);
-
-    useEffect(() => {
-      mounted.current = true;
-
-      return () => {
-        mounted.current = false;
-      };
-    }, []);
-
-    const dark = useColorScheme() === "dark";
-
-    async function handleSignout() {
-      if (pending.current) return;
-
-      pending.current = true;
-      setPending(true);
-      setError("");
-
-      try {
-        await auth.signout();
-      } catch (cause) {
-        if (mounted.current) setError(messageFor(cause));
-      } finally {
-        pending.current = false;
-        if (mounted.current) setPending(false);
-      }
-    }
-
-    if (auth.status !== "authenticated") return null;
-    
-    return (...);
-  }
-  ...
-  ```
-  
 - Preserve TypeScript strict mode. Prefer inferred local types and explicit public contracts; use `unknown` and narrow it for untrusted values rather than introducing `any` or unchecked assertions.
 - Prefer function components with typed props. Keep one primary component per file; small private helpers may remain in that file. Extract reusable hooks and components when they have a clear responsibility.
 - Define components at module scope, rather than inside other components, and treat props as read-only. Use boolean conditions in JSX when a numeric value could otherwise leak into rendered output, such as `items.length > 0 && <ItemsList />`.
-- Use JSX boolean shorthand for literal `true`, such as `disabled` rather than `disabled={true}`. Keep `false` and dynamic expressions explicit. A local Biome GritQL plugin enforces this convention as an error; keep the inverse `noImplicitBoolean` rule disabled. See the [Biome guide](biome.md#jsx-boolean-shorthand) for its coverage.
-- React Compiler is enabled in the app configuration. Review Biome's compiler warnings; its experimental lint rule uses `compilationMode: "infer"` to analyze components and hooks. Keep experimental rule selection explicit rather than enabling every domain rule with `all`; see the [Biome guide](biome.md#react-and-react-native-checks) for the configured rules and severities.
+- Use JSX boolean shorthand for literal `true` (`disabled`); keep `false` and expressions explicit. See [Biome enforcement](biome.md#jsx-boolean-shorthand).
+- React Compiler is enabled. Review Biome's compiler warnings; consult the [Biome guide](biome.md#react-and-react-native-checks) when changing compiler lint configuration.
 - Keep styles close to their component. Use descriptive `camelCase` style keys such as `container`, `headerTitle` and `submitButton`. Split into a nearby `<component>.styles.ts` only when it improves readability.
 - Reuse existing theme tokens and shared UI before adding repeated colors, spacing or typography. Follow the project's existing styling setup; do not introduce a styling library solely to apply these conventions.
 - Give interactive controls meaningful accessible names, roles and states; add a label when visible content does not provide one. A `testID` does not replace accessibility semantics. Follow [React Native accessibility](https://reactnative.dev/docs/accessibility).
@@ -146,7 +101,7 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 - When a suitable runner is configured, name unit and component tests `<basename>.test.ts` or `<basename>.test.tsx` and colocate them with the code they verify, within the same architectural layer and outside `src/app/`.
 - Keep end-to-end journeys in a separate directory chosen for the installed runner. Name test cases after observable behavior; prefer accessible queries and use stable, descriptive `kebab-case` test IDs when IDs are needed.
-- Jest routes colocated `.test.ts` files to Node and `.test.tsx` files to Expo's native environment. Use `.test.tsx` for hook tests that need React even when they contain no JSX. Shared test infrastructure and navigation integration tests live in root `tests/`, which Biome also checks. See the [testing guide](../testing.md).
+- Use `.test.tsx` for tests that require React, including hooks without JSX; `.test.ts` runs in Node. Shared test setup and navigation integration tests live in root `tests/`. See the [testing guide](../testing.md).
 
 ## Commit messages
 
@@ -161,4 +116,8 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 - Keep rules actionable and examples aligned with the repository. Update this document when intentionally changing a convention; update architecture only when responsibilities or dependency rules change.
 - Use standard Markdown, relative links for repository documents and explicit scope references. Keep workflow commands in the root instructions and avoid copying them here. Follow the [AGENTS.md guidance](https://agents.md/).
 - Preserve explicit defaults when editing [biome.json](../../biome.json). Update the configuration and this document together when a convention changes; keep technical explanations and examples in the [Biome guide](biome.md). Add a narrowly scoped exception when an integration genuinely requires one.
-- Biome and TypeScript are the existing automated checks. Biome checks source filenames in `kebab-case`, dynamic route parameter filenames in `camelCase`, basic identifier casing, type imports, named exports, explicit `any` and unused imports/variables. Review directory names, English terminology, semantic prefixes such as `is`/`has`, `on`/`handle`, file placement and public API intent separately. Layer and module import boundaries also require review. Follow these conventions even when Biome accepts additional naming forms.
+
+## Automated checks and review
+
+- Biome checks source filename and basic identifier casing, type imports, named exports, explicit `any`, unused code and import cycles. TypeScript checks types in strict mode. See [Biome coverage](biome.md#maintenance-and-coverage) for exceptions and limits.
+- Review directory names, English terminology, semantic prefixes (`is`/`has`, `on`/`handle`), file placement, layer/module dependencies, public API intent and unnecessary abstractions. Follow the conventions even when automated checks accept additional forms.

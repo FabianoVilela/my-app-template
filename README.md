@@ -128,6 +128,8 @@ pnpm test:rename-app
 - [Project conventions](docs/conventions/AGENTS.md)
 - [HTTP client, module services and dependency composition](docs/architecture/http-client.md)
 - [Local preferences and secure credential storage](docs/architecture/storage.md)
+- [Dates, UTC and time-zone policy](docs/architecture/date-adapter.md#utc-and-device-display)
+- [Internationalization and localized formatting](docs/architecture/i18n.md)
 
 The JSON HTTP client is ready to use through an Axios adapter. API configuration
 is optional until a derived project connects a backend; see `.env.example` and
@@ -144,6 +146,7 @@ Zustand will be integrated separately.
 ```bash
 pnpm check
 pnpm typecheck
+pnpm i18n:check
 pnpm test:ci
 pnpm test:rename-app
 ```
@@ -164,7 +167,8 @@ existing checkout, run `pnpm prepare` to reinstall them.
 - Before a commit, lint-staged checks staged files with Biome without rewriting them.
 - Commit messages must follow Conventional Commits, for example
   `chore(tooling): configure local git hooks`.
-- Before a push, TypeScript, application tests and rename script tests must pass.
+- Before a push, catalog freshness, TypeScript and application tests must pass.
+  Rename script tests run separately with `pnpm test:rename-app`.
 
 See the [Git workflow guide](docs/git-workflow.md) for commands, partial staging
 and troubleshooting. These hooks are local; CI/CD and remote merge policies are

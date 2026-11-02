@@ -18,6 +18,41 @@ The contract lives in `shared/lib` because it contains only framework-independen
 types. The implementation belongs to infrastructure. See
 [application architecture](AGENTS.md#date-operations) for dependency rules.
 
+## UTC and device display
+
+Choose the representation from the field's meaning:
+
+| Meaning | Exchange and persistence | Presentation |
+| --- | --- | --- |
+| Instant, such as a message or payment timestamp | UTC; ISO 8601 with `Z` for API payloads and serialized state, such as `2026-11-02T15:00:00.000Z` | Device time zone by default, unless a business rule selects another zone |
+| Calendar-only date, such as a birthday or business date | Calendar value such as `2026-11-02`, without a time zone | Preserve the date; localize its format without shifting the day |
+| Location-bound schedule, including recurring appointments or meetings | Preserve intended local date/time, IANA zone such as `America/Sao_Paulo`, and recurrence rules when applicable; resolved occurrences may also have UTC instants | Use the event's zone when required by the business; label the zone when users could otherwise misinterpret it |
+
+- Validate temporal payloads in the owning infrastructure boundary according to
+  their meaning. Instant fields require an explicit time-zone designator;
+  calendar-only fields and schedule-local fields must not be treated as implicit
+  UTC timestamps. Never turn a birthday into UTC midnight for local display.
+- Keep an instant unchanged in application data; conversion for display changes
+  its representation. Use the active app locale for language/formatting and the
+  selected time zone for clock time. Changing the language does not select a zone.
+  The UTC timestamp above displays as `12:00` on a device at UTC−03:00.
+- Interpret date/time input in the context's zone: an appointment uses the
+  clinic's zone even if the phone is elsewhere. Use the device zone only when
+  the feature follows the user's local time. Resolve an instant before UTC
+  serialization; do not add/subtract offsets manually, append `Z` to local text,
+  or reparse display text as UTC.
+- For location-bound schedules, preserve an IANA identifier rather than just a
+  fixed offset. Define handling of nonexistent or repeated local times around
+  daylight saving transitions. For recurrence, explicitly choose between a
+  location's wall time, the user's device-local time or a fixed UTC interval;
+  preserve that intent. Future occurrences tied to a location may need
+  recalculation when zone rules change.
+- Use `useAppFormatting` for localized display and `DateAdapter` for its fixed
+  project formats and operations. Select calendar-operation zones explicitly,
+  including local-day boundaries. The current adapter supports local/UTC modes,
+  not named-zone parsing or scheduling; extend the contract only for real
+  consumers. Its local default does not define storage or business-zone policy.
+
 ## Formats and parsing
 
 Use the project's format names instead of library masks:
@@ -117,8 +152,16 @@ UTC serialization and input immutability. Run it with `TZ=UTC` and
 `TZ=America/New_York` to exercise local behavior with different offsets and daylight
 saving transitions. These tests use Node; device behavior is not exercised.
 
+When implementing temporal consumers, verify UTC round trips, display across
+midnight, input in the context's zone, and calendar-only date preservation.
+For location-bound or recurring schedules, also cover a device in another zone,
+daylight saving gaps/overlaps and recurrence across offset changes. Verify
+device time-zone changes on a device; existing adapter tests cover local/UTC
+operations, not named-zone scheduling or reactive UI behavior.
+
 ## References
 
+- [W3C: Working with Time and Timezones](https://www.w3.org/TR/timezone/)
 - [Day.js installation](https://day.js.org/docs/en/installation/installation)
 - [Strict format parsing](https://day.js.org/docs/en/parse/string-format)
 - [UTC plugin](https://day.js.org/docs/en/plugin/utc)

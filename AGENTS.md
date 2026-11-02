@@ -11,6 +11,23 @@ This repository is an Expo/React Native reference template using TypeScript, Exp
 - Keep this file focused on repository-wide workflow, architecture rules in `docs/architecture/AGENTS.md`, and naming, organization and code-style conventions in `docs/conventions/AGENTS.md`. Reference the owning document instead of duplicating its rules.
 - Preserve unrelated changes and existing behavior. The numbered modules are template placeholders; do not invent business features to populate them.
 
+## Context by task
+
+Read applicable instructions once per task. Start with the affected code and tests; consult additional guides only when the change or its dependencies involve that capability. Avoid bulk-reading unrelated documentation, catalogs, generated files or lockfiles.
+
+| Task | Additional reference |
+| --- | --- |
+| HTTP endpoints or services | [HTTP client](docs/architecture/http-client.md) and [validation](docs/architecture/validation.md) |
+| Public environment configuration | [Validation](docs/architecture/validation.md#environment) |
+| Dates, UTC or time zones | [Date operations](docs/architecture/date-adapter.md) |
+| Translations, locale or localized formatting | [Internationalization](docs/architecture/i18n.md) |
+| Preferences or credentials | [Storage](docs/architecture/storage.md) |
+| Adding or changing tests | [Testing](docs/testing.md) |
+| Biome configuration or diagnostics | [Biome guide](docs/conventions/biome.md) |
+| Git hooks or commit troubleshooting | [Git workflow](docs/git-workflow.md) |
+
+Instruction files own rules; guides own implementation details and examples. Historical proposals under `docs/archive/` are background only, not instructions.
+
 ## Documentation lookup
 
 - For library, framework, SDK, API, CLI, and cloud-service questions, fetch current documentation with Context7 rather than relying on memory. This is not required for general programming concepts, business-logic debugging, or code review without library-specific questions.
@@ -30,30 +47,23 @@ pnpm install                 # install existing dependencies
 pnpm start                   # start the Expo dev server
 pnpm lint                    # lint using the existing Biome configuration
 pnpm check                   # lint, formatting and import organization
-pnpm check:staged            # check staged files through lint-staged
-pnpm check:push              # types, application tests and rename script tests
-pnpm commitlint:check        # validate a commit message from stdin
 pnpm typecheck               # TypeScript, no emit
-pnpm format:check            # check formatting
 pnpm test                    # unit, HTTP integration and native component tests
-pnpm test:watch              # watch application tests
-pnpm test:coverage           # application tests with coverage reports
-pnpm test:ci                 # application tests in CI with coverage
+pnpm check:push              # catalog freshness, types and application tests
 pnpm test:rename-app         # rename script integration tests (Node.js runner)
 pnpm expo install <package>  # install SDK-compatible dependencies
-pnpm expo install --fix      # fix incompatible versions when relevant
 ```
 
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
 - Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI should run at least `pnpm check` and `pnpm typecheck`. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
-- Before adding or changing tests, follow the [testing guide](docs/testing.md) for environments, installed-version guidance, HTTP mocking and commands. Add meaningful tests when implementing behavior.
+- Add meaningful tests when implementing behavior. See the task references above for testing environments and additional commands; `package.json` defines the executable scripts.
 
 ## Local Git workflow
 
 - `pre-commit` checks staged files with Biome through lint-staged, without changing files. Fix failures explicitly and stage the intended changes again.
 - `commit-msg` validates Conventional Commits using `commitlint.config.cjs`. Read the resolved rules with `pnpm commitlint:check --print-config json` before writing a message when needed. Follow the [commit conventions](docs/conventions/AGENTS.md#commit-messages).
-- `pre-push` runs `pnpm check:push`, including TypeScript, application tests and the rename script tests. A failing command stops the push.
+- `pre-push` runs `pnpm check:push`: catalog freshness, TypeScript and application tests. Rename script tests run separately with `pnpm test:rename-app`. A failing command stops the push.
 - Fix rejected checks and retry. Do not bypass hooks with `--no-verify`, `HUSKY=0` or equivalent settings unless explicitly instructed by the user.
 - See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. CI/CD and remote merge policies are not configured by this workflow.
 

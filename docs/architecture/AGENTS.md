@@ -6,9 +6,7 @@ The root [AGENTS.md](../../AGENTS.md) explicitly applies these instructions to a
 
 For file and directory names, identifier style, imports and exports, route notation, platform suffixes and test filenames, follow [Project conventions](../conventions/AGENTS.md). This document owns layer responsibilities, dependency direction and module boundaries.
 
-Use business modules with inward-pointing dependencies, inspired by Clean Architecture, Ports and Adapters, and DDD. Keep the structure useful for medium to large applications without requiring abstractions that have no current responsibility.
-
-This is a reference template. `module-1`, `module-2`, and `module-3` demonstrate the same module structure and contain no business behavior. In a product derived from this template, name modules after business capabilities.
+Organize business capabilities in modules with inward-pointing dependencies. The numbered modules are empty reference placeholders; create only abstractions with a current responsibility.
 
 ## Source structure
 
@@ -17,20 +15,16 @@ src/
 ├── app/                          # Expo Router routes and layouts
 ├── bootstrap/                    # Dependency composition, providers and startup
 ├── modules/
-│   ├── module-1/
-│   │   ├── domain/
-│   │   ├── application/
-│   │   │   └── ports/
-│   │   ├── infrastructure/
-│   │   └── presentation/
-│   │       ├── screens/
-│   │       ├── components/
-│   │       └── hooks/
-│   ├── module-2/                 # Same internal structure
-│   └── module-3/                 # Same internal structure
+│   └── module-1/                 # Representative; module-2/3 have the same shape
+│       ├── domain/
+│       ├── application/ports/
+│       ├── infrastructure/
+│       └── presentation/         # screens/, components/, hooks/ as needed
 ├── infrastructure/
 │   ├── date/
+│   ├── env/
 │   ├── http/
+│   ├── i18n/
 │   ├── storage/
 │   └── observability/
 └── shared/
@@ -39,9 +33,8 @@ src/
     └── lib/
 ```
 
-- Do not add dummy screens, entities, repositories, providers, or empty TypeScript entry points to fill the skeleton.
-- For new product modules, create only the directories needed by their current responsibilities. The complete template tree is an illustration, not a requirement to populate every layer.
-- These business modules under `src/modules/` are not Expo native modules. Do not change Expo native-module discovery or native-project configuration to accommodate them.
+- Preserve the template skeleton; do not fill it with dummy features or empty entry points. In derived products, name modules after business capabilities and create only the directories currently needed.
+- Business modules are not Expo native modules; they require no native-module discovery or native-project configuration.
 
 ## Responsibilities and allowed dependencies
 
@@ -61,28 +54,18 @@ The following rules concern source imports, including type imports. Runtime call
 
 ## Shared internationalization boundary
 
-Internationalization is application-wide technical infrastructure. Features consume the application's `useAppTranslation`, `useAppLocale`, `useAppFormatting` and `AppTranslatedText` facade from `shared/i18n`; they must not import i18next, react-i18next, device-language APIs, catalogs or language persistence. Domain and application remain translation-free. Presentation maps technical/business outcomes to messages.
-
-`shared/i18n/contracts.ts` and its generated type dependency `shared/i18n/app-messages.ts` are pure contracts: no React, React Native, Expo, storage, vendor imports or initialization. Other files in `shared/i18n` own the React context, provider and consumers, receiving the implementation explicitly through provider props. They must not import infrastructure or bootstrap. `bootstrap` constructs the adapter and mounts the provider; routes only consume the facade and mount composition.
-
-**Isolated dependency exception:** only files under root `infrastructure/i18n/` may import types directly from `shared/i18n/contracts.ts` and `shared/i18n/app-messages.ts`. Use `import type`; never import the `shared/i18n` barrel, its hooks, context, provider or components into infrastructure. This exception does not allow other infrastructure directories or business-module infrastructure to depend on shared React capabilities.
-
-This exception exists because the stable contract belongs to the capability consumed by presentation, while its implementation belongs to infrastructure. Moving React hooks into pure `shared/lib` would violate purity; making shared UI import a concrete adapter would reverse dependency direction and spread vendor coupling. The narrow type-only dependency lets bootstrap inject an implementation without introducing either violation. It is not a general permission for infrastructure to depend on shared presentation.
-
-In addition to the dependency table, `app`, `bootstrap`, module presentation and `shared/ui` may consume the public `shared/i18n` facade. Core layers may not import it. A capability-local React rendering boundary can be supplied by bootstrap as a provider prop; infrastructure implements that function using external React APIs and the pure message types, without importing shared React definitions. Keep catalogs and vendor details private to `infrastructure/i18n`.
-
-See [Internationalization](i18n.md) for lifecycle, catalog generation, locale policy, platform limits and tests.
+- `app`, `bootstrap`, module presentation and `shared/ui` may consume the public `shared/i18n` facade. Core layers remain translation-free; presentation maps outcomes to messages. Keep vendor imports, catalogs, device detection and language persistence in root `infrastructure/i18n`.
+- `shared/i18n/contracts.ts` and generated `app-messages.ts` are pure: no React, native, vendor or initialization dependencies. The shared React facade receives its implementation through provider props and never imports infrastructure or bootstrap.
+- **Isolated exception:** root `infrastructure/i18n/` may use `import type` directly from those two pure files. No infrastructure may import the shared barrel or React facade; the exception does not extend to other infrastructure directories.
+- Bootstrap constructs the implementation and mounts the provider. See [Internationalization](i18n.md) for rendering injection, lifecycle, catalog maintenance and platform details.
 
 ## Domain and application boundaries
 
 - Keep domain and application independent of React, React Native, Expo, routing, HTTP clients, device storage and state/cache libraries.
-- Represent rules with types and functions by default. Use classes, entities, value objects or aggregates when they protect a real invariant or clarify behavior.
-- Keep stable business rules in domain; put workflow orchestration in application. Loading indicators, translated messages, modal state and navigation belong to presentation.
-- Define ports next to the policy that needs them. Put use-case integration contracts in `application/ports/`; a contract genuinely owned by the domain may live in domain.
-- Ports can be interfaces or function types. Name them by required capabilities, not vendor APIs. Do not create a generic repository or a use-case interface for every function.
-- Inject external capabilities into application operations through explicit parameters or factories. Do not import concrete adapters, global service locators or React contexts into the core.
-- Keep simple operations small. Do not add pass-through layers or duplicate models solely to satisfy a diagram.
-- Model only the business knowledge the client needs. Server-side authorization and authoritative consistency checks remain necessary even when the client performs early validation.
+- Prefer types and functions; introduce classes or richer models only to protect invariants or clarify behavior. Domain owns business rules, application owns workflows, and presentation owns UI state, messages and navigation.
+- Define capability-named ports as interfaces or function types beside the policy that needs them, usually in `application/ports/`. Domain-owned contracts may live in domain.
+- Inject external capabilities through parameters or factories. No concrete adapters, global service locators or React contexts in the core. Avoid pass-through layers, generic repositories and duplicate models without a responsibility.
+- Model only client-required business knowledge; server authorization and authoritative consistency checks remain necessary.
 
 ## Adapters and composition
 
@@ -92,44 +75,36 @@ See [Internationalization](i18n.md) for lifecycle, catalog generation, locale po
 
 ## HTTP integrations
 
-- Use the shared `HttpClient` contract in `infrastructure/http/` for HTTP execution. Keep imports of the `axios` package inside its concrete adapter; public request, response and error types must be library-independent.
-- Group related endpoints in module infrastructure services. Receive the HTTP client explicitly when constructing a service, and define consumed capabilities in application contracts without HTTP imports. Do not add pass-through use cases or a second gateway object solely to wrap a service.
-- Select default clients and inject overrides in bootstrap when there are real services to assemble. Preserve instance lifetimes; do not create default clients through eager module-level exports or import bootstrap from services.
-- Keep endpoint-specific error decisions and payload validation in module infrastructure. Do not introduce global status-to-`null` conversions, automatic retries, refresh or UI reactions in the transport.
-- Follow the [HTTP client guide](http-client.md) for the implemented transport contract, composition examples, optional configuration and extension points. Keep example product code in documentation; preserve the numbered template modules.
+- Use `HttpClient` from `infrastructure/http/`; keep Axios imports inside its concrete adapter and public types vendor-independent.
+- Module infrastructure services receive HTTP explicitly and implement application-owned capabilities without HTTP imports in the core. Keep endpoint validation and error policy there; avoid pass-through wrappers.
+- Keep global status-to-`null` conversion, retries, refresh and UI reactions out of the transport. See the [HTTP guide](http-client.md) for contract details and composition examples.
 
 ## Validation and environment configuration
 
-- Use Zod directly in infrastructure schemas and their consumers; do not introduce a generic validation adapter. Keep schema definitions in separate `*.schema.ts` files, colocated with the owning infrastructure capability or under a module's infrastructure `schemas/` directory.
-- Domain and application contracts must not import Zod, schemas or infrastructure DTOs. Infer DTO types locally and map validated data to application-owned contracts; translate validation failures before exposing them to core consumers.
-- Validate outgoing requests before HTTP execution and incoming payloads before mapping. Keep endpoint schemas in module infrastructure, outside the shared transport. Use strict outgoing objects and tolerate additional response fields by default, unless an endpoint requires another policy.
-- Read public environment variables through `infrastructure/env/read-env.ts` using static Expo dot notation. Bootstrap validates configuration before initialization and injects the default locale. Keep the API URL optional until composing a real API client; preserve the English fallback for missing or unsupported default locales. Do not log configuration values or payloads in validation errors.
-- Follow [Validation and environment configuration](validation.md) and the [HTTP examples](http-client.md#example-product-service). Keep example endpoints in documentation and preserve the numbered module placeholders.
+- Use Zod directly in infrastructure-owned `*.schema.ts` files; no generic validation adapter. Keep Zod, DTOs and validation errors out of domain/application; map validated data to core contracts.
+- Validate requests before HTTP and responses before mapping. Default to strict request objects and tolerant response objects; endpoint policy may override this. Schemas stay outside shared transport.
+- Read public configuration through `infrastructure/env/read-env.ts` with static Expo dot notation. Bootstrap validates before initialization and injects the locale. API URL remains optional until a real client needs it; missing/unsupported locale falls back to English. Never expose configuration values or payloads in validation errors.
+- See [Validation](validation.md) for schema placement, configuration behavior and service examples.
 
 ## Date operations
 
 - Use the library-independent `DateAdapter` contract in `shared/lib/date-adapter.ts`. Keep `dayjs` and plugin imports inside the concrete adapter in `infrastructure/date/`; do not expose library instances, types, tokens or errors through the contract.
-- Inject date operations explicitly where needed. Domain and application may import the pure contract, but must not import the concrete adapter. Select implementations in bootstrap when there are real consumers; do not introduce an eager singleton or example business features.
-- Follow the [date adapter guide](date-adapter.md) for supported formats, strict parsing, calendar arithmetic, time-zone behavior, errors and composition.
+- Exchange and persist instants in UTC. Display in the device's current time zone by default, subject to explicit business rules; interpret input in the zone defined by its context. Calendar-only dates preserve their calendar value. Location-bound schedules preserve their IANA zone and local-time intent; recurrence declares its time-zone policy. See the [date/time policy](date-adapter.md#utc-and-device-display) for representations, conversion boundaries and adapter limits.
+- Inject the pure contract into consumers; select implementations in bootstrap. See the [date guide](date-adapter.md) for parsing, arithmetic and adapter modes.
 
 ## Local persistence
 
-- Use the library-independent `LocalStorage` and `SecureStorage` contracts in `infrastructure/storage/`. Keep `react-native-mmkv` and `expo-secure-store` imports inside their concrete adapters.
-- MMKV stores non-sensitive preferences, settings and serialized state only. Store tokens and credentials in SecureStore. Do not use these mechanisms as a local database.
-- Keep device storage out of domain and application. Define consumed capabilities in module application ports and implement persistence details in module infrastructure. Select adapters in bootstrap when real consumers exist, and preserve their instance lifetimes.
-- Keep serialization, payload validation, key ownership and schema migrations in the consuming infrastructure boundary. The shared adapters persist strings and normalize technical failures; they do not decide defaults or silently discard failed writes.
-- Follow the [storage guide](storage.md) for contracts, namespaces, platform limitations, composition and testing. State management integration is a separate concern.
+- Use `LocalStorage`/`SecureStorage` from `infrastructure/storage/`; keep MMKV/SecureStore vendor imports in their adapters. Preferences and serialized state use MMKV; tokens and credentials use SecureStore. Neither is a local database.
+- Core operations depend on application ports, never device storage. Consuming infrastructure owns serialization, validation, keys, migrations and defaults; shared adapters persist strings and normalize failures without discarding failed writes.
+- See the [storage guide](storage.md) for lifetimes, namespaces and platform limits. State management is separate.
 
 ## Bootstrap: composition and startup
 
-- Use `bootstrap/` as the application's composition root: select concrete adapters, supply them to application operations and compose the providers used by the UI. Use manual factories and explicit dependencies; a dependency-injection framework is not required.
-- Keep composition distinct from startup. Composition connects dependencies; startup coordinates required preparation, such as restoring a session or activating observability. Invoke module operations for business workflows rather than implementing their rules here.
-- Create composition and startup files only when needed; follow the filename examples in [Project conventions](../conventions/AGENTS.md#files-and-directories). Use React components or hooks when preparation requires React lifecycle behavior.
-- Keep module-specific providers and consumer hooks in their module's presentation layer. Bootstrap mounts those providers; screens use the module's hooks. Keep SDK initialization implementations in the relevant infrastructure adapter and coordinate their activation from bootstrap when needed.
-- `bootstrap/` may import concrete module adapters and presentation providers for assembly. Modules, shared code and infrastructure must not import bootstrap. Supply assembled operations through props or focused providers rather than a global service locator.
-- Let `src/app/_layout.tsx` mount the composed providers and navigation, delegating substantial assembly and startup coordination to bootstrap.
-- Give resources an explicit lifetime: app-wide, session-specific or feature-specific as needed. Preserve instances across ordinary renders, and reset or release resources when their owning lifecycle ends.
-- Wait only for preparation required by the initial UI. Avoid eagerly initializing every module, SDK or native capability, or blocking startup on unrelated remote data. Define failure and retry behavior for required asynchronous preparation.
+- Bootstrap selects concrete adapters, injects operations and mounts providers through manual factories. Create composition/startup files only when needed; never export eager default instances or expose a global service locator.
+- Composition connects dependencies; startup coordinates required preparation and invokes module operations for business workflows. SDK initialization stays in infrastructure; module providers/hooks stay in module presentation.
+- Modules, shared code and infrastructure must not import bootstrap. Routes mount composed providers/navigation and delegate substantial assembly to bootstrap; consumers receive operations through props or focused providers.
+- Give resources explicit app/session/feature lifetimes. Preserve instances across renders and release/reset them at lifecycle end. Use React lifecycle when needed.
+- Prepare only what the initial UI requires; avoid unrelated remote dependencies or eager SDK/module initialization. Define failure and retry behavior for required asynchronous startup.
 
 ## Module boundaries and shared code
 
@@ -152,7 +127,7 @@ See [Internationalization](i18n.md) for lifecycle, catalog generation, locale po
 
 ## Verification when implementing behavior
 
-- Follow the root verification instructions. Biome checks import cycles, including type-only cycles, and explicitly annotated private/package exports. Layer and module import boundaries, public API usage and semantic responsibilities still require review.
+- Follow the root checks and [review responsibilities](../conventions/AGENTS.md#automated-checks-and-review). Passing automated checks does not establish layer/module boundaries or semantic correctness.
 - Follow [test naming and placement](../conventions/AGENTS.md#tests). Exercise domain and application through injected fakes without mounting React or contacting live services.
 - Test adapter translations and important user journeys in proportion to the behavior changed. Keep end-to-end journeys separate when an end-to-end runner is introduced.
 - Do not add a test framework, a dependency or an architectural enforcement tool solely to populate this skeleton.
