@@ -2,9 +2,9 @@ import { act, render, renderHook, screen } from "@testing-library/react-native";
 import type { ReactNode } from "react";
 import { Text } from "react-native";
 import {
-  createAppI18n,
+  createI18nextAdapter,
   resolveAppLocale,
-} from "@/infrastructure/i18n/create-app-i18n";
+} from "@/infrastructure/i18n/i18next-adapter";
 import type { LocalStorage } from "@/infrastructure/storage/local-storage";
 import {
   AppTranslatedText,
@@ -32,7 +32,11 @@ async function setup(
   storage = memoryStorage(),
   getDeviceLocales = () => ["en-US"],
 ) {
-  return createAppI18n({ storage, getDeviceLocales, onReadError: jest.fn() });
+  return createI18nextAdapter({
+    storage,
+    getDeviceLocales,
+    onReadError: jest.fn(),
+  });
 }
 function Greeting() {
   const { t } = useAppTranslation("common");
@@ -72,7 +76,7 @@ test("ignores invalid saved preferences and reports failed reads", async () => {
 
   const onReadError = jest.fn();
   const failure = new Error("read");
-  const dependencies = await createAppI18n({
+  const dependencies = await createI18nextAdapter({
     storage: {
       ...memoryStorage(),
       getItem: () => {

@@ -5,11 +5,11 @@ import { renderRouter, screen } from "expo-router/testing-library";
 import type { ReactNode } from "react";
 import { AppNavigation } from "@/app/_layout";
 import Index from "@/app/index";
-import { createAppI18n } from "@/infrastructure/i18n/create-app-i18n";
+import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import { AppTranslationProvider } from "@/shared/i18n";
 
 test("keeps the home URL while its content changes language", async () => {
-  const dependencies = await createAppI18n({
+  const dependencies = await createI18nextAdapter({
     storage: {
       getItem: () => "en",
       setItem: () => undefined,

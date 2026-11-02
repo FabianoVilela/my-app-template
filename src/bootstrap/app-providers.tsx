@@ -1,11 +1,11 @@
 import { getLocales } from "expo-localization";
 import { type ReactNode, useEffect, useState } from "react";
 import { AppState, Pressable, Text, View } from "react-native";
-import { createAppI18n } from "@/infrastructure/i18n/create-app-i18n";
+import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import { createMmkvStorage } from "@/infrastructure/storage/mmkv-storage";
 import { AppTranslationProvider } from "@/shared/i18n";
 
-type Dependencies = Awaited<ReturnType<typeof createAppI18n>>;
+type Dependencies = Awaited<ReturnType<typeof createI18nextAdapter>>;
 export function AppProviders({ children }: { children: ReactNode }) {
   const [dependencies, setDependencies] = useState<Dependencies | null>(null);
   const [hasFailed, setHasFailed] = useState(false);
@@ -18,7 +18,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
     async function start() {
       try {
-        const dependencies = await createAppI18n({
+        const dependencies = await createI18nextAdapter({
           storage: createMmkvStorage({ id: "app-preferences" }),
           getDeviceLocales: () =>
             getLocales().map((locale) => locale.languageTag),

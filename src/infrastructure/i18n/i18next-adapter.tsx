@@ -17,8 +17,10 @@ import ptCommon from "./locales/pt-br/common.json";
 import ptNavigation from "./locales/pt-br/navigation.json";
 
 const PREFERENCE_KEY = "i18n.locale-preference";
-const DEFAULT_LOCALE: AppLocale = "en";
-const SUPPORTED_LOCALES: AppLocale[] = [DEFAULT_LOCALE, "pt-BR"];
+const CONFIGURED_DEFAULT_LOCALE = process.env.EXPO_PUBLIC_DEFAULT_LOCALE;
+const DEFAULT_LOCALE: AppLocale =
+  CONFIGURED_DEFAULT_LOCALE === "pt-BR" ? "pt-BR" : "en";
+const SUPPORTED_LOCALES: AppLocale[] = ["en", "pt-BR"];
 
 function isPreference(value: unknown): value is AppLocalePreference {
   return (
@@ -41,7 +43,7 @@ export function resolveAppLocale(locales: readonly string[]): AppLocale {
   return DEFAULT_LOCALE;
 }
 
-export async function createAppI18n({
+export async function createI18nextAdapter({
   storage,
   getDeviceLocales,
   onReadError,
