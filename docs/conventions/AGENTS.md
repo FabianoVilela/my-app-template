@@ -71,6 +71,61 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 ## TypeScript, components and styles
 
+- Keep directly related statements together and use a single blank line to separate logical stages and adjacent function declarations. Apply judgment based on readability rather than inserting a blank line after every statement. For example:
+
+  ```ts
+  async function loadItem(id: string) {
+    const response = await fetchItem(id);
+    const item = parseItem(response);
+
+    if (item.isAvailable) {
+      showItem(item);
+    }
+  }
+  ```
+
+  ```tsx
+  export function ProfileScreen() {
+    const auth = useAuth();
+    const [error, setError] = useState("");
+    const [isPending, setPending] = useState(false);
+    const pending = useRef(false);
+    const mounted = useRef(false);
+
+    useEffect(() => {
+      mounted.current = true;
+
+      return () => {
+        mounted.current = false;
+      };
+    }, []);
+
+    const dark = useColorScheme() === "dark";
+
+    async function handleSignout() {
+      if (pending.current) return;
+
+      pending.current = true;
+      setPending(true);
+      setError("");
+
+      try {
+        await auth.signout();
+      } catch (cause) {
+        if (mounted.current) setError(messageFor(cause));
+      } finally {
+        pending.current = false;
+        if (mounted.current) setPending(false);
+      }
+    }
+
+    if (auth.status !== "authenticated") return null;
+    
+    return (...);
+  }
+  ...
+  ```
+  
 - Preserve TypeScript strict mode. Prefer inferred local types and explicit public contracts; use `unknown` and narrow it for untrusted values rather than introducing `any` or unchecked assertions.
 - Prefer function components with typed props. Keep one primary component per file; small private helpers may remain in that file. Extract reusable hooks and components when they have a clear responsibility.
 - Define components at module scope, rather than inside other components, and treat props as read-only. Use boolean conditions in JSX when a numeric value could otherwise leak into rendered output, such as `items.length > 0 && <ItemsList />`.
