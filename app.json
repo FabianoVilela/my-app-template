@@ -39,7 +39,14 @@
       "expo-image",
       "expo-status-bar",
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": ["pt-BR", "en"],
+          "supportsRTL": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

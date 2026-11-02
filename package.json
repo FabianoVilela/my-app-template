@@ -13,6 +13,7 @@
     "expo-glass-effect": "~58.0.5",
     "expo-image": "~58.0.18",
     "expo-linking": "~58.0.15",
+    "expo-localization": "~58.0.5",
     "expo-router": "~58.0.29",
     "expo-secure-store": "~58.0.2",
     "expo-splash-screen": "~58.0.12",
@@ -20,8 +21,11 @@
     "expo-symbols": "~58.0.4",
     "expo-system-ui": "~58.0.7",
     "expo-web-browser": "~58.0.7",
+    "i18next": "^26.6.0",
+    "intl-pluralrules": "^2.0.1",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-i18next": "^17.1.10",
     "react-native": "0.88.1",
     "react-native-gesture-handler": "~3.3.0",
     "react-native-mmkv": "^4.3.2",
@@ -61,7 +65,7 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "check:staged": "lint-staged",
-    "check:push": "pnpm typecheck && pnpm test",
+    "check:push": "pnpm i18n:check && pnpm typecheck && pnpm test",
     "commitlint:check": "commitlint",
     "format": "biome format --write .",
     "format:check": "biome format .",
@@ -69,7 +73,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage"
+    "test:ci": "jest --ci --coverage",
+    "i18n:types": "node scripts/i18n-types.mjs",
+    "i18n:check": "node scripts/i18n-types.mjs --check"
   },
   "lint-staged": {
     "*": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"

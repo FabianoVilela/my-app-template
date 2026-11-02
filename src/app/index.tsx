@@ -1,9 +1,12 @@
 import { StyleSheet, Text, View } from "react-native";
+import { useAppTranslation } from "@/shared/i18n";
 
 export default function Index() {
+  const { t } = useAppTranslation("common");
+
   return (
     <View style={styles.container}>
-      <Text>Edit src/app/index.tsx to edit this screen.</Text>
+      <Text>{t("editScreen", { file: "src/app/index.tsx" })}</Text>
     </View>
   );
 }

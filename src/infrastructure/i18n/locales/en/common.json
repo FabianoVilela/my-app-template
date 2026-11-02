@@ -1,0 +1,6 @@
+{
+  "editScreen": "Edit {{file}} to edit this screen.",
+  "items_one": "{{count}} item",
+  "items_other": "{{count}} items",
+  "learnMore": "Read <action>more information</action>."
+}

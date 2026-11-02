@@ -34,6 +34,7 @@ src/
 │   ├── storage/
 │   └── observability/
 └── shared/
+    ├── i18n/                    # Pure i18n contracts and injected React facade
     ├── ui/
     └── lib/
 ```
@@ -57,6 +58,20 @@ The following rules concern source imports, including type imports. Runtime call
 | `infrastructure/` | Technical HTTP, storage and observability mechanisms reused across modules | External libraries and pure shared utilities; no business-module internals |
 | `shared/ui/` | Reusable UI primitives and theme resources without module-specific business knowledge | React, React Native, UI libraries and pure shared utilities |
 | `shared/lib/` | Small pure utilities independent of business contexts and frameworks | Other pure shared utilities and platform-independent language APIs |
+
+## Shared internationalization boundary
+
+Internationalization is application-wide technical infrastructure. Features consume the application's `useAppTranslation`, `useAppLocale`, `useAppFormatting` and `AppTranslatedText` facade from `shared/i18n`; they must not import i18next, react-i18next, device-language APIs, catalogs or language persistence. Domain and application remain translation-free. Presentation maps technical/business outcomes to messages.
+
+`shared/i18n/contracts.ts` and its generated type dependency `shared/i18n/app-messages.ts` are pure contracts: no React, React Native, Expo, storage, vendor imports or initialization. Other files in `shared/i18n` own the React context, provider and consumers, receiving the implementation explicitly through provider props. They must not import infrastructure or bootstrap. `bootstrap` constructs the adapter and mounts the provider; routes only consume the facade and mount composition.
+
+**Isolated dependency exception:** only files under root `infrastructure/i18n/` may import types directly from `shared/i18n/contracts.ts` and `shared/i18n/app-messages.ts`. Use `import type`; never import the `shared/i18n` barrel, its hooks, context, provider or components into infrastructure. This exception does not allow other infrastructure directories or business-module infrastructure to depend on shared React capabilities.
+
+This exception exists because the stable contract belongs to the capability consumed by presentation, while its implementation belongs to infrastructure. Moving React hooks into pure `shared/lib` would violate purity; making shared UI import a concrete adapter would reverse dependency direction and spread vendor coupling. The narrow type-only dependency lets bootstrap inject an implementation without introducing either violation. It is not a general permission for infrastructure to depend on shared presentation.
+
+In addition to the dependency table, `app`, `bootstrap`, module presentation and `shared/ui` may consume the public `shared/i18n` facade. Core layers may not import it. A capability-local React rendering boundary can be supplied by bootstrap as a provider prop; infrastructure implements that function using external React APIs and the pure message types, without importing shared React definitions. Keep catalogs and vendor details private to `infrastructure/i18n`.
+
+See [Internationalization](i18n.md) for lifecycle, catalog generation, locale policy, platform limits and tests.
 
 ## Domain and application boundaries
 
