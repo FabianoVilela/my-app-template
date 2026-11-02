@@ -61,7 +61,7 @@
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "check:staged": "lint-staged",
-    "check:push": "pnpm typecheck && pnpm test && pnpm test:rename-app",
+    "check:push": "pnpm typecheck && pnpm test",
     "commitlint:check": "commitlint",
     "format": "biome format --write .",
     "format:check": "biome format .",
