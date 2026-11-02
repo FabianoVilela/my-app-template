@@ -98,6 +98,14 @@ See [Internationalization](i18n.md) for lifecycle, catalog generation, locale po
 - Keep endpoint-specific error decisions and payload validation in module infrastructure. Do not introduce global status-to-`null` conversions, automatic retries, refresh or UI reactions in the transport.
 - Follow the [HTTP client guide](http-client.md) for the implemented transport contract, composition examples, optional configuration and extension points. Keep example product code in documentation; preserve the numbered template modules.
 
+## Validation and environment configuration
+
+- Use Zod directly in infrastructure schemas and their consumers; do not introduce a generic validation adapter. Keep schema definitions in separate `*.schema.ts` files, colocated with the owning infrastructure capability or under a module's infrastructure `schemas/` directory.
+- Domain and application contracts must not import Zod, schemas or infrastructure DTOs. Infer DTO types locally and map validated data to application-owned contracts; translate validation failures before exposing them to core consumers.
+- Validate outgoing requests before HTTP execution and incoming payloads before mapping. Keep endpoint schemas in module infrastructure, outside the shared transport. Use strict outgoing objects and tolerate additional response fields by default, unless an endpoint requires another policy.
+- Read public environment variables through `infrastructure/env/read-env.ts` using static Expo dot notation. Bootstrap validates configuration before initialization and injects the default locale. Keep the API URL optional until composing a real API client; preserve the English fallback for missing or unsupported default locales. Do not log configuration values or payloads in validation errors.
+- Follow [Validation and environment configuration](validation.md) and the [HTTP examples](http-client.md#example-product-service). Keep example endpoints in documentation and preserve the numbered module placeholders.
+
 ## Date operations
 
 - Use the library-independent `DateAdapter` contract in `shared/lib/date-adapter.ts`. Keep `dayjs` and plugin imports inside the concrete adapter in `infrastructure/date/`; do not expose library instances, types, tokens or errors through the contract.

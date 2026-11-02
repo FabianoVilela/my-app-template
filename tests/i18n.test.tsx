@@ -52,13 +52,33 @@ test.each([
   expect(resolveAppLocale(locales)).toBe(expected);
 });
 
+test("uses an injected fallback locale while preserving device and saved preference priority", async () => {
+  const dependencies = await createI18nextAdapter({
+    defaultLocale: "pt-BR",
+    storage: memoryStorage(),
+    getDeviceLocales: () => ["fr-FR"],
+    onReadError: jest.fn(),
+  });
+
+  expect(dependencies.runtime.getSnapshot().locale).toBe("pt-BR");
+  expect(resolveAppLocale([], "pt-BR")).toBe("pt-BR");
+  expect(resolveAppLocale(["en-US"], "pt-BR")).toBe("en");
+
+  await dependencies.runtime.setPreference("en");
+  await dependencies.runtime.refreshDeviceLocale();
+
+  expect(dependencies.runtime.getSnapshot().locale).toBe("en");
+});
+
 test("restores an explicit preference and persists system mode across restarts", async () => {
   const storage = memoryStorage("pt-BR");
   let device = ["en-US"];
   const first = await setup(storage, () => device);
+
   expect(first.runtime.getSnapshot().locale).toBe("pt-BR");
   await first.runtime.setPreference("system");
   expect(first.runtime.getSnapshot().locale).toBe("en");
+
   device = ["pt-PT"];
   await first.runtime.refreshDeviceLocale();
   expect(first.runtime.getSnapshot().locale).toBe("pt-BR");
@@ -86,6 +106,7 @@ test("ignores invalid saved preferences and reports failed reads", async () => {
     getDeviceLocales: () => [],
     onReadError,
   });
+
   expect(onReadError).toHaveBeenCalledWith(failure);
   expect(dependencies.runtime.getSnapshot().locale).toBe("en");
 });
@@ -169,10 +190,12 @@ test("formatting follows locale while currency and time zone remain explicit", a
       {children}
     </AppTranslationProvider>
   );
+
   const { result } = await renderHook(
     () => ({ formatting: useAppFormatting(), locale: useAppLocale() }),
     { wrapper },
   );
+
   expect(result.current.formatting.percent(0.15)).toBe("15%");
   expect(result.current.formatting.currency(12, "BRL")).toContain("12.00");
   expect(
@@ -181,6 +204,7 @@ test("formatting follows locale while currency and time zone remain explicit", a
       year: "numeric",
     }),
   ).toBe("2025");
+
   await act(() => result.current.locale.setPreference("pt-BR"));
   expect(result.current.formatting.number(1234.5)).toBe("1.234,5");
   expect(result.current.formatting.currency(12, "BRL")).toContain("12,00");
@@ -195,4 +219,5 @@ function checkTranslationTypes(t: AppTranslate) {
   // @ts-expect-error Count must be numeric.
   t("common:items", { count: "two" });
 }
+
 void checkTranslationTypes;

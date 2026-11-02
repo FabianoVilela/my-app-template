@@ -17,9 +17,6 @@ import ptCommon from "./locales/pt-br/common.json";
 import ptNavigation from "./locales/pt-br/navigation.json";
 
 const PREFERENCE_KEY = "i18n.locale-preference";
-const CONFIGURED_DEFAULT_LOCALE = process.env.EXPO_PUBLIC_DEFAULT_LOCALE;
-const DEFAULT_LOCALE: AppLocale =
-  CONFIGURED_DEFAULT_LOCALE === "pt-BR" ? "pt-BR" : "en";
 const SUPPORTED_LOCALES: AppLocale[] = ["en", "pt-BR"];
 
 function isPreference(value: unknown): value is AppLocalePreference {
@@ -28,7 +25,10 @@ function isPreference(value: unknown): value is AppLocalePreference {
   );
 }
 
-export function resolveAppLocale(locales: readonly string[]): AppLocale {
+export function resolveAppLocale(
+  locales: readonly string[],
+  defaultLocale: AppLocale = "en",
+): AppLocale {
   for (const tag of locales) {
     const normalized = tag.toLowerCase();
     const exact = SUPPORTED_LOCALES.find(
@@ -40,14 +40,16 @@ export function resolveAppLocale(locales: readonly string[]): AppLocale {
     if (normalized.split("-")[0] === "en") return "en";
   }
 
-  return DEFAULT_LOCALE;
+  return defaultLocale;
 }
 
 export async function createI18nextAdapter({
+  defaultLocale = "en",
   storage,
   getDeviceLocales,
   onReadError,
 }: {
+  defaultLocale?: AppLocale;
   storage: LocalStorage;
   getDeviceLocales: () => readonly string[];
   onReadError: (error: unknown) => void;
@@ -63,12 +65,14 @@ export async function createI18nextAdapter({
   }
 
   const resolve = () =>
-    preference === "system" ? resolveAppLocale(getDeviceLocales()) : preference;
+    preference === "system"
+      ? resolveAppLocale(getDeviceLocales(), defaultLocale)
+      : preference;
   const instance = createInstance();
 
   await instance.init({
     lng: resolve(),
-    fallbackLng: DEFAULT_LOCALE,
+    fallbackLng: defaultLocale,
     supportedLngs: SUPPORTED_LOCALES,
     defaultNS: "common",
     ns: ["common", "navigation"],

@@ -50,6 +50,14 @@ transform without loading native setup; `.mjs`/ESM dependencies, including MSW 3
 are transformed for Jest's CommonJS runtime. Tests in Node must not import native
 UI modules; use the native project when an integration requires React Native.
 
+## Environment validation
+
+`src/infrastructure/env/read-env.test.ts` runs in Node and exercises the real
+Zod schemas through the public reader/parser: optional API configuration,
+HTTP/HTTPS development hosts, invalid URLs, locale fallback and sanitized errors.
+Native i18n tests check that the injected default locale preserves device and
+saved-preference precedence. See [validation](architecture/validation.md).
+
 ## Domain and application
 
 Test pure rules directly. Supply small typed fakes for application ports rather

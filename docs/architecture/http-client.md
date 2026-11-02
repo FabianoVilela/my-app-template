@@ -87,6 +87,13 @@ export interface ProductService {
   getProductById(id: string): Promise<Product>;
 }
 
+export class InvalidProductRequestError extends Error {
+  constructor() {
+    super("Invalid product request");
+    this.name = "InvalidProductRequestError";
+  }
+}
+
 export class InvalidProductResponseError extends Error {
   constructor() {
     super("Invalid product response");
@@ -95,46 +102,86 @@ export class InvalidProductResponseError extends Error {
 }
 ```
 
-Implement it in `modules/products/infrastructure/product-service.ts`. Keep small
-private payload conversions in this file; a separate DTO or mapper file is optional.
+Define `modules/products/infrastructure/schemas/get-product-request.schema.ts`:
+
+```ts
+import * as z from "zod";
+
+export const getProductRequestSchema = z.strictObject({
+  id: z.string().min(1),
+});
+```
+
+Define `modules/products/infrastructure/schemas/product-response.schema.ts`:
+
+```ts
+import * as z from "zod";
+
+export const productResponseSchema = z.object({
+  id: z.string(),
+  display_name: z.string(),
+});
+
+export type ProductResponse = z.infer<typeof productResponseSchema>;
+```
+
+Implement `modules/products/infrastructure/product-service.ts`. Keep the mapping
+local; schemas and inferred DTO types belong to infrastructure, while the public
+`Product` contract remains application-owned.
 
 ```ts
 import type { HttpClient } from "@/infrastructure/http/http-client";
-
 import {
+  InvalidProductRequestError,
   InvalidProductResponseError,
-  type Product,
   type ProductService,
 } from "../application/ports/product-service";
+import { getProductRequestSchema } from "./schemas/get-product-request.schema";
+import { productResponseSchema } from "./schemas/product-response.schema";
 
 export function createProductService(http: HttpClient): ProductService {
   return {
     async getProductById(id) {
+      const request = getProductRequestSchema.safeParse({ id });
+      if (!request.success) throw new InvalidProductRequestError();
+
       const response = await http.request({
         method: "GET",
-        path: `/products/${encodeURIComponent(id)}`,
+        path: `/products/${encodeURIComponent(request.data.id)}`,
       });
+      const product = productResponseSchema.safeParse(response.body);
+      if (!product.success) throw new InvalidProductResponseError();
 
-      return parseProduct(response.body);
+      return { id: product.data.id, name: product.data.display_name };
     },
   };
 }
-
-function parseProduct(body: unknown): Product {
-  if (
-    typeof body !== "object" ||
-    body === null ||
-    !("id" in body) ||
-    typeof body.id !== "string" ||
-    !("display_name" in body) ||
-    typeof body.display_name !== "string"
-  ) {
-    throw new InvalidProductResponseError();
-  }
-
-  return { id: body.id, name: body.display_name };
-}
 ```
+
+Use the same sequence for JSON bodies and query parameters: map operation input
+to the external payload, validate it before sending, and send the parsed result.
+An invalid request must not call HTTP. Validate successful response bodies before
+mapping to application models. Handle `204`, `205`, HEAD and endpoints with empty
+responses according to their contract instead of always expecting an object.
+Non-success payloads, when consumed, also need endpoint-specific validation without
+masking the original HTTP failure.
+
+Use strict objects for controlled outgoing payloads by default. Use `z.object()`
+for incoming objects so additional server fields are accepted and stripped from
+the parsed result. Declare the fields consumed by the client; avoid coercions or
+fallbacks that conceal broken backend contracts. Keep `null` and absent fields
+distinct unless the endpoint explicitly equates them. Use `z.input` and `z.output`
+when transformations change a DTO's type, and use async parsing for asynchronous
+refinements. Prefer synchronous schemas for ordinary payload shape checks.
+
+Use Zod directly; do not add a generic validation adapter or a schema option to
+`HttpClient`. Translate Zod failures into application-owned errors when crossing
+that boundary. Do not expose `ZodError`, schemas or inferred external DTO types
+through domain/application ports, and do not display technical validation messages
+as UI copy. Keep diagnostic reporting limited to useful field paths and codes;
+avoid logging payloads or attaching raw validation errors containing sensitive data.
+Define schemas at module scope and validate at the integration boundary, rather
+than recreating schemas or revalidating payloads on each React render.
 
 The factory connects HTTP once and returns a service whose methods retain that
 dependency. Calling `getProductById` does not require injecting HTTP again. Add
@@ -147,6 +194,7 @@ The default belongs in bootstrap, not in service imports. Once a derived project
 has a real service, its `bootstrap/create-dependencies.ts` could contain:
 
 ```ts
+import { readEnv } from "@/infrastructure/env/read-env";
 import { createAxiosHttpClient } from "@/infrastructure/http/axios-http-client";
 import type { HttpClient } from "@/infrastructure/http/http-client";
 import { createProductService } from "@/modules/products/infrastructure/product-service";
@@ -164,7 +212,7 @@ export function createDependencies(overrides: DependencyOverrides = {}) {
 }
 
 function createApiHttpClient(): HttpClient {
-  const baseUrl = process.env.EXPO_PUBLIC_API_URL;
+  const { apiUrl: baseUrl } = readEnv();
 
   if (!baseUrl) {
     throw new Error("EXPO_PUBLIC_API_URL is required to connect the API");
@@ -177,8 +225,9 @@ function createApiHttpClient(): HttpClient {
 The template deliberately does not create this file before there are services to
 assemble. `.env.example` documents the optional API URL. Copy it to `.env` and
 configure the URL when connecting the first API. The unmodified template starts
-without it. Use Expo's static `process.env.EXPO_PUBLIC_API_URL` notation; these
-values are public configuration, not secrets.
+without it. The shared environment reader uses Expo static dot notation and
+validates public configuration with the separate environment schema. See [validation](validation.md)
+for startup behavior and the locale fallback.
 
 Create dependencies explicitly at the app's composition boundary. When React owns
 that lifetime, retain them with lazy state initialization in the bootstrap provider
@@ -274,3 +323,5 @@ above, including primitive JSON bodies and failure categories.
 - [Axios errors](https://github.com/axios/axios#handling-errors)
 - [Axios interceptors](https://github.com/axios/axios#interceptors)
 - [Expo environment variables](https://docs.expo.dev/guides/environment-variables/)
+- [Zod basic usage](https://zod.dev/basics)
+- [Zod schemas](https://zod.dev/api)

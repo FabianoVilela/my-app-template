@@ -1,6 +1,7 @@
 import { getLocales } from "expo-localization";
 import { type ReactNode, useEffect, useState } from "react";
 import { AppState, Pressable, Text, View } from "react-native";
+import { readEnv } from "@/infrastructure/env/read-env";
 import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import { createMmkvStorage } from "@/infrastructure/storage/mmkv-storage";
 import { AppTranslationProvider } from "@/shared/i18n";
@@ -18,7 +19,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
     async function start() {
       try {
+        const env = readEnv();
         const dependencies = await createI18nextAdapter({
+          defaultLocale: env.defaultLocale,
           storage: createMmkvStorage({ id: "app-preferences" }),
           getDeviceLocales: () =>
             getLocales().map((locale) => locale.languageTag),
@@ -37,7 +40,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
               );
         });
       } catch (error: unknown) {
-        console.warn("Unable to initialize translations", error);
+        console.warn("Unable to initialize application", error);
         if (active) setHasFailed(true);
       }
     }
