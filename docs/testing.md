@@ -106,6 +106,25 @@ TZ=America/New_York pnpm test --runTestsByPath src/infrastructure/date/dayjs-dat
 Consumer tests should inject `DateAdapter` fakes instead of importing Day.js.
 Keep any clock dependency separate and explicit; the adapter does not read now.
 
+## Storage adapters
+
+The storage suites run in the native project as `.test.tsx` files because the
+libraries import native modules. MMKV uses its own in-memory test implementation;
+the suite stubs Nitro's bootstrap so no native object can be created. It checks
+string persistence behavior and normalized failures. The library mock does not
+simulate reopening a file or sharing persistence across instances with the same ID.
+
+SecureStore uses Expo's native mocks and scoped public API spies. Tests verify
+missing and empty values, asynchronous calls, service/accessibility options,
+unsupported environments, invalid keys and failure propagation. Consumer tests
+should inject typed `LocalStorage` or `SecureStorage` fakes rather than importing
+either vendor. Domain/application tests should use their own application ports.
+
+See the [storage guide](architecture/storage.md) for the contract and composition.
+Disk durability, Keychain/Keystore protection and reinstall/backup behavior need
+real iOS and Android development builds. Browser persistence needs browser checks.
+Jest mocks do not establish those guarantees.
+
 ## Components and navigation
 
 Read the installed Testing Library documentation before changing tests:

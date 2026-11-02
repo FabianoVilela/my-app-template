@@ -89,6 +89,14 @@ The following rules concern source imports, including type imports. Runtime call
 - Inject date operations explicitly where needed. Domain and application may import the pure contract, but must not import the concrete adapter. Select implementations in bootstrap when there are real consumers; do not introduce an eager singleton or example business features.
 - Follow the [date adapter guide](date-adapter.md) for supported formats, strict parsing, calendar arithmetic, time-zone behavior, errors and composition.
 
+## Local persistence
+
+- Use the library-independent `LocalStorage` and `SecureStorage` contracts in `infrastructure/storage/`. Keep `react-native-mmkv` and `expo-secure-store` imports inside their concrete adapters.
+- MMKV stores non-sensitive preferences, settings and serialized state only. Store tokens and credentials in SecureStore. Do not use these mechanisms as a local database.
+- Keep device storage out of domain and application. Define consumed capabilities in module application ports and implement persistence details in module infrastructure. Select adapters in bootstrap when real consumers exist, and preserve their instance lifetimes.
+- Keep serialization, payload validation, key ownership and schema migrations in the consuming infrastructure boundary. The shared adapters persist strings and normalize technical failures; they do not decide defaults or silently discard failed writes.
+- Follow the [storage guide](storage.md) for contracts, namespaces, platform limitations, composition and testing. State management integration is a separate concern.
+
 ## Bootstrap: composition and startup
 
 - Use `bootstrap/` as the application's composition root: select concrete adapters, supply them to application operations and compose the providers used by the UI. Use manual factories and explicit dependencies; a dependency-injection framework is not required.

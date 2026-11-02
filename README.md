@@ -29,6 +29,7 @@ You can start developing by editing the files inside the **src/app** directory. 
 
 - Biome is already configured for linting, formatting and import organization. See the quality checks below.
 - Jest, Expo component/navigation testing and MSW HTTP mocking are configured. See the [testing guide](docs/testing.md).
+- MMKV persistence requires a development build when used on iOS or Android. Run `pnpm ios` or `pnpm android` to create one; see the [storage guide](docs/architecture/storage.md).
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
 ## Rename the app
@@ -126,11 +127,17 @@ pnpm test:rename-app
 - [Application architecture](docs/architecture/AGENTS.md)
 - [Project conventions](docs/conventions/AGENTS.md)
 - [HTTP client, module services and dependency composition](docs/architecture/http-client.md)
+- [Local preferences and secure credential storage](docs/architecture/storage.md)
 
 The JSON HTTP client is ready to use through an Axios adapter. API configuration
 is optional until a derived project connects a backend; see `.env.example` and
 the HTTP guide. The template does not create business services or contact an API
 at startup.
+
+Local storage is available through an MMKV adapter for preferences, settings and
+serialized state, and a SecureStore adapter for tokens and credentials. Both use
+library-independent contracts and explicit factories. State management with
+Zustand will be integrated separately.
 
 ## Quality checks
 
