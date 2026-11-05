@@ -51,6 +51,7 @@ pnpm typecheck               # TypeScript, no emit
 pnpm test                    # unit, HTTP integration and native component tests
 pnpm check:push              # catalog freshness, types and application tests
 pnpm test:rename-app         # rename script integration tests (Node.js runner)
+pnpm test:variants           # app configuration and variant command tests
 pnpm expo install <package>  # install SDK-compatible dependencies
 ```
 
@@ -69,7 +70,7 @@ pnpm expo install <package>  # install SDK-compatible dependencies
 
 ## Rules
 
-- This template uses generated, Git-ignored `ios/` and `android/` directories (Continuous Native Generation). Configure native behavior in `app.json` and config plugins; do not create or edit generated native files by hand, even when local builds have created those directories.
+- This template uses generated, Git-ignored `ios/` and `android/` directories (Continuous Native Generation). Configure native behavior in `app.json`, `app.config.ts` and config plugins; do not create or edit generated native files by hand, even when local builds have created those directories.
 - Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build. Use `pnpm ios` or `pnpm android` when a local build is requested.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
 

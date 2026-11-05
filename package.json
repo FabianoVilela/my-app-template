@@ -58,10 +58,10 @@
     "prepare": "husky",
     "rename-app": "node --experimental-strip-types ./scripts/rename-app.ts",
     "test:rename-app": "node --experimental-strip-types --test ./scripts/rename-app.test.ts",
-    "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "web": "expo start --web",
+    "start": "node scripts/expo-variant.mjs development start",
+    "android": "node scripts/expo-variant.mjs development run:android",
+    "ios": "node scripts/expo-variant.mjs development run:ios",
+    "web": "node scripts/expo-variant.mjs development start --web",
     "lint": "biome lint .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
@@ -76,7 +76,17 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage",
     "i18n:types": "node scripts/i18n-types.mjs",
-    "i18n:check": "node scripts/i18n-types.mjs --check"
+    "i18n:check": "node scripts/i18n-types.mjs --check",
+    "test:variants": "node --experimental-strip-types --test scripts/app-variants.test.mjs",
+    "expo:development": "node scripts/expo-variant.mjs development",
+    "expo:staging": "node scripts/expo-variant.mjs staging",
+    "start:staging": "node scripts/expo-variant.mjs staging start",
+    "android:staging": "node scripts/expo-variant.mjs staging run:android --variant release",
+    "ios:staging": "node scripts/expo-variant.mjs staging run:ios --configuration Release",
+    "expo:production": "node scripts/expo-variant.mjs production",
+    "start:production": "node scripts/expo-variant.mjs production start",
+    "android:production": "node scripts/expo-variant.mjs production run:android --variant release",
+    "ios:production": "node scripts/expo-variant.mjs production run:ios --configuration Release"
   },
   "lint-staged": {
     "*": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"

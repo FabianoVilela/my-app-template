@@ -1,0 +1,135 @@
+# App variants and local releases
+
+Variants use Expo SDK 58 dynamic app configuration and Continuous Native
+Generation (CNG). No EAS account, EAS project, OTA service or backend is required.
+`app.json` owns the base production identity and shared configuration;
+`app.config.ts` derives the selected variant without changing the base file.
+
+| Variant | Display name suffix | Android/iOS ID suffix | URL scheme suffix |
+| --- | --- | --- | --- |
+| development | ` (Dev)` | `.dev` | `.dev` |
+| staging | ` (Staging)` | `.staging` | `.staging` |
+| production | none | none | none |
+
+The Expo slug stays the same. Distinct native IDs allow simultaneous installation;
+distinct URL schemes avoid opening the wrong installed variant. Register each
+identity and callback URL with authentication, push and other services when those
+capabilities are added. Backend configuration must provide actual data isolation.
+
+## Selecting configuration
+
+Use Node.js >= 22.13 and the package scripts from the repository root:
+
+```bash
+pnpm start
+pnpm ios
+pnpm android
+pnpm web
+pnpm start:staging
+pnpm ios:staging
+pnpm android:staging
+pnpm ios:production
+pnpm android:production
+pnpm expo:production config --json
+pnpm expo:staging start --web
+```
+
+Default commands select development. Staging and production native commands select
+release compilation; the environment itself does not determine debug/release.
+`expo:<variant>` forwards any Expo CLI command and arguments with the same environment
+selection. For example, use `pnpm expo:staging run:ios` for staging in debug mode.
+The Metro command and installed development binary must use the same variant.
+Release binaries include their JavaScript bundle and do not need Metro.
+
+The runner selects `APP_VARIANT`, loads environment files with Node, and disables
+Expo's automatic dotenv loading with `EXPO_NO_DOTENV=1`. It never changes `NODE_ENV`.
+Configuration defaults to development outside the runner; invalid variants fail.
+Direct `pnpm expo` commands bypass the runner's environment-file selection, so use
+the variant commands for reproducible builds and exports.
+
+Copy `.env.example` to `.env.development.local`, `.env.staging.local` or
+`.env.production.local` and supply each environment's public values. No API URL is
+required by the template. These files and `.env.<variant>` files are Git-ignored.
+
+Precedence, highest first:
+
+1. Existing process/CI variables.
+2. `.env.<variant>.local`.
+3. `.env.<variant>`.
+4. Development only: `.env.local`, then `.env` (backward compatibility).
+
+Staging and production never load generic `.env` or `.env.local` files, preventing
+a development endpoint from leaking through fallback. Existing shell variables
+still take precedence: inspect them when switching environments. Set the variant
+through the command, not through dotenv files. `EXPO_PUBLIC_*` values are public
+and are embedded into the bundle; changes require reloading/rebuilding it. Keep
+credentials outside public variables. Existing startup validation still validates
+URLs and locale; it does not validate CI or require a backend.
+
+## Switching native variants
+
+Existing native directories retain the previously generated identity. Before
+switching variants or after renaming the app, regenerate and then compile:
+
+```bash
+pnpm expo:staging prebuild --clean
+pnpm ios:staging
+# Or: pnpm android:staging
+```
+
+`prebuild --clean` removes and regenerates native directories. Keep customizations
+in app config/config plugins, as required by this repository; never rely on manual
+changes inside `ios/` or `android/`. Normal repeated builds of the same unchanged
+variant do not need a clean prebuild. Expo Go cannot demonstrate separate native
+identities; use installed builds to verify coexistence and deep links.
+
+`rename-app` updates the base identity in `app.json` and preserves `app.config.ts`,
+including customizations. Keep names, identifiers and schemes derived from the
+base configuration when customizing this file. The script does not evaluate or
+validate custom overrides; hardcoded identities there will not be renamed.
+Other dynamic configuration filenames are still rejected to avoid conflicting
+sources of configuration.
+
+## Local production and manual publishing
+
+Select production configuration for generation, compilation and bundling. An
+installable local release is not automatically signed for store distribution.
+
+- Android: configure release signing using your upload keystore, build a signed
+  AAB with Gradle, then upload it through Google Play Console.
+- iOS: on macOS with Xcode, configure your team and provisioning, archive the
+  production app and distribute it to App Store Connect through Xcode. Submit it
+  to TestFlight or App Review in App Store Connect.
+
+Signing credentials, store registrations and version/build-number management
+belong to each derived project and are not provisioned by this template. Preserve
+CNG by implementing persistent native signing customization through config plugins
+or reproducible build tooling rather than hand-editing generated files. Keep the
+variant environment active for direct native builds that invoke Expo bundling;
+for example, in a shell session loaded with production public variables, export
+`APP_VARIANT=production` and `EXPO_NO_DOTENV=1` before launching Gradle or Xcode from
+that session. This avoids Expo loading a development `.env` during bundling.
+The `ios:production` and `android:production` commands already pass the selected
+environment to their child builds.
+
+No OTA runtime is installed. Updates are delivered by submitting new app versions
+to the stores. EAS Build, EAS Submit and EAS Update can each be adopted separately
+later; `eas.json` is unnecessary for local variants. If adopting EAS, explicitly
+map build profiles to `APP_VARIANT` and the appropriate remote environment
+(`development`, `preview` for staging, `production`). Configure signing and install
+`expo-dev-client` only if adopting a development-client workflow. OTA needs its
+own channel/runtime-version design and is outside this template's current setup.
+
+## Verification
+
+Run `pnpm test:variants`, `pnpm test:rename-app`, the application tests and the
+standard lint/check/typecheck commands. Inspect each resolved configuration with
+`pnpm expo:<variant> config --json`; do not share output containing private config.
+On devices/simulators, verify coexistence, display names, URL schemes and the
+selected backend, then launch a staging release without Metro. Automated config
+tests do not establish signing, native installation or store acceptance.
+
+References: [Expo variants](https://docs.expo.dev/build-reference/variants/),
+[environment variables](https://docs.expo.dev/guides/environment-variables/),
+[local production builds](https://docs.expo.dev/guides/local-app-production/),
+[SDK 58 app config](https://docs.expo.dev/versions/v58.0.0/config/app/).

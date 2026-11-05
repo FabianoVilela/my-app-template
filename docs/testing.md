@@ -12,6 +12,7 @@ pnpm test:watch
 pnpm test:coverage
 pnpm test:ci
 pnpm test:rename-app
+pnpm test:variants
 ```
 
 `test` runs once. `test:watch` watches changed tests; `test:ci` runs once with CI
@@ -20,7 +21,8 @@ behavior and coverage. Reports are written to ignored `coverage/`, including
 source, including files without tests; no arbitrary percentage threshold is set.
 
 Run `pnpm check`, `pnpm typecheck`, `pnpm test:ci` and `pnpm test:rename-app`
-in CI. The script tests use Node's built-in runner and are excluded from Jest.
+in CI. Also run `pnpm test:variants` for dynamic configuration, environment isolation and
+CLI forwarding checks. The script tests use Node's built-in runner and are excluded from Jest.
 
 To select an environment or an individual suite:
 

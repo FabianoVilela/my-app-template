@@ -79,6 +79,10 @@ const IGNORED_FILES = new Set([
   "skills-lock.json",
   "rename-app.ts",
   "rename-app.test.ts",
+  // Preserve variant configuration; base identity is owned by app.json.
+  "app.config.ts",
+  "expo-variant.mjs",
+  "app-variants.test.mjs",
 ]);
 const RESERVED_SEGMENTS = new Set(
   `abstract assert boolean break byte case catch char class const continue default
@@ -342,9 +346,15 @@ async function main() {
   );
   const root = process.cwd();
   for (const extension of ["js", "ts", "cjs", "mjs", "cts", "mts", "json"]) {
-    if (await exists(join(root, `app.config.${extension}`))) {
+    const configPath = join(root, `app.config.${extension}`);
+    if (await exists(configPath)) {
+      if (extension === "ts") {
+        // app.config.ts derives variant identities from app.json. Leave it intact.
+        await readChange(configPath);
+        continue;
+      }
       throw new Error(
-        `app.config.${extension} can override app.json. Migrate its configuration to app.json before using this script.`,
+        `app.config.${extension} can override app.json. Use app.config.ts with identity derived from app.json or migrate its configuration to app.json before using this script.`,
       );
     }
   }

@@ -16,8 +16,10 @@ explicit inputs and tests. Both return validated configuration with `apiUrl` and
 references, which Expo replaces in the JavaScript bundle. Dynamic property
 access, destructuring `process.env`, or parsing the entire `process.env` object
 does not provide equivalent client-side behavior. These variables are public;
-do not use them for secrets. Expo already loads `.env` files; no additional dotenv
-or native configuration package is required.
+do not use them for secrets. The variant commands load the selected environment files with Node and disable
+Expo automatic dotenv loading. No additional dotenv or native configuration
+package is required; see [app variants](../app-variants.md) for precedence and
+production isolation. Direct Expo CLI commands retain Expo default loading.
 
 `EXPO_PUBLIC_API_URL` is optional; an empty string becomes absent. A supplied URL
 must use HTTP or HTTPS. Localhost, emulator IPs and LAN hosts remain valid for

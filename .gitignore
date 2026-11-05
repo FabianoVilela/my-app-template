@@ -45,3 +45,8 @@ example
 .env
 
 /.harness-eval
+
+# Variant-specific environment values
+.env.development
+.env.staging
+.env.production

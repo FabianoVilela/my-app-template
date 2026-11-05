@@ -98,16 +98,18 @@ Schemes start with a lowercase letter and contain lowercase letters, digits,
 digits, hyphens and periods. Android IDs have at least two segments, each starting
 with a lowercase letter and containing ASCII letters, digits or underscores.
 `--help` lists all options. Invalid arguments, malformed or missing configuration,
-and dynamic `app.config.*` overrides stop the operation before writing. Writes
-are staged beside the originals; if a write fails, the script attempts to restore
+and unsupported dynamic `app.config.*` overrides stop the operation before writing.
+`app.config.ts` is preserved, including customizations. Keep variant identities
+derived from `app.json`; custom hardcoded overrides are not renamed or validated. Writes are staged beside the originals; if a write fails, the script attempts to restore
 every file already committed and reports any restoration failures.
 
 This template uses [Expo app configuration](https://docs.expo.dev/versions/v58.0.0/config/app/)
 and [Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/).
 Expo Router handles the [React Native root registration](https://reactnative.dev/docs/appregistry);
-keep `main: "expo-router/entry"`. Native projects are generated from `app.json`.
-If `ios/` or `android/` already exists, preserve manual native changes, regenerate
-with `pnpm expo prebuild --clean`, and rebuild. A new native build is required
+keep `main: "expo-router/entry"`. Native projects are generated from `app.json`
+and `app.config.ts`. Keep native customization in app config and config plugins.
+If `ios/` or `android/` already exists, regenerate with
+`pnpm expo:development prebuild --clean`, and rebuild. A new native build is required
 for the updated native name, identifiers and scheme to take effect.
 
 Changing an application ID creates a separate store identity. For an existing
@@ -121,6 +123,24 @@ Run the script's integration checks with the built-in Node.js test runner:
 ```bash
 pnpm test:rename-app
 ```
+
+## App variants
+
+The template supports `development` (default), `staging` and `production` through
+Expo dynamic configuration. EAS and OTA are optional and are not configured.
+See [App variants and local releases](docs/app-variants.md) for environment files,
+local builds, switching variants and manual store submission.
+
+```bash
+pnpm ios                         # development, debug build
+pnpm android:staging              # staging, release build
+pnpm ios:production               # production, release build
+pnpm expo:staging config --json   # inspect the resolved configuration
+pnpm test:variants
+```
+
+When switching an existing native project to another variant, first regenerate it
+with the matching `pnpm expo:<variant> prebuild --clean` command.
 
 ## Project architecture
 
@@ -148,6 +168,7 @@ pnpm check
 pnpm typecheck
 pnpm i18n:check
 pnpm test:ci
+pnpm test:variants
 pnpm test:rename-app
 ```
 

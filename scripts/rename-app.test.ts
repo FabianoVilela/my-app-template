@@ -311,7 +311,7 @@ for (const args of [
   });
 }
 
-for (const extension of ["js", "ts", "mjs", "cjs", "mts", "cts", "json"]) {
+for (const extension of ["js", "mjs", "cjs", "mts", "cts", "json"]) {
   test(`rejects app.config.${extension} before writing`, (context) => {
     const { root, run, read, files } = fixture(context);
     writeFileSync(join(root, `app.config.${extension}`), "{}");
@@ -365,4 +365,50 @@ test("restores committed files and removes temporary files after a write failure
     ),
     false,
   );
+});
+
+test("renames the base identity with the supported variant config", (context) => {
+  const { root, run, read } = fixture(context);
+  const config = readFileSync(
+    new URL("../app.config.ts", import.meta.url),
+    "utf8",
+  );
+  writeFileSync(join(root, "app.config.ts"), config);
+  const result = run(["New App"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(read("app.config.ts"), config);
+  assert.equal(
+    JSON.parse(read("app.json")).expo.ios.bundleIdentifier,
+    "com.example.newapp",
+  );
+});
+
+test("preserves customized variant configuration while renaming the base", (context) => {
+  const { root, run, read } = fixture(context);
+  const config = `${readFileSync(new URL("../app.config.ts", import.meta.url), "utf8")}\n// customized\n`;
+  writeFileSync(join(root, "app.config.ts"), config);
+  const result = run(["New App"]);
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(read("app.config.ts"), config);
+  assert.equal(JSON.parse(read("app.json")).expo.name, "New App");
+});
+
+test("rejects symlinked variant configuration before writing", (context) => {
+  const { root, run, read, files } = fixture(context);
+  symlinkSync(join(root, "package.json"), join(root, "app.config.ts"));
+  const result = run(["New App"]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /without symlinks/);
+  assert.equal(read("app.json"), files["app.json"]);
+});
+
+test("supports the template variant config with Windows line endings", (context) => {
+  const { root, run } = fixture(context);
+  const config = readFileSync(
+    new URL("../app.config.ts", import.meta.url),
+    "utf8",
+  );
+  writeFileSync(join(root, "app.config.ts"), config.replace(/\r?\n/g, "\r\n"));
+  const result = run(["New App"]);
+  assert.equal(result.status, 0, result.stderr);
 });
