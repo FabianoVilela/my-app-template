@@ -81,6 +81,10 @@ const IGNORED_FILES = new Set([
   "rename-app.test.ts",
   // Preserve variant configuration; base identity is owned by app.json.
   "app.config.ts",
+  "app-versions.json",
+  "app-versions.cjs",
+  "release-version.mjs",
+  "release-version.test.mjs",
   "expo-variant.mjs",
   "app-variants.test.mjs",
 ]);

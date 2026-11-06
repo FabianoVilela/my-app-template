@@ -1,10 +1,14 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
+import { isAppVariant, readAppVersions } from "./scripts/app-versions.cjs";
 
 export default function appConfig({ config }: ConfigContext): ExpoConfig {
   const variant = process.env.APP_VARIANT ?? "development";
-  if (!["development", "staging", "production"].includes(variant)) {
+  if (!isAppVariant(variant)) {
     throw new Error("APP_VARIANT must be development, staging or production");
   }
+
+  const versions = readAppVersions();
+  const { version, build } = versions[variant];
 
   const suffix = { development: ".dev", staging: ".staging", production: "" }[
     variant
@@ -28,9 +32,11 @@ export default function appConfig({ config }: ConfigContext): ExpoConfig {
     ...config,
     name: `${config.name}${label}`,
     slug: config.slug,
+    version,
     scheme: `${config.scheme}${suffix}`,
     ios: {
       ...config.ios,
+      buildNumber: String(build),
       bundleIdentifier: `${config.ios.bundleIdentifier}${suffix}`,
       ...(config.ios.infoPlist?.CFBundleDisplayName
         ? {
@@ -43,6 +49,7 @@ export default function appConfig({ config }: ConfigContext): ExpoConfig {
     },
     android: {
       ...config.android,
+      versionCode: build,
       package: `${config.android.package}${suffix}`,
     },
   };

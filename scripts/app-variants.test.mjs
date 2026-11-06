@@ -16,6 +16,9 @@ import appConfig from "../app.config.ts";
 const BASE = JSON.parse(
   readFileSync(new URL("../app.json", import.meta.url)),
 ).expo;
+const VERSIONS = JSON.parse(
+  readFileSync(new URL("../app-versions.json", import.meta.url)),
+);
 const RUNNER = fileURLToPath(new URL("./expo-variant.mjs", import.meta.url));
 
 for (const [variant, suffix, label] of [
@@ -40,6 +43,9 @@ for (const [variant, suffix, label] of [
     );
     assert.equal(config.android.package, BASE.android.package + suffix);
     assert.equal(config.slug, BASE.slug);
+    assert.equal(config.version, VERSIONS[variant].version);
+    assert.equal(config.ios.buildNumber, String(VERSIONS[variant].build));
+    assert.equal(config.android.versionCode, VERSIONS[variant].build);
     assert.deepEqual(config.plugins, BASE.plugins);
     assert.deepEqual(BASE, original);
     const renamed = appConfig({

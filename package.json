@@ -86,7 +86,9 @@
     "expo:production": "node scripts/expo-variant.mjs production",
     "start:production": "node scripts/expo-variant.mjs production start",
     "android:production": "node scripts/expo-variant.mjs production run:android --variant release",
-    "ios:production": "node scripts/expo-variant.mjs production run:ios --configuration Release"
+    "ios:production": "node scripts/expo-variant.mjs production run:ios --configuration Release",
+    "release:version": "node scripts/release-version.mjs",
+    "test:release-version": "node --experimental-strip-types --test scripts/release-version.test.mjs"
   },
   "lint-staged": {
     "*": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"

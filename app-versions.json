@@ -1,0 +1,14 @@
+{
+  "development": {
+    "version": "1.0.0",
+    "build": 1
+  },
+  "staging": {
+    "version": "1.0.0",
+    "build": 1
+  },
+  "production": {
+    "version": "1.0.0",
+    "build": 1
+  }
+}

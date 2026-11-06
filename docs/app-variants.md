@@ -4,6 +4,7 @@ Variants use Expo SDK 58 dynamic app configuration and Continuous Native
 Generation (CNG). No EAS account, EAS project, OTA service or backend is required.
 `app.json` owns the base production identity and shared configuration;
 `app.config.ts` derives the selected variant without changing the base file.
+`app-versions.json` owns each variant's app version and build counter.
 
 | Variant | Display name suffix | Android/iOS ID suffix | URL scheme suffix |
 | --- | --- | --- | --- |
@@ -90,6 +91,62 @@ validate custom overrides; hardcoded identities there will not be renamed.
 Other dynamic configuration filenames are still rejected to avoid conflicting
 sources of configuration.
 
+## Versions and release preparation
+
+A version (for example `1.3.0`) identifies an app release. A build (for example
+`27`) distinguishes binaries of that release. A corrected release candidate can
+remain version `1.3.0` while moving from build `27` to `28`.
+
+`app-versions.json` is the only source for app versions and build counters. Each
+variant starts at version `1.0.0`, build `1` and evolves independently. The selected
+entry supplies Expo `version`, iOS `buildNumber` (string) and Android `versionCode`
+(integer). `package.json.version` describes the project/template and is independent;
+`app.json` does not define a second app version. Keep the versions file in Git.
+
+```bash
+pnpm release:version staging minor --dry-run
+pnpm release:version staging minor        # 1.0.0 (1) -> 1.1.0 (2)
+pnpm release:version staging --build-only # 1.1.0 (2) -> 1.1.0 (3)
+pnpm release:version production 1.1.0     # promote the public version, with production's own next build
+pnpm release:version production patch
+pnpm release:version development major
+```
+
+`patch`, `minor` and `major` increment the requested version component and reset
+lower components to zero. An explicit `X.Y.Z` must be greater than the variant's
+current version. Use `--build-only` to retain its version. Every successful update
+increments that variant's build by one, shared between iOS and Android; the build
+never resets when changing version. Other variants, `app.json` and `package.json`
+are preserved. `--dry-run` previews without writing. `--help` lists usage.
+
+Versions use three nonnegative integer components without leading zeroes or
+prerelease suffixes. Builds are positive integers up to Android's `2100000000`
+limit. Invalid input, malformed data and overflowing increments fail before
+writing. The single versions file is replaced through a temporary file; run
+release preparation serially. This local workflow does not coordinate concurrent
+branches/CI jobs or query store history. For an already distributed app, first
+align each variant's counters with its existing uploads so the next upload uses
+a new build number.
+
+Prepare a candidate explicitly, review and commit the versions file, then
+regenerate and build the chosen native variant:
+
+```bash
+pnpm release:version production --build-only
+pnpm expo:production config --json
+pnpm expo:production prebuild --clean
+pnpm ios:production
+# Or: pnpm android:production
+```
+
+Reading app configuration and running normal development commands never increment
+versions. The version command does not create a commit, tag, build or deployment.
+Regenerating native projects is required to carry changed version metadata into
+the binary; refreshing Metro alone does not change an installed app's version.
+Staging should normally test the public version intended for production, while
+each app identity retains its own build counter. Check versions again after merging
+release branches; increasing a build number does not imply approval for publication.
+
 ## Local production and manual publishing
 
 Select production configuration for generation, compilation and bundling. An
@@ -101,8 +158,8 @@ installable local release is not automatically signed for store distribution.
   production app and distribute it to App Store Connect through Xcode. Submit it
   to TestFlight or App Review in App Store Connect.
 
-Signing credentials, store registrations and version/build-number management
-belong to each derived project and are not provisioned by this template. Preserve
+Signing credentials and store registrations belong to each derived project and
+are not provisioned by this template. Preserve
 CNG by implementing persistent native signing customization through config plugins
 or reproducible build tooling rather than hand-editing generated files. Keep the
 variant environment active for direct native builds that invoke Expo bundling;
@@ -119,10 +176,13 @@ map build profiles to `APP_VARIANT` and the appropriate remote environment
 (`development`, `preview` for staging, `production`). Configure signing and install
 `expo-dev-client` only if adopting a development-client workflow. OTA needs its
 own channel/runtime-version design and is outside this template's current setup.
+If adopting EAS with this versioning workflow, keep app versions sourced locally
+and avoid a second automatic counter that would override the values in Git.
 
 ## Verification
 
-Run `pnpm test:variants`, `pnpm test:rename-app`, the application tests and the
+Run `pnpm test:release-version`, `pnpm test:variants`, `pnpm test:rename-app`,
+the application tests and the
 standard lint/check/typecheck commands. Inspect each resolved configuration with
 `pnpm expo:<variant> config --json`; do not share output containing private config.
 On devices/simulators, verify coexistence, display names, URL schemes and the

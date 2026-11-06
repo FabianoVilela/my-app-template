@@ -139,6 +139,21 @@ pnpm expo:staging config --json   # inspect the resolved configuration
 pnpm test:variants
 ```
 
+Each variant has an independent version and build counter in `app-versions.json`.
+Prepare releases explicitly; these commands do not build or publish:
+
+```bash
+pnpm release:version staging minor --dry-run
+pnpm release:version staging minor
+pnpm release:version staging --build-only
+pnpm release:version production 1.1.0
+```
+
+`patch`, `minor`, `major` or a higher explicit version also increment the build.
+`--build-only` increments the build without changing the version. The package's
+own version remains independent. Regenerate native projects after version changes.
+See the [versioning workflow](docs/app-variants.md#versions-and-release-preparation).
+
 When switching an existing native project to another variant, first regenerate it
 with the matching `pnpm expo:<variant> prebuild --clean` command.
 
@@ -169,6 +184,7 @@ pnpm typecheck
 pnpm i18n:check
 pnpm test:ci
 pnpm test:variants
+pnpm test:release-version
 pnpm test:rename-app
 ```
 

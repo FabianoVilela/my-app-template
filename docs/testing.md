@@ -13,6 +13,7 @@ pnpm test:coverage
 pnpm test:ci
 pnpm test:rename-app
 pnpm test:variants
+pnpm test:release-version
 ```
 
 `test` runs once. `test:watch` watches changed tests; `test:ci` runs once with CI
@@ -22,7 +23,9 @@ source, including files without tests; no arbitrary percentage threshold is set.
 
 Run `pnpm check`, `pnpm typecheck`, `pnpm test:ci` and `pnpm test:rename-app`
 in CI. Also run `pnpm test:variants` for dynamic configuration, environment isolation and
-CLI forwarding checks. The script tests use Node's built-in runner and are excluded from Jest.
+CLI forwarding checks. Run `pnpm test:release-version` for independent version
+selection, version/build increments, previews, rejected requests and unchanged
+files on failure. The script tests use Node's built-in runner and are excluded from Jest.
 
 To select an environment or an individual suite:
 

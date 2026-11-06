@@ -52,6 +52,8 @@ pnpm test                    # unit, HTTP integration and native component tests
 pnpm check:push              # catalog freshness, types and application tests
 pnpm test:rename-app         # rename script integration tests (Node.js runner)
 pnpm test:variants           # app configuration and variant command tests
+pnpm test:release-version    # per-variant release preparation tests
+pnpm release:version staging patch # prepare version/build metadata; no deployment
 pnpm expo install <package>  # install SDK-compatible dependencies
 ```
 
