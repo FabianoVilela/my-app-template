@@ -17,6 +17,41 @@ distinct URL schemes avoid opening the wrong installed variant. Register each
 identity and callback URL with authentication, push and other services when those
 capabilities are added. Backend configuration must provide actual data isolation.
 
+## Future visual differentiation (not implemented)
+
+Variant-specific launcher icons and an app information screen are intended future
+improvements. Current variants share icon assets; their installed names already
+distinguish development and staging. This proposal records direction for future
+work and does not request implementation during unrelated tasks.
+
+When implementing visual differentiation, start with these two capabilities:
+
+- Distinct development and staging icons derived from the app's production
+  identity. Combine a different color with a recognizable shape or mark so the
+  distinction survives themed or tinted appearances. Preserve the production
+  artwork. Choose colors and marks to fit the actual app's branding.
+- An app information screen showing the selected environment and the installed
+  binary's version and build. Use the per-variant versioning workflow documented here;
+  avoid showing a newer config value as if it described an older installed build.
+
+The user can supply finished assets or request AI assistance creating variants
+from the production artwork. AI-generated artwork is optional and depends on the
+available image tools; it is not required to use this template. Preserve editable
+sources and handle platform-specific packaging separately, including the current
+iOS Icon Composer asset and Android adaptive/monochrome assets. Do not assume a
+generated PNG alone replaces every platform's icon resources.
+
+Create or update the artwork once when implementing or changing the design, then
+keep approved assets under `assets/` in Git. Builds should select existing assets
+deterministically through `app.config.ts`; they should not invoke image generation.
+After implementation, this selection is automatic for each variant. Native
+regeneration and rebuilding are still required to change installed launcher icons.
+Verify installed icons on Android and iOS, including themed/tinted appearances.
+
+Additional possibilities include an in-app non-production environment indicator,
+variant-specific splash details and environment/version/build metadata in error
+reports. Revisit these when the corresponding capability is requested.
+
 ## Selecting configuration
 
 Use Node.js >= 22.13 and the package scripts from the repository root:

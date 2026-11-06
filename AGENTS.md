@@ -19,6 +19,7 @@ Read applicable instructions once per task. Start with the affected code and tes
 | --- | --- |
 | HTTP endpoints or services | [HTTP client](docs/architecture/http-client.md) and [validation](docs/architecture/validation.md) |
 | Public environment configuration | [Validation](docs/architecture/validation.md#environment) |
+| App variants, launcher icons or environment/version display | [App variants](docs/app-variants.md), including the future visual differentiation proposal |
 | Dates, UTC or time zones | [Date operations](docs/architecture/date-adapter.md) |
 | Translations, locale or localized formatting | [Internationalization](docs/architecture/i18n.md) |
 | Preferences or credentials | [Storage](docs/architecture/storage.md) |
