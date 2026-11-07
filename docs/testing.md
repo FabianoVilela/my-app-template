@@ -60,9 +60,9 @@ UI modules; use the native project when an integration requires React Native.
 
 `src/infrastructure/env/read-env.test.ts` runs in Node and exercises the real
 Zod schemas through the public reader/parser: optional API configuration,
-HTTP/HTTPS development hosts, invalid URLs, locale fallback and sanitized errors.
-Native i18n tests check that the injected default locale preserves device and
-saved-preference precedence. See [validation](architecture/validation.md).
+HTTP/HTTPS development hosts, invalid URLs, locale fallback, app variants and
+sanitized errors. The i18n adapter tests check that the injected default locale
+preserves device and saved-preference precedence. See [validation](architecture/validation.md).
 
 ## Domain and application
 
@@ -173,7 +173,7 @@ backend data. No Maestro flows or device tests are configured yet.
 
 ## Internationalization
 
-`tests/i18n.test.tsx` exercises isolated real translation instances with fake storage/device locales, shared facade hooks, rich text and locale-aware formatting. `catalogs.test.ts` validates logical messages, interpolation variables, markup and plural categories, and checks catalog directories and `app.json` supportedLocales against `APP_LOCALES`. Navigation integration checks language changes without losing the route. Type assertions in the i18n suite check the public translation contract during `pnpm typecheck`. Run `pnpm i18n:types` after catalog edits and `pnpm i18n:check` in CI; pre-push includes the freshness check. See the [i18n guide](architecture/i18n.md) for native and web limitations.
+`infrastructure/i18n/i18next-adapter.test.ts` exercises isolated real translation instances with fake storage/device locales: locale resolution, preferences, storage failures and plurals. `shared/i18n/app-translation-provider.test.tsx` covers the shared facade hooks, rich text and locale-aware formatting through a real adapter. `catalogs.test.ts` validates logical messages, interpolation variables, markup and plural categories, and checks catalog directories and `app.json` supportedLocales against `APP_LOCALES`. Navigation integration checks language changes without losing the route. Type assertions in the facade suite check the public translation contract during `pnpm typecheck`. Run `pnpm i18n:types` after catalog edits and `pnpm i18n:check` in CI; pre-push includes the freshness check. See the [i18n guide](architecture/i18n.md) for native and web limitations.
 
 ## Observability
 
