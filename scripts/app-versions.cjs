@@ -34,13 +34,16 @@ function validateAppVersions(input) {
   if (typeof input !== "object" || input === null || Array.isArray(input)) {
     throw new Error("app-versions.json must contain an object");
   }
+
   for (const variant of VARIANTS) {
     const entry = Reflect.get(input, variant);
+
     if (!entry || !isAppVersion(entry.version)) {
       throw new Error(
         `${variant}.version must use major.minor.patch without prerelease suffixes`,
       );
     }
+
     if (
       !Number.isSafeInteger(entry.build) ||
       entry.build < 1 ||

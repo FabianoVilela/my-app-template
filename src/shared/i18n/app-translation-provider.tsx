@@ -44,5 +44,6 @@ export function useAppI18nContext() {
     context.runtime.getSnapshot,
     context.runtime.getSnapshot,
   );
+
   return { ...context, ...snapshot };
 }

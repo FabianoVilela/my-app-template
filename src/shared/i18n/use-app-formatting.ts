@@ -11,6 +11,7 @@ export function useAppFormatting() {
     function number(value: number, options: Intl.NumberFormatOptions = {}) {
       const key = JSON.stringify(options);
       let formatter = numbers.get(key);
+
       if (!formatter) {
         formatter = new Intl.NumberFormat(locale, options);
         numbers.set(key, formatter);
