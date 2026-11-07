@@ -17,7 +17,10 @@ renders HTML in Node (`static` or `server` output), initialization is skipped
 there to avoid sharing request context. No configuration is required to start the template.
 
 Startup, preference restoration and device locale refresh failures are reported
-at their handling boundary. Do not report the same error at every layer. Expected
+at their handling boundary. The root layout exports an Expo Router
+`ErrorBoundary` that reports render errors once as `app.render` and shows the
+shared error screen with retry; screen-level boundaries added later must report
+only what they catch. Do not report the same error at every layer. Expected
 validation failures, cancellations and normal offline behavior should not become
 incidents automatically. Domain stays telemetry-free. If an application operation
 needs reporting, define a pure capability beside that operation and inject it;

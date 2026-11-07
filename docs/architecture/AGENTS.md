@@ -103,7 +103,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 - Use the vendor-independent `ErrorReporter` contract for technical reporting; keep Sentry imports and framework integration in `infrastructure/observability`. Inject reporting into consumers and keep domain telemetry-free. Application operations needing reporting define their own pure ports.
 - Initialize the crash SDK once at the client process boundary before React mounts; this SDK-specific lifetime is an exception to ordinary dependency lifetimes, not a global service locator. Skip server rendering and disable remote reporting without configuration or in debug builds.
-- Report once at the handling boundary, use fixed technical context, and avoid payloads, credentials and personal data. See [observability](observability.md) for privacy limits, native setup, source maps and activation.
+- Report once at the handling boundary, use fixed technical context, and avoid payloads, credentials and personal data. The root layout's `ErrorBoundary` is the handling boundary for render errors. See [observability](observability.md) for privacy limits, native setup, source maps and activation.
 
 ## Bootstrap: composition and startup
 

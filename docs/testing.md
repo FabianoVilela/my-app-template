@@ -189,7 +189,10 @@ backend data. No Maestro flows or device tests are configured yet.
 fake preference store: foreground locale refresh, refresh failures reported at
 their boundary, `dispose` and invalid configuration. `app-providers.test.tsx`
 replaces startup to cover the splash screen, the error screen and retry, and
-disposal of a session that resolves after unmounting.
+disposal of a session that resolves after unmounting. `route-error-fallback.test.tsx`
+checks that a render error is reported once and retried, and
+`tests/root-layout.test.tsx` renders the real root layout module with a throwing
+screen to confirm its `ErrorBoundary` export catches and reports it.
 
 ## Observability
 
