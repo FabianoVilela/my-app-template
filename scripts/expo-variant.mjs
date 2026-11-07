@@ -1,13 +1,11 @@
 import { spawn } from "node:child_process";
 import { loadEnvFile } from "node:process";
+import { isAppVariant, VARIANTS } from "./app-versions.cjs";
 
 const [variant, ...args] = process.argv.slice(2);
-if (
-  !["development", "staging", "production"].includes(variant) ||
-  args.length === 0
-) {
+if (!isAppVariant(variant) || args.length === 0) {
   console.error(
-    "Usage: node scripts/expo-variant.mjs <development|staging|production> <expo command> [args]",
+    `Usage: node scripts/expo-variant.mjs <${VARIANTS.join("|")}> <expo command> [args]`,
   );
   process.exit(1);
 }

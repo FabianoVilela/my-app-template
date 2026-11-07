@@ -11,11 +11,13 @@ import { parseArgs } from "node:util";
 import {
   isAppVariant,
   isAppVersion,
+  VARIANTS,
   validateAppVersions,
 } from "./app-versions.cjs";
 
-const HELP = `Usage: pnpm release:version <development|staging|production> <patch|minor|major|X.Y.Z> [--dry-run]
-       pnpm release:version <development|staging|production> --build-only [--dry-run]
+const VARIANT_USAGE = `<${VARIANTS.join("|")}>`;
+const HELP = `Usage: pnpm release:version ${VARIANT_USAGE} <patch|minor|major|X.Y.Z> [--dry-run]
+       pnpm release:version ${VARIANT_USAGE} --build-only [--dry-run]
 
 Updates only app-versions.json. Does not build, commit, tag or publish.`;
 
