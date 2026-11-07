@@ -23,7 +23,8 @@ export const envSchema = z.object({
         return Boolean(
           url.username &&
             !url.password &&
-            /^\/\d+$/.test(url.pathname) &&
+            // Self-hosted Sentry may serve under a path prefix: /sentry/<id>.
+            /^(?:\/[^/]+)*\/\d+$/.test(url.pathname) &&
             !url.search &&
             !url.hash,
         );

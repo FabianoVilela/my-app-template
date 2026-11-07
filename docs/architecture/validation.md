@@ -76,4 +76,4 @@ are available; Jest does not establish Metro inlining or device behavior.
 References: [Zod](https://zod.dev/), [schema API](https://zod.dev/api),
 [Expo environment variables](https://docs.expo.dev/guides/environment-variables/).
 
-Optional `EXPO_PUBLIC_SENTRY_DSN` is validated as a public HTTP/HTTPS DSN without a password or query. See [observability](observability.md) for activation and privacy.
+Optional `EXPO_PUBLIC_SENTRY_DSN` is validated as a public HTTP/HTTPS DSN without a password, query or fragment, whose path ends in a numeric project ID; self-hosted path prefixes such as `/sentry/<id>` are accepted. See [observability](observability.md) for activation and privacy.

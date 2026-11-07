@@ -80,15 +80,20 @@ test.each([undefined, ""])(
   },
 );
 
-test("accepts a public DSN", () => {
-  expect(parseEnv({ sentryDsn: validDsn }).sentryDsn).toBe(validDsn);
-});
+test.each([validDsn, "https://public-key@sentry.example.test/sentry/456"])(
+  "accepts public DSN %s",
+  (sentryDsn) => {
+    expect(parseEnv({ sentryDsn }).sentryDsn).toBe(sentryDsn);
+  },
+);
 
 test.each([
   "malformed-private-dsn",
   "https://example.test/123",
   "https://key:secret@example.test/123",
   "https://key@example.test/123?token=secret",
+  "https://key@example.test/",
+  "https://key@example.test/sentry/project",
 ])("rejects invalid DSNs without exposing their values", (sentryDsn) => {
   expect(() => parseEnv({ sentryDsn })).toThrow("EXPO_PUBLIC_SENTRY_DSN");
   expect(() => parseEnv({ sentryDsn })).not.toThrow(sentryDsn);
