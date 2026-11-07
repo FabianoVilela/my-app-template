@@ -20,8 +20,13 @@ module.exports = {
       transform: {
         "\\.[cm]?[jt]sx?$": expoPreset.transform["\\.[jt]sx?$"],
       },
-      // MSW 3 and its dependencies ship ESM. Babel converts them for Jest.
-      transformIgnorePatterns: [],
+      // Transform only ESM-only code: MSW 3 and its dependencies, and the
+      // expo/virtual/env module that babel-preset-expo inlines for
+      // process.env. Add a package when a Node test fails with "Must use
+      // import to load ES Module".
+      transformIgnorePatterns: [
+        "/node_modules/(?!(\\.pnpm|expo/virtual|msw|@msw/url|@mswjs/interceptors|@open-draft/until|cookie|rettime|until-async)(/|@))",
+      ],
       moduleNameMapper: {
         "^@/assets/(.*)$": "<rootDir>/assets/$1",
         "^@/(.*)$": "<rootDir>/src/$1",

@@ -52,8 +52,10 @@ tests and reusable testing setup belong in root `tests/`.
 
 Both projects clear mock call history and restore spies between tests. They
 resolve the existing `@/` and `@/assets/` aliases. Node tests use the Expo Babel
-transform without loading native setup; `.mjs`/ESM dependencies, including MSW 3,
-are transformed for Jest's CommonJS runtime. Tests in Node must not import native
+transform without loading native setup. Only the ESM-only dependencies listed in
+its `transformIgnorePatterns` (MSW 3 and its dependencies, plus Expo's inlined
+environment module) are transformed for Jest's CommonJS runtime; add a package
+there when a Node test reports "Must use import to load ES Module". Tests in Node must not import native
 UI modules; use the native project when an integration requires React Native.
 
 ## Environment validation
