@@ -12,8 +12,9 @@ The root layout calls `initializeObservability()` before mounting React.
 Bootstrap retains one reporter for the client process, injects it into
 `AppProviders`, and delegates root wrapping to the infrastructure integration.
 This process lifetime is specific to the global crash SDK; other dependencies
-remain explicitly assembled. Server rendering skips initialization to avoid
-sharing request context. No configuration is required to start the template.
+remain explicitly assembled. The web build is a single-page app; if it later
+renders HTML in Node (`static` or `server` output), initialization is skipped
+there to avoid sharing request context. No configuration is required to start the template.
 
 Startup, preference restoration and device locale refresh failures are reported
 at their handling boundary. Do not report the same error at every layer. Expected
