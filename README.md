@@ -10,14 +10,16 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    pnpm install
    ```
 
-2. Build and run the development build
+2. Build, install and run the app
 
    ```bash
    pnpm ios     # or: pnpm android
    ```
 
+   This compiles a local debug build, installs it on an [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or device and starts Metro. Use the same command to start later sessions; it rebuilds native code incrementally.
+
 > [!IMPORTANT]
-> Expo Go is not supported. The app initializes native modules that Expo Go does not include, such as MMKV through Nitro Modules, and it stops on the startup failure screen there. Use a [development build](https://docs.expo.dev/develop/development-builds/introduction/) on an [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or device. After the first build, `pnpm start` serves JavaScript changes to the installed app; rebuild with `pnpm ios` or `pnpm android` after native changes.
+> Expo Go is not supported. The app imports native modules that Expo Go does not include, such as MMKV through Nitro Modules, so it fails at launch there with a NitroModules error. `expo-dev-client` is not installed, so `pnpm start` runs in Expo Go mode: do not open the app through its QR code or its `i`/`a` shortcuts.
 
 You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
@@ -206,7 +208,8 @@ existing checkout, run `pnpm prepare` to reinstall them.
 See the [Git workflow guide](docs/git-workflow.md) for commands, partial staging
 and troubleshooting. These hooks are local; GitHub Actions CI
 (`.github/workflows/ci.yml`) repeats the checks on pushes to `main` and pull
-requests. Deployment and remote merge policies are not configured. Commitizen is not required.
+requests. Deployment and remote merge policies are not configured. Commitizen
+is not required.
 
 ## Learn more
 

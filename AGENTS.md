@@ -74,7 +74,7 @@ pnpm expo install <package>  # install SDK-compatible dependencies
 ## Rules
 
 - This template uses generated, Git-ignored `ios/` and `android/` directories (Continuous Native Generation). Configure native behavior in `app.json`, `app.config.ts` and config plugins; do not create or edit generated native files by hand, even when local builds have created those directories.
-- Expo Go is not supported: the app initializes native modules that Expo Go does not bundle, such as MMKV. Run and verify the app in a development build (`pnpm ios` or `pnpm android`), and rebuild after adding or changing native code. Do not suggest Expo Go or add Expo Go fallbacks.
+- Expo Go is not supported: the app imports native modules that Expo Go does not bundle, such as MMKV, and fails at launch there. Run and verify the app in a local debug build with `pnpm ios` or `pnpm android`, which also rebuild after native changes. `expo-dev-client` is not installed, so `pnpm start` runs in Expo Go mode; do not open the app through its QR code or `i`/`a` shortcuts. Do not suggest Expo Go or add Expo Go fallbacks.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
 
 ## Change verification
