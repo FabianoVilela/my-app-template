@@ -9,8 +9,9 @@ only after measuring bundle constraints on the target platforms.
 
 `src/infrastructure/env/env.schema.ts` defines public configuration validation.
 `read-env.ts` exposes `readEnv()` for Expo and `parseEnv(input: unknown)` for
-explicit inputs and tests. Both return validated configuration with `apiUrl` and
-`defaultLocale` and optional `sentryDsn`. No configuration is read or parsed at import time.
+explicit inputs and tests. Both return validated configuration with optional
+`apiUrl` and `sentryDsn`, plus `defaultLocale` and `appVariant`. No configuration
+is read or parsed at import time.
 
 `readEnv()` constructs its input from static `process.env.EXPO_PUBLIC_*`
 references, which Expo replaces in the JavaScript bundle. Dynamic property
@@ -31,6 +32,13 @@ and does not create a default HTTP client yet.
 `EXPO_PUBLIC_DEFAULT_LOCALE` accepts `en` and `pt-BR`; absent, empty or unsupported
 values fall back to `en`, preserving existing behavior. Bootstrap supplies this
 value to the translation adapter; the adapter no longer reads environment values.
+
+`appVariant` is not an `EXPO_PUBLIC_` variable: `app.config.ts` copies the selected
+`APP_VARIANT` into `expo.extra.appVariant`, and `readEnv()` reads it from
+`expo-constants`. It must be one of the variants in `scripts/app-versions.cjs`;
+absent becomes `development` (tests and tools without app config) and any other
+value fails as `APP_VARIANT`. Read it through `readEnv()` rather than
+`Constants.expoConfig` so consumers receive the validated type.
 
 Invalid configuration throws an ordinary error with field names and issue codes,
 without raw values or a Zod error cause. Startup uses the existing bilingual retry

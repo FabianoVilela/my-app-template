@@ -1,7 +1,16 @@
+jest.mock("expo-constants", () => ({
+  __esModule: true,
+  default: { expoConfig: { extra: { appVariant: "staging" } } },
+}));
+
+import { APP_VARIANTS } from "./env.schema";
 import { parseEnv, readEnv } from "./read-env";
 
 test.each([undefined, ""])("allows an absent API URL (%j)", (apiUrl) => {
-  expect(parseEnv({ apiUrl })).toEqual({ defaultLocale: "en" });
+  expect(parseEnv({ apiUrl })).toEqual({
+    defaultLocale: "en",
+    appVariant: "development",
+  });
 });
 
 test.each([
@@ -55,6 +64,7 @@ test("reads public Expo configuration explicitly", () => {
     expect(readEnv()).toEqual({
       apiUrl: "http://localhost:3000",
       defaultLocale: "pt-BR",
+      appVariant: "staging",
     });
   } finally {
     process.env = previous;
@@ -83,3 +93,24 @@ test.each([
   expect(() => parseEnv({ sentryDsn })).toThrow("EXPO_PUBLIC_SENTRY_DSN");
   expect(() => parseEnv({ sentryDsn })).not.toThrow(sentryDsn);
 });
+
+test("app variants match the list used by app config and scripts", () => {
+  const { VARIANTS } = jest.requireActual<{ VARIANTS: readonly string[] }>(
+    "../../../scripts/app-versions.cjs",
+  );
+
+  expect(APP_VARIANTS).toEqual(VARIANTS);
+});
+
+test.each(APP_VARIANTS)("accepts app variant %s", (appVariant) => {
+  expect(parseEnv({ appVariant }).appVariant).toBe(appVariant);
+});
+
+test.each(["", "qa", "Production"])(
+  "rejects unknown app variant %j",
+  (appVariant) => {
+    expect(() => parseEnv({ appVariant })).toThrow(
+      "APP_VARIANT: invalid_value",
+    );
+  },
+);

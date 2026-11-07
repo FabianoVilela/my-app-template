@@ -26,7 +26,7 @@ do not import root infrastructure into the core.
 
 - `EXPO_PUBLIC_SENTRY_DSN`: optional public client key, validated by `readEnv`.
   Empty disables the SDK. Debug builds never initialize or send to Sentry.
-- Environment comes from the selected app variant in Expo config. Release/dist
+- Environment is the app variant validated by `readEnv`. Release/dist
   are detected by the SDK from installed native metadata; do not substitute
   package.json versions, which may differ from the installed binary.
 - Expo Go has no native crash SDK. Native transport, caching, release metadata

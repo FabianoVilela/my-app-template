@@ -1,17 +1,24 @@
+import Constants from "expo-constants";
 import { type Env, envSchema } from "./env.schema";
 
-const ENV_NAMES: Record<string, string> = {
+const ENV_NAMES: Record<keyof Env, string> = {
   sentryDsn: "EXPO_PUBLIC_SENTRY_DSN",
   apiUrl: "EXPO_PUBLIC_API_URL",
   defaultLocale: "EXPO_PUBLIC_DEFAULT_LOCALE",
+  appVariant: "APP_VARIANT",
 };
+
+function isEnvField(value: unknown): value is keyof Env {
+  return typeof value === "string" && Object.hasOwn(ENV_NAMES, value);
+}
 
 export function parseEnv(input: unknown): Env {
   const result = envSchema.safeParse(input);
 
   if (!result.success) {
     const fields = result.error.issues.map((issue) => {
-      const field = ENV_NAMES[String(issue.path[0])] ?? "environment";
+      const [key] = issue.path;
+      const field = isEnvField(key) ? ENV_NAMES[key] : "environment";
       return `${field}: ${issue.code}`;
     });
 
@@ -27,5 +34,7 @@ export function readEnv(): Env {
     sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
     apiUrl: process.env.EXPO_PUBLIC_API_URL,
     defaultLocale: process.env.EXPO_PUBLIC_DEFAULT_LOCALE,
+    // Set by app.config.ts from APP_VARIANT; not an EXPO_PUBLIC_ variable.
+    appVariant: Constants.expoConfig?.extra?.appVariant,
   });
 }
