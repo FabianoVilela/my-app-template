@@ -115,7 +115,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 ## Module boundaries and shared code
 
-- Use business capabilities as module boundaries. Screens and individual actions usually belong inside an existing module. A module is not automatically a DDD Bounded Context.
+- Use business capabilities as module boundaries. Screens and individual actions usually belong inside an existing module. A module is not automatically a DDD Bounded Context. See [Adding a business module](add-module.md) for a worked example across the layers.
 - Keep a module's implementation private. Introduce explicit public entry points when it has real consumers; do not create empty `index.ts` files now.
 - Other modules must not reach into private screens, hooks, adapters or repository implementations.
 - Public APIs must preserve layer rules. A core consumer must not import a barrel that re-exports React UI or concrete infrastructure; expose a focused pure contract entry point if necessary.
