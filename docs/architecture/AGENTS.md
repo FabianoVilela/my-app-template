@@ -72,6 +72,7 @@ The following rules concern source imports, including type imports. Runtime call
 - Put module-specific endpoints, external payloads, persistence details and data conversions inside that module's infrastructure.
 - Translate external formats and errors at the adapter boundary when needed; follow the [project naming conventions](../conventions/AGENTS.md#identifiers) for external DTO fields and application-owned models. Core contracts must not expose vendor-specific response or error types.
 - Share technical mechanisms in root infrastructure only when they are actually reused. Keep business-specific adapters with their module.
+- Place a shared, vendor-independent contract by who may consume it. If domain or application code may depend on it directly, keep it pure and put it in `shared/lib/`, with its adapters in root infrastructure (`DateAdapter`). If only infrastructure, bootstrap and presentation consume it, keep it beside its adapters in root `infrastructure/` (`HttpClient`, `LocalStorage`, `SecureStorage`, `ErrorReporter`). A core operation that needs one of these capabilities defines its own port in `application/ports/`, and an outer layer adapts the shared contract to it.
 
 ## HTTP integrations
 
