@@ -10,18 +10,14 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    pnpm install
    ```
 
-2. Start the app
+2. Build and run the development build
 
    ```bash
-   pnpm start
+   pnpm ios     # or: pnpm android
    ```
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+> [!IMPORTANT]
+> Expo Go is not supported. The app initializes native modules that Expo Go does not include, such as MMKV through Nitro Modules, and it stops on the startup failure screen there. Use a [development build](https://docs.expo.dev/develop/development-builds/introduction/) on an [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or device. After the first build, `pnpm start` serves JavaScript changes to the installed app; rebuild with `pnpm ios` or `pnpm android` after native changes.
 
 You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
@@ -29,12 +25,12 @@ You can start developing by editing the files inside the **src/app** directory. 
 
 - Biome is already configured for linting, formatting and import organization. See the quality checks below.
 - Jest, Expo component/navigation testing and MSW HTTP mocking are configured. See the [testing guide](docs/testing.md).
-- MMKV persistence requires a development build when used on iOS or Android. Run `pnpm ios` or `pnpm android` to create one; see the [storage guide](docs/architecture/storage.md).
+- MMKV persistence requires a development build on iOS and Android; see the [storage guide](docs/architecture/storage.md).
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
 ## Rename the app
 
-Use Node.js 22.13 or newer and run from the repository root:
+Use a Node.js version allowed by `engines` in `package.json` and run from the repository root:
 
 ```bash
 pnpm rename-app "Minha Aplicação" --dry-run
