@@ -183,6 +183,14 @@ backend data. No Maestro flows or device tests are configured yet.
 
 `infrastructure/i18n/i18next-adapter.test.ts` exercises isolated real translation instances with fake storage/device locales: locale resolution, preferences, storage failures and plurals. `shared/i18n/app-translation-provider.test.tsx` covers the shared facade hooks, rich text and locale-aware formatting through a real adapter. `catalogs.test.ts` validates logical messages, interpolation variables, markup and plural categories, and checks catalog directories and `app.json` supportedLocales against `APP_LOCALES`. Navigation integration checks language changes without losing the route. Type assertions in the facade suite check the public translation contract during `pnpm typecheck`. Run `pnpm i18n:types` after catalog edits and `pnpm i18n:check` in CI; pre-push includes the freshness check. See the [i18n guide](architecture/i18n.md) for native and web limitations.
 
+## Bootstrap
+
+`bootstrap/startup.test.tsx` runs startup with the real translation adapter and a
+fake preference store: foreground locale refresh, refresh failures reported at
+their boundary, `dispose` and invalid configuration. `app-providers.test.tsx`
+replaces startup to cover the splash screen, the error screen and retry, and
+disposal of a session that resolves after unmounting.
+
 ## Observability
 
 Sentry adapter and bootstrap tests mock the SDK to verify disabled reporting, context isolation, filtering and failure containment without network traffic. Real release builds are needed for native delivery and source-map verification. See [observability](architecture/observability.md).

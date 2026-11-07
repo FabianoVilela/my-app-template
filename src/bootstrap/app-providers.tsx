@@ -1,85 +1,72 @@
-import { getLocales } from "expo-localization";
+import * as SplashScreen from "expo-splash-screen";
 import { type ReactNode, useEffect, useState } from "react";
-import { AppState, Pressable, Text, View } from "react-native";
-import { readEnv } from "@/infrastructure/env/read-env";
-import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
-import { createMmkvStorage } from "@/infrastructure/storage/mmkv-storage";
 import { AppTranslationProvider } from "@/shared/i18n";
+import { ErrorScreen } from "@/shared/ui/error-screen";
+import { type AppDependencies, startup } from "./startup";
 
-type Dependencies = Awaited<ReturnType<typeof createI18nextAdapter>>;
-type AppProvidersProps = { children: ReactNode; errorReporter: ErrorReporter };
+export type AppProvidersProps = {
+  children: ReactNode;
+  errorReporter: ErrorReporter;
+};
 
+type StartupState =
+  | { status: "loading" }
+  | { status: "ready"; dependencies: AppDependencies }
+  | { status: "failed" };
+
+/**
+ * Runs startup per mounted application and composes its providers. The root
+ * layout keeps the native splash screen visible until startup settles.
+ */
 export function AppProviders({ children, errorReporter }: AppProvidersProps) {
-  const [dependencies, setDependencies] = useState<Dependencies | null>(null);
-  const [hasFailed, setHasFailed] = useState(false);
+  const [state, setState] = useState<StartupState>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: attempt intentionally retries startup.
   useEffect(() => {
-    let active = true;
-    let subscription: ReturnType<typeof AppState.addEventListener> | undefined;
+    let isActive = true;
+    let dispose: (() => void) | undefined;
 
-    async function start() {
-      try {
-        errorReporter.addBreadcrumb("app.startup");
-        const env = readEnv();
-        const dependencies = await createI18nextAdapter({
-          defaultLocale: env.defaultLocale,
-          storage: createMmkvStorage({ id: "app-preferences" }),
-          getDeviceLocales: () =>
-            getLocales().map((locale) => locale.languageTag),
-          onReadError: (error) =>
-            errorReporter.captureException(error, {
-              operation: "i18n.restore-preference",
-            }),
-        });
+    startup({ errorReporter }).then(
+      (session) => {
+        if (!isActive) return session.dispose();
 
-        if (!active) return;
-        setDependencies(dependencies);
-        subscription = AppState.addEventListener("change", (state) => {
-          if (state === "active")
-            void dependencies.runtime.refreshDeviceLocale().catch((error) =>
-              errorReporter.captureException(error, {
-                operation: "i18n.refresh-device-locale",
-              }),
-            );
-        });
-      } catch (error: unknown) {
+        dispose = session.dispose;
+        setState({ status: "ready", dependencies: session.dependencies });
+      },
+      (error: unknown) => {
         errorReporter.captureException(error, { operation: "app.startup" });
 
         if (__DEV__) console.warn("Unable to initialize application");
-        if (active) setHasFailed(true);
-      }
-    }
-    // Instance creation stays outside render and server requests never share it.
-    void start();
+        if (isActive) setState({ status: "failed" });
+      },
+    );
 
     return () => {
-      active = false;
-      subscription?.remove();
+      isActive = false;
+      dispose?.();
     };
   }, [attempt, errorReporter]);
 
-  if (hasFailed)
-    return (
-      <View>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            setHasFailed(false);
-            setAttempt((value) => value + 1);
-          }}
-        >
-          <Text>Retry</Text>
-        </Pressable>
-      </View>
-    );
+  const isSettled = state.status !== "loading";
 
-  if (!dependencies) return null;
+  useEffect(() => {
+    if (isSettled) SplashScreen.hide();
+  }, [isSettled]);
+
+  function handleRetry() {
+    setState({ status: "loading" });
+    setAttempt((value) => value + 1);
+  }
+
+  if (state.status === "failed") return <ErrorScreen onRetry={handleRetry} />;
+
+  // The native splash screen still covers this empty frame.
+  if (state.status === "loading") return null;
 
   return (
-    <AppTranslationProvider {...dependencies}>
+    <AppTranslationProvider {...state.dependencies}>
       {children}
     </AppTranslationProvider>
   );

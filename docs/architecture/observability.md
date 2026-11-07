@@ -78,7 +78,8 @@ following Sentry's Expo guide. Native build uploads do not cover later OTA bundl
 
 Adapter tests cover disabled mode, per-event context, privacy hooks, unknown
 exceptions, technical breadcrumbs and SDK failures. Bootstrap tests check debug
-startup; navigation tests mount the navigator without the root layout, so they do
+startup, startup failures reported once per attempt and failed locale refreshes;
+navigation tests mount the navigator without the root layout, so they do
 not initialize telemetry.
 Run the normal lint/check/typecheck/test scripts and variant configuration tests.
 Real-device checks are required to validate native crash delivery, offline caches,
