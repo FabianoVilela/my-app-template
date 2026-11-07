@@ -285,6 +285,7 @@ diagnostic message names the broken rule and links to the architecture.
 | `src/modules/*/presentation/**/*.test.tsx` | The same, except infrastructure |
 | `src/infrastructure/**` | Bootstrap, routes, modules, shared UI and the shared i18n facade |
 | `src/infrastructure/i18n/**` | The same, except `@/shared/i18n/contracts` and `@/shared/i18n/app-messages` |
+| `src/infrastructure/env/**` | The same, except `@/shared/i18n/contracts` (supported locales) |
 | `src/shared/**` | Bootstrap, routes, modules and infrastructure |
 | `src/shared/**/*.test.{ts,tsx}` | The same, except infrastructure |
 | `src/shared/lib/**` | Everything except relative files and `@/shared/lib` |
@@ -322,7 +323,7 @@ The rule checks static imports, `import type`, re-exports and dynamic
 When several overrides configure `noRestrictedImports` for one file, the last
 one replaces the earlier options; Biome does not merge their pattern lists. Keep
 the layer globs disjoint, or repeat the full pattern list in the more specific
-override, as `src/infrastructure/i18n/**`, `src/shared/lib/**` and the test
+override, as `src/infrastructure/i18n/**`, `src/infrastructure/env/**`, `src/shared/lib/**` and the test
 overrides do. Verify
 a changed override with a temporary file that imports the specifiers in
 question, then delete the file.

@@ -420,6 +420,43 @@
       }
     },
     {
+      "includes": ["src/infrastructure/env/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/**", "../**/modules/**"],
+                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": [
+                      "@/shared/ui/**",
+                      "@/shared/i18n",
+                      "@/shared/i18n/**",
+                      "!@/shared/i18n/contracts"
+                    ],
+                    "message": "Environment validation may import only the pure shared i18n contracts, for the supported locales. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/infrastructure/i18n/**"],
       "linter": {
         "rules": {

@@ -1,6 +1,11 @@
 import type { AppMessages } from "./app-messages";
 
-export type AppLocale = "pt-BR" | "en";
+/**
+ * Supported locales; the first is the fallback when none is configured.
+ * Add a locale here, in its catalog directory and in app.json supportedLocales.
+ */
+export const APP_LOCALES = ["en", "pt-BR"] as const;
+export type AppLocale = (typeof APP_LOCALES)[number];
 export type AppLocalePreference = AppLocale | "system";
 export type AppTranslationKey = keyof AppMessages;
 export type AppNamespace = AppTranslationKey extends `${infer N}:${string}`

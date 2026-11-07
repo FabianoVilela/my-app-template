@@ -56,7 +56,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 - `app`, `bootstrap`, module presentation and `shared/ui` may consume the public `shared/i18n` facade. Core layers remain translation-free; presentation maps outcomes to messages. Keep vendor imports, catalogs, device detection and language persistence in root `infrastructure/i18n`.
 - `shared/i18n/contracts.ts` and generated `app-messages.ts` are pure: no React, native, vendor or initialization dependencies. The shared React facade receives its implementation through provider props and never imports infrastructure or bootstrap.
-- **Isolated exception:** root `infrastructure/i18n/` may use `import type` directly from those two pure files. No infrastructure may import the shared barrel or React facade; the exception does not extend to other infrastructure directories.
+- **Isolated exceptions:** root `infrastructure/i18n/` may import directly from those two pure files (types and the `APP_LOCALES` registry), and `infrastructure/env/` may import `APP_LOCALES` from `contracts.ts` to validate the default locale. No infrastructure may import the shared barrel or React facade; the exceptions do not extend to other infrastructure directories.
 - Bootstrap constructs the implementation and mounts the provider. See [Internationalization](i18n.md) for rendering injection, lifecycle, catalog maintenance and platform details.
 
 ## Domain and application boundaries

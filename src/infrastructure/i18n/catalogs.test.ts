@@ -1,9 +1,14 @@
 import "intl-pluralrules";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { APP_LOCALES } from "@/shared/i18n/contracts";
+import appJson from "../../../app.json";
 
 const root = join(__dirname, "locales");
-const locales = { "pt-br": "pt-BR", en: "en" };
+// Catalog directories are lowercase locale tags, such as pt-br for pt-BR.
+const locales = Object.fromEntries(
+  APP_LOCALES.map((locale) => [locale.toLowerCase(), locale]),
+);
 
 function leaves(
   value: Record<string, unknown>,
@@ -30,6 +35,20 @@ const placeholders = (text: string) =>
 const tags = (text: string) =>
   [...text.matchAll(/<([a-zA-Z]+)>/g)].map((match) => match[1]).sort();
 const namespaces = readdirSync(join(root, "en")).sort();
+
+test("catalog directories and native supported locales match APP_LOCALES", () => {
+  const directories = readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+  const [, localization] = appJson.expo.plugins.find(
+    (plugin) => Array.isArray(plugin) && plugin[0] === "expo-localization",
+  ) as [string, { supportedLocales: string[] }];
+
+  expect(directories.sort()).toEqual(Object.keys(locales).sort());
+  expect([...localization.supportedLocales].sort()).toEqual(
+    [...APP_LOCALES].sort(),
+  );
+});
 
 for (const [directory, locale] of Object.entries(locales)) {
   test(`${locale} has complete messages, variables, markup and plural categories`, () => {

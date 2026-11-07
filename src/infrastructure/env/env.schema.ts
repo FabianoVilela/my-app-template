@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { APP_LOCALES } from "@/shared/i18n/contracts";
 
 /** Mirrors VARIANTS in scripts/app-versions.cjs; read-env.test.ts checks parity. */
 export const APP_VARIANTS = ["development", "staging", "production"] as const;
@@ -29,7 +30,7 @@ export const envSchema = z.object({
       })
       .optional(),
   ),
-  defaultLocale: z.enum(["en", "pt-BR"]).catch("en"),
+  defaultLocale: z.enum(APP_LOCALES).catch(APP_LOCALES[0]),
   // app.config.ts always sets the variant; test and tool contexts omit it.
   appVariant: z.enum(APP_VARIANTS).default("development"),
 });
