@@ -38,7 +38,7 @@ src/
 
 ## Responsibilities and allowed dependencies
 
-The following rules concern source imports, including type imports. Runtime calls to an injected adapter do not authorize importing its concrete implementation into the application core.
+The following rules concern source imports, including type imports. Runtime calls to an injected adapter do not authorize importing its concrete implementation into the application core. Biome enforces them per layer; see [layer import boundaries](../conventions/biome.md#layer-import-boundaries) for coverage and limits.
 
 | Location | Put here | Allowed dependencies |
 | --- | --- | --- |
@@ -119,7 +119,7 @@ The following rules concern source imports, including type imports. Runtime call
 - Other modules must not reach into private screens, hooks, adapters or repository implementations.
 - Public APIs must preserve layer rules. A core consumer must not import a barrel that re-exports React UI or concrete infrastructure; expose a focused pure contract entry point if necessary.
 - Avoid cyclic module dependencies. Coordinate cross-module workflows in an explicit outer composition or workflow boundary, using contracts rather than private imports.
-- Within a module, import the defining files rather than its own public barrel to avoid self-referencing dependency cycles.
+- Within a module, import the defining files with relative paths rather than its own public barrel or `@/modules/<name>/...` aliases, to avoid self-referencing dependency cycles.
 - Move code to `shared/` only when its meaning and reasons to change match across consumers. A business entity or business component does not become shared merely because several screens use it.
 - Keep context-specific models separate when their meaning differs. Do not create a universal shared domain model by default.
 
@@ -133,7 +133,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 ## Verification when implementing behavior
 
-- Follow the root checks and [review responsibilities](../conventions/AGENTS.md#automated-checks-and-review). Passing automated checks does not establish layer/module boundaries or semantic correctness.
+- Follow the root checks and [review responsibilities](../conventions/AGENTS.md#automated-checks-and-review). Lint enforces layer imports written as package names and `@/` aliases; it does not establish relative-path escapes, public entry point purity or semantic correctness.
 - Follow [test naming and placement](../conventions/AGENTS.md#tests). Exercise domain and application through injected fakes without mounting React or contacting live services.
 - Test adapter translations and important user journeys in proportion to the behavior changed. Keep end-to-end journeys separate when an end-to-end runner is introduced.
 - Do not add a test framework, a dependency or an architectural enforcement tool solely to populate this skeleton.

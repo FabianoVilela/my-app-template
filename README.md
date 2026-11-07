@@ -189,8 +189,8 @@ pnpm test:rename-app
 Run these before merging changes. `check` verifies lint, formatting and import
 organization; `lint` is available for lint-only checks. Biome keeps defaults
 explicit and checks import cycles (including type-only cycles), filename casing
-and named exports with route exceptions. Layer and module import boundaries
-still require review. See the [project conventions](docs/conventions/AGENTS.md)
+and named exports with route exceptions, and enforces layer and module import
+boundaries; relative paths that leave a module still require review. See the [project conventions](docs/conventions/AGENTS.md)
 and [Biome override guide](docs/conventions/biome.md) for coverage, exceptions and
 examples.
 
