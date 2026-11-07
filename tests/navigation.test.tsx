@@ -1,18 +1,8 @@
-jest.mock("@/bootstrap/observability", () => ({
-  initializeObservability: () => ({
-    captureException: jest.fn(),
-    addBreadcrumb: jest.fn(),
-  }),
-  withObservability: (component: unknown) => component,
-}));
-
-jest.mock("react-native-nitro-modules", () => ({}));
-
 import { act } from "@testing-library/react-native";
 import { renderRouter, screen } from "expo-router/testing-library";
 import type { ReactNode } from "react";
-import { AppNavigation } from "@/app/_layout";
 import Index from "@/app/index";
+import { AppNavigation } from "@/bootstrap/app-navigation";
 import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import { AppTranslationProvider } from "@/shared/i18n";
 

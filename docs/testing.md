@@ -150,8 +150,10 @@ queries and built-in matchers such as `toBeDisabled` and `toBeOnTheScreen`.
 Prefer `userEvent` for supported interactions; avoid snapshots of entire screens.
 
 Use `expo-router/testing-library` for navigation integration. The existing
-`tests/navigation.test.tsx` mounts the actual home route through `renderRouter`
-and verifies its URL and content. Supply application operations through their
+`tests/navigation.test.tsx` mounts the actual home route under
+`bootstrap/app-navigation.tsx` through `renderRouter` and verifies its URL and
+content. Routes in `src/app/` export only what Expo Router reads, so tests import
+the navigator from bootstrap rather than from the root layout. Supply application operations through their
 usual props/providers when testing components; MSW is initialized only in the
 Node project. The native suite exercises JavaScript behavior with native mocks,
 not actual device rendering, permissions or keyboard behavior.
