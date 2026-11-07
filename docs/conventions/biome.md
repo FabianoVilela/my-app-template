@@ -2,7 +2,7 @@
 
 This guide explains the React checks, editor integration, source overrides and
 layer import boundaries in root [biome.json](../../biome.json), configured for
-Biome 2.5.15.
+Biome 2.6.5.
 [Project conventions](AGENTS.md) define the project's
 naming and export policy; the configuration defines the checks Biome executes.
 Keep them aligned when either changes. Verification commands belong in the
@@ -22,16 +22,17 @@ The following additional rules are selected explicitly:
 | `correctness.noNestedComponentDefinitions` | Error | Avoid defining components inside other components, which can reset state through remounting |
 | `correctness.noReactPropAssignments` | Error | Reject assignments that mutate props |
 | `suspicious.noLeakedRender` | Error | Prevent values such as `0` from leaking into conditional JSX |
-| `nursery.noReactNativeDeepImports` | Error | Use public React Native exports instead of internal implementation paths |
-| `nursery.noReactNativeRawText` | Error | Detect raw text outside recognized text containers |
-| `nursery.useReactNativePlatformComponents` | Error | Check platform-specific native component imports |
+| `suspicious.noReactNativeDeepImports` | Error | Use public React Native exports instead of internal implementation paths |
+| `correctness.noReactNativeRawText` | Error | Detect raw text outside recognized text containers |
+| `correctness.useReactNativePlatformComponents` | Error | Check platform-specific native component imports |
 | `nursery.useReactCompiler` | Warning | Report React Compiler diagnostics for inferred components and hooks |
 | `style.noReactNativeLiteralColors` | Error | Reject color literals in inline `style` props; the [Unistyles color plugin](#unistyles-stylesheet-import) covers stylesheets |
 
-In the installed Biome 2.5.15, these React Native rules and the compiler rule
-belong to `nursery`. Selecting a recommended domain alone does not enable its
-nursery rules; keep the desired rules explicit. Recheck their groups and
-behavior when upgrading Biome, since experimental rules can change.
+In the installed Biome 2.6.5, the React Native rules sit in `correctness`,
+`suspicious` and `style`, as listed above, while `useReactCompiler` remains in
+`nursery`. Selecting a recommended domain alone does not enable nursery rules;
+keep the desired rules explicit. Rules move between groups as they stabilize,
+so recheck each rule's group and behavior when upgrading Biome.
 
 React Compiler is already enabled in `app.json`. Its lint rule starts at
 `warn` because it is experimental. The explicit `compilationMode: "infer"`
@@ -68,7 +69,7 @@ including `<Button disabled={false} />` and
 of the component's default prop values; omitting the prop altogether has
 different semantics.
 
-Biome 2.5.15 has no built-in rule that enforces this direction. The root
+Biome 2.6.5 has no built-in rule that enforces this direction. The root
 configuration registers the local
 [`use-jsx-boolean-shorthand.grit`](../../scripts/biome/use-jsx-boolean-shorthand.grit)
 plugin instead. It runs inside Biome through the existing lint/check commands
