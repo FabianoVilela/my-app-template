@@ -22,7 +22,8 @@ behavior and coverage. Reports are written to ignored `coverage/`, including
 source, including files without tests; no arbitrary percentage threshold is set.
 
 CI (`.github/workflows/ci.yml`) runs `pnpm check`, `pnpm typecheck`,
-`pnpm i18n:check`, `pnpm test:ci` and all script test suites. Run `pnpm test:variants` for dynamic configuration, environment isolation and
+`pnpm i18n:check`, `pnpm test:ci` and every script test suite. Locally, run
+`pnpm test:variants` for dynamic configuration, environment isolation and
 CLI forwarding checks. Run `pnpm test:release-version` for independent version
 selection, version/build increments, previews, rejected requests and unchanged
 files on failure. The script tests use Node's built-in runner and are excluded from Jest.
