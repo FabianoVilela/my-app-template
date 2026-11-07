@@ -12,11 +12,15 @@ The root layout calls `initializeObservability()` before mounting React.
 Bootstrap retains one reporter for the client process, injects it into
 `AppProviders`, and delegates root wrapping to the infrastructure integration.
 This process lifetime is specific to the global crash SDK; other dependencies
-remain explicitly assembled. Server rendering skips initialization to avoid
-sharing request context. No configuration is required to start the template.
+remain explicitly assembled. The web build is a single-page app; if it later
+renders HTML in Node (`static` or `server` output), initialization is skipped
+there to avoid sharing request context. No configuration is required to start the template.
 
 Startup, preference restoration and device locale refresh failures are reported
-at their handling boundary. Do not report the same error at every layer. Expected
+at their handling boundary. The root layout exports an Expo Router
+`ErrorBoundary` that reports render errors once as `app.render` and shows the
+shared error screen with retry; screen-level boundaries added later must report
+only what they catch. Do not report the same error at every layer. Expected
 validation failures, cancellations and normal offline behavior should not become
 incidents automatically. Domain stays telemetry-free. If an application operation
 needs reporting, define a pure capability beside that operation and inject it;
@@ -26,7 +30,7 @@ do not import root infrastructure into the core.
 
 - `EXPO_PUBLIC_SENTRY_DSN`: optional public client key, validated by `readEnv`.
   Empty disables the SDK. Debug builds never initialize or send to Sentry.
-- Environment comes from the selected app variant in Expo config. Release/dist
+- Environment is the app variant validated by `readEnv`. Release/dist
   are detected by the SDK from installed native metadata; do not substitute
   package.json versions, which may differ from the installed binary.
 - Expo Go has no native crash SDK. Native transport, caching, release metadata
@@ -77,7 +81,9 @@ following Sentry's Expo guide. Native build uploads do not cover later OTA bundl
 
 Adapter tests cover disabled mode, per-event context, privacy hooks, unknown
 exceptions, technical breadcrumbs and SDK failures. Bootstrap tests check debug
-startup; navigation tests substitute the telemetry composition boundary.
+startup, startup failures reported once per attempt and failed locale refreshes;
+navigation tests mount the navigator without the root layout, so they do
+not initialize telemetry.
 Run the normal lint/check/typecheck/test scripts and variant configuration tests.
 Real-device checks are required to validate native crash delivery, offline caches,
 source maps and privacy manifest aggregation.

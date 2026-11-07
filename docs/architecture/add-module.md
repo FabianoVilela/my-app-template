@@ -158,7 +158,8 @@ The screen maps states to UI and messages. Write
 `presentation/screens/product-screen.tsx`:
 
 ```tsx
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { useAppTranslation } from "@/shared/i18n";
 import { useProduct } from "../hooks/use-product";
 
@@ -185,17 +186,18 @@ export function ProductScreen({ productId }: ProductScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: theme.colors.background,
   },
-});
+}));
 ```
 
-Follow the [styling rule](../conventions/AGENTS.md#typescript-components-and-styles)
-in force when you write the screen. Map failures to messages here; never render
+Follow the [styling rule](../conventions/AGENTS.md#typescript-components-and-styles):
+styles come from Unistyles theme tokens. Map failures to messages here; never render
 `HttpError`, Zod errors or their `cause`. To distinguish failures, such as
 not found and offline, define that meaning in the port's errors and translate it
 in the adapter.
@@ -212,10 +214,10 @@ Create `products.json` in each locale directory under
 }
 ```
 
-Register the namespace in `src/infrastructure/i18n/i18next-adapter.tsx`: import
-both JSON files, add `"products"` to `ns` and add the catalogs to `resources` for
-each locale. Then run `pnpm i18n:types` and commit the regenerated
-`src/shared/i18n/app-messages.ts`. See [catalog maintenance](i18n.md#catalog-maintenance).
+Run `pnpm i18n:types` and commit the regenerated
+`src/shared/i18n/app-messages.ts` and `src/infrastructure/i18n/resources.ts`;
+the generator registers the new namespace for every locale, so the adapter does
+not change. See [catalog maintenance](i18n.md#catalog-maintenance).
 
 ## 7. Bootstrap
 
@@ -224,15 +226,35 @@ Write `src/bootstrap/create-dependencies.ts` as shown in
 selects the Axios client, accepts an HTTP override and returns
 `{ productService }`.
 
-Call `createDependencies()` once, inside the startup that already creates the
-i18n adapter in `src/bootstrap/app-providers.tsx`, so a missing API URL goes
-through the existing startup failure and retry path. Keep the result with the
-startup state, then wrap the children:
+Call `createDependencies()` once inside `startup()` in
+`src/bootstrap/startup.ts`, which already creates the i18n adapter, so a missing
+API URL goes through the existing startup failure and retry path. Add its result
+to `AppDependencies` as its own entry and return it with the session:
+
+```ts
+export type AppDependencies = {
+  i18n: Awaited<ReturnType<typeof createI18nextAdapter>>;
+  productService: ProductService;
+};
+
+// In startup(), after creating i18n:
+const { productService } = createDependencies();
+
+return {
+  dependencies: { i18n, productService },
+  dispose: () => subscription.remove(),
+};
+```
+
+Then wrap the children in `src/bootstrap/app-providers.tsx`, passing each
+provider only its own entry:
 
 ```tsx
-<ProductServiceProvider productService={dependencies.productService}>
-  {children}
-</ProductServiceProvider>
+<AppTranslationProvider {...state.dependencies.i18n}>
+  <ProductServiceProvider productService={state.dependencies.productService}>
+    {children}
+  </ProductServiceProvider>
+</AppTranslationProvider>
 ```
 
 Do not call the factory during render or export an instance from a module.

@@ -2,7 +2,7 @@
 
 This guide explains the React checks, editor integration, source overrides and
 layer import boundaries in root [biome.json](../../biome.json), configured for
-Biome 2.5.15.
+Biome 2.6.5.
 [Project conventions](AGENTS.md) define the project's
 naming and export policy; the configuration defines the checks Biome executes.
 Keep them aligned when either changes. Verification commands belong in the
@@ -22,16 +22,17 @@ The following additional rules are selected explicitly:
 | `correctness.noNestedComponentDefinitions` | Error | Avoid defining components inside other components, which can reset state through remounting |
 | `correctness.noReactPropAssignments` | Error | Reject assignments that mutate props |
 | `suspicious.noLeakedRender` | Error | Prevent values such as `0` from leaking into conditional JSX |
-| `nursery.noReactNativeDeepImports` | Error | Use public React Native exports instead of internal implementation paths |
-| `nursery.noReactNativeRawText` | Error | Detect raw text outside recognized text containers |
-| `nursery.useReactNativePlatformComponents` | Error | Check platform-specific native component imports |
+| `suspicious.noReactNativeDeepImports` | Error | Use public React Native exports instead of internal implementation paths |
+| `correctness.noReactNativeRawText` | Error | Detect raw text outside recognized text containers |
+| `correctness.useReactNativePlatformComponents` | Error | Check platform-specific native component imports |
 | `nursery.useReactCompiler` | Warning | Report React Compiler diagnostics for inferred components and hooks |
-| `nursery.noReactNativeLiteralColors` | Off | Defer automated color-token enforcement until a theme policy exists |
+| `style.noReactNativeLiteralColors` | Error | Reject color literals in inline `style` props; the [Unistyles color plugin](#unistyles-stylesheet-import) covers stylesheets |
 
-In the installed Biome 2.5.15, these React Native rules and the compiler rule
-belong to `nursery`. Selecting a recommended domain alone does not enable its
-nursery rules; keep the desired rules explicit. Recheck their groups and
-behavior when upgrading Biome, since experimental rules can change.
+In the installed Biome 2.6.5, the React Native rules sit in `correctness`,
+`suspicious` and `style`, as listed above, while `useReactCompiler` remains in
+`nursery`. Selecting a recommended domain alone does not enable nursery rules;
+keep the desired rules explicit. Rules move between groups as they stabilize,
+so recheck each rule's group and behavior when upgrading Biome.
 
 React Compiler is already enabled in `app.json`. Its lint rule starts at
 `warn` because it is experimental. The explicit `compilationMode: "infer"`
@@ -68,7 +69,7 @@ including `<Button disabled={false} />` and
 of the component's default prop values; omitting the prop altogether has
 different semantics.
 
-Biome 2.5.15 has no built-in rule that enforces this direction. The root
+Biome 2.6.5 has no built-in rule that enforces this direction. The root
 configuration registers the local
 [`use-jsx-boolean-shorthand.grit`](../../scripts/biome/use-jsx-boolean-shorthand.grit)
 plugin instead. It runs inside Biome through the existing lint/check commands
@@ -82,6 +83,23 @@ expressions or rewrite code automatically; remove `={true}` manually. Ordinary
 JavaScript object properties, strings and comments are outside its match.
 Verify its syntax-node pattern against the installed version when upgrading
 Biome.
+
+### Unistyles StyleSheet import
+
+The [`no-react-native-stylesheet.grit`](../../scripts/biome/no-react-native-stylesheet.grit)
+plugin reports `StyleSheet` imported from `react-native`. The Unistyles Babel
+plugin only makes `StyleSheet.create` reactive to themes and runtime changes when
+it comes from `react-native-unistyles`. The plugin matches named imports from the
+`react-native` specifier; it does not follow re-exports or detect a namespace
+import (`import * as RN`), which review must catch.
+
+`style.noReactNativeLiteralColors` only inspects React Native's `StyleSheet`, so
+the [`no-unistyles-literal-colors.grit`](../../scripts/biome/no-unistyles-literal-colors.grit)
+plugin covers Unistyles stylesheets: it reports a string literal assigned to
+any property whose name contains `color` inside `StyleSheet.create(...)`,
+including variants and both the object and theme-function forms. It does not
+evaluate template literals, constants or values computed outside the
+stylesheet; take those from theme tokens as well.
 
 ## VS Code integration
 
@@ -285,6 +303,7 @@ diagnostic message names the broken rule and links to the architecture.
 | `src/modules/*/presentation/**/*.test.tsx` | The same, except infrastructure |
 | `src/infrastructure/**` | Bootstrap, routes, modules, shared UI and the shared i18n facade |
 | `src/infrastructure/i18n/**` | The same, except `@/shared/i18n/contracts` and `@/shared/i18n/app-messages` |
+| `src/infrastructure/env/**` | The same, except `@/shared/i18n/contracts` (supported locales) |
 | `src/shared/**` | Bootstrap, routes, modules and infrastructure |
 | `src/shared/**/*.test.{ts,tsx}` | The same, except infrastructure |
 | `src/shared/lib/**` | Everything except relative files and `@/shared/lib` |
@@ -322,7 +341,7 @@ The rule checks static imports, `import type`, re-exports and dynamic
 When several overrides configure `noRestrictedImports` for one file, the last
 one replaces the earlier options; Biome does not merge their pattern lists. Keep
 the layer globs disjoint, or repeat the full pattern list in the more specific
-override, as `src/infrastructure/i18n/**`, `src/shared/lib/**` and the test
+override, as `src/infrastructure/i18n/**`, `src/infrastructure/env/**`, `src/shared/lib/**` and the test
 overrides do. Verify
 a changed override with a temporary file that imports the specifiers in
 question, then delete the file.

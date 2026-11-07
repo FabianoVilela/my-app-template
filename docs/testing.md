@@ -50,19 +50,28 @@ Use `.test.tsx` for React hook tests even if they contain no JSX. Never put test
 or fixtures in `src/app/`, where Expo Router treats files as routes. Cross-route
 tests and reusable testing setup belong in root `tests/`.
 
+The native project loads `react-native-unistyles/mocks` and then
+`bootstrap/unistyles.ts`; mocked styles always resolve with the light theme and
+zero runtime values, so do not assert computed theme styles in unit tests.
+
 Both projects clear mock call history and restore spies between tests. They
 resolve the existing `@/` and `@/assets/` aliases. Node tests use the Expo Babel
-transform without loading native setup; `.mjs`/ESM dependencies, including MSW 3,
-are transformed for Jest's CommonJS runtime. Tests in Node must not import native
+transform without loading native setup. Only the ESM-only dependencies listed in
+its `transformIgnorePatterns` (MSW 3 and its dependencies, plus Expo's inlined
+environment module) are transformed for Jest's CommonJS runtime; add a package
+there when a Node test reports "Must use import to load ES Module". The Node setup
+also mocks `expo-constants` with an empty app config, so code that reaches
+`readEnv()` runs in Node with the `development` variant; mock it in the test to
+supply another variant. Tests in Node must not import native
 UI modules; use the native project when an integration requires React Native.
 
 ## Environment validation
 
 `src/infrastructure/env/read-env.test.ts` runs in Node and exercises the real
 Zod schemas through the public reader/parser: optional API configuration,
-HTTP/HTTPS development hosts, invalid URLs, locale fallback and sanitized errors.
-Native i18n tests check that the injected default locale preserves device and
-saved-preference precedence. See [validation](architecture/validation.md).
+HTTP/HTTPS development hosts, invalid URLs, locale fallback, app variants and
+sanitized errors. The i18n adapter tests check that the injected default locale
+preserves device and saved-preference precedence. See [validation](architecture/validation.md).
 
 ## Domain and application
 
@@ -148,8 +157,10 @@ queries and built-in matchers such as `toBeDisabled` and `toBeOnTheScreen`.
 Prefer `userEvent` for supported interactions; avoid snapshots of entire screens.
 
 Use `expo-router/testing-library` for navigation integration. The existing
-`tests/navigation.test.tsx` mounts the actual home route through `renderRouter`
-and verifies its URL and content. Supply application operations through their
+`tests/navigation.test.tsx` mounts the actual home route under
+`bootstrap/app-navigation.tsx` through `renderRouter` and verifies its URL and
+content. Routes in `src/app/` export only what Expo Router reads, so tests import
+the navigator from bootstrap rather than from the root layout. Supply application operations through their
 usual props/providers when testing components; MSW is initialized only in the
 Node project. The native suite exercises JavaScript behavior with native mocks,
 not actual device rendering, permissions or keyboard behavior.
@@ -173,7 +184,18 @@ backend data. No Maestro flows or device tests are configured yet.
 
 ## Internationalization
 
-`tests/i18n.test.tsx` exercises isolated real translation instances with fake storage/device locales, shared facade hooks, rich text and locale-aware formatting. `catalogs.test.ts` validates logical messages, interpolation variables, markup and plural categories. Navigation integration checks language changes without losing the route. Type assertions in the i18n suite check the public translation contract during `pnpm typecheck`. Run `pnpm i18n:types` after catalog edits and `pnpm i18n:check` in CI; pre-push includes the freshness check. See the [i18n guide](architecture/i18n.md) for native and web limitations.
+`infrastructure/i18n/i18next-adapter.test.ts` exercises isolated real translation instances with fake storage/device locales: locale resolution, preferences, storage failures and plurals. `shared/i18n/app-translation-provider.test.tsx` covers the shared facade hooks, rich text and locale-aware formatting through a real adapter. `catalogs.test.ts` validates logical messages, interpolation variables, markup and plural categories, and checks catalog directories and `app.json` supportedLocales against `APP_LOCALES`. Navigation integration checks language changes without losing the route. Type assertions in the facade suite check the public translation contract during `pnpm typecheck`. Run `pnpm i18n:types` after catalog edits and `pnpm i18n:check` in CI; pre-push includes the freshness check. See the [i18n guide](architecture/i18n.md) for native and web limitations.
+
+## Bootstrap
+
+`bootstrap/startup.test.tsx` runs startup with the real translation adapter and a
+fake preference store: foreground locale refresh, refresh failures reported at
+their boundary, `dispose` and invalid configuration. `app-providers.test.tsx`
+replaces startup to cover the splash screen, the error screen and retry, and
+disposal of a session that resolves after unmounting. `route-error-fallback.test.tsx`
+checks that a render error is reported once and retried, and
+`tests/root-layout.test.tsx` renders the real root layout module with a throwing
+screen to confirm its `ErrorBoundary` export catches and reports it.
 
 ## Observability
 

@@ -25,7 +25,7 @@ export function initializeObservability(): ErrorReporter {
     const env = readEnv();
     reporter = createSentryErrorReporter({
       dsn: env.sentryDsn,
-      environment: Constants.expoConfig?.extra?.appVariant ?? "development",
+      environment: env.appVariant,
       isEnabled: !__DEV__,
       isNativeEnabled:
         Platform.OS !== "web" &&

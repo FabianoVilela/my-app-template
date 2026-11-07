@@ -24,9 +24,12 @@ meant to be copied; it contains no business features.
 - [Tests](docs/testing.md) with Jest, Testing Library and MSW; Biome, Git hooks,
   Conventional Commits and GitHub Actions CI.
 
-Not included yet: a styling and theme setup (Unistyles v3 is adopted but not
-installed; see the [styling rule](docs/conventions/AGENTS.md#typescript-components-and-styles)),
-state management, authentication, end-to-end tests and EAS Build or Update.
+- [Styling](docs/conventions/AGENTS.md#typescript-components-and-styles) with
+  Unistyles v3: light and dark theme tokens that follow the OS appearance, and
+  breakpoints.
+
+Not included yet: state management, authentication, end-to-end tests and EAS
+Build or Update.
 
 ## Requirements
 

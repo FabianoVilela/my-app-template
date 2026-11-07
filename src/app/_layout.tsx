@@ -1,21 +1,20 @@
-import { Stack } from "expo-router";
+import type { ErrorBoundaryProps } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { AppNavigation } from "@/bootstrap/app-navigation";
 import { AppProviders } from "@/bootstrap/app-providers";
 import {
   initializeObservability,
   withObservability,
 } from "@/bootstrap/observability";
-import { useAppTranslation } from "@/shared/i18n";
+import { RouteErrorFallback } from "@/bootstrap/route-error-fallback";
+
+// Module scope, before React renders: AppProviders hides it after startup.
+void SplashScreen.preventAutoHideAsync();
 
 const errorReporter = initializeObservability();
 
-export function AppNavigation() {
-  const { t } = useAppTranslation("navigation");
-
-  return (
-    <Stack>
-      <Stack.Screen name="index" options={{ title: t("home") }} />
-    </Stack>
-  );
+export function ErrorBoundary(props: ErrorBoundaryProps) {
+  return <RouteErrorFallback {...props} errorReporter={errorReporter} />;
 }
 
 function RootLayout() {

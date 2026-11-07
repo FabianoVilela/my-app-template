@@ -1,16 +1,23 @@
 const { readFileSync } = require("node:fs");
 const { resolve } = require("node:path");
 
-/** @typedef {"development" | "staging" | "production"} AppVariant */
+/** @typedef {(typeof VARIANTS)[number]} AppVariant */
 /** @typedef {{ version: string, build: number }} AppVersion */
 /** @typedef {Record<AppVariant, AppVersion>} AppVersions */
 
-const VARIANTS = ["development", "staging", "production"];
+/** Single source of the supported variants for config and scripts. */
+const VARIANTS = /** @type {const} */ ([
+  "development",
+  "staging",
+  "production",
+]);
 const MAX_BUILD = 2100000000;
 
 /** @param {unknown} value @returns {value is AppVariant} */
 function isAppVariant(value) {
-  return typeof value === "string" && VARIANTS.includes(value);
+  return (
+    typeof value === "string" && VARIANTS.some((variant) => variant === value)
+  );
 }
 
 /** @param {unknown} value @returns {value is string} */
@@ -54,6 +61,7 @@ function readAppVersions(
 }
 
 module.exports = {
+  VARIANTS,
   isAppVariant,
   isAppVersion,
   readAppVersions,

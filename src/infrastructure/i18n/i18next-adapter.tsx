@@ -2,49 +2,45 @@ import "intl-pluralrules";
 import { createInstance } from "i18next";
 import type { ReactElement } from "react";
 import { Trans } from "react-i18next";
-import type {
-  AppI18n,
-  AppLocale,
-  AppLocalePreference,
-  AppLocaleSnapshot,
-  AppTranslate,
-  AppTranslationKey,
+import type { LocalStorage } from "@/infrastructure/storage/local-storage";
+import {
+  APP_LOCALES,
+  type AppI18n,
+  type AppLocale,
+  type AppLocalePreference,
+  type AppLocaleSnapshot,
+  type AppTranslate,
+  type AppTranslationKey,
 } from "@/shared/i18n/contracts";
-import type { LocalStorage } from "../storage/local-storage";
-import enCommon from "./locales/en/common.json";
-import enNavigation from "./locales/en/navigation.json";
-import ptCommon from "./locales/pt-br/common.json";
-import ptNavigation from "./locales/pt-br/navigation.json";
+import { NAMESPACES, resources } from "./resources";
 
 const PREFERENCE_KEY = "i18n.locale-preference";
-const SUPPORTED_LOCALES: AppLocale[] = ["en", "pt-BR"];
 
 function isPreference(value: unknown): value is AppLocalePreference {
-  return (
-    value === "system" || SUPPORTED_LOCALES.some((locale) => locale === value)
-  );
+  return value === "system" || APP_LOCALES.some((locale) => locale === value);
 }
 
+const language = (tag: string) => tag.toLowerCase().split("-")[0];
+
+/** Exact tag first, then the first supported locale of the same language. */
 export function resolveAppLocale(
   locales: readonly string[],
-  defaultLocale: AppLocale = "en",
+  defaultLocale: AppLocale = APP_LOCALES[0],
 ): AppLocale {
   for (const tag of locales) {
     const normalized = tag.toLowerCase();
-    const exact = SUPPORTED_LOCALES.find(
-      (locale) => locale.toLowerCase() === normalized,
-    );
+    const match =
+      APP_LOCALES.find((locale) => locale.toLowerCase() === normalized) ??
+      APP_LOCALES.find((locale) => language(locale) === language(tag));
 
-    if (exact) return exact;
-    if (normalized.split("-")[0] === "pt") return "pt-BR";
-    if (normalized.split("-")[0] === "en") return "en";
+    if (match) return match;
   }
 
   return defaultLocale;
 }
 
 export async function createI18nextAdapter({
-  defaultLocale = "en",
+  defaultLocale = APP_LOCALES[0],
   storage,
   getDeviceLocales,
   onReadError,
@@ -73,13 +69,10 @@ export async function createI18nextAdapter({
   await instance.init({
     lng: resolve(),
     fallbackLng: defaultLocale,
-    supportedLngs: SUPPORTED_LOCALES,
+    supportedLngs: [...APP_LOCALES],
     defaultNS: "common",
-    ns: ["common", "navigation"],
-    resources: {
-      "pt-BR": { common: ptCommon, navigation: ptNavigation },
-      en: { common: enCommon, navigation: enNavigation },
-    },
+    ns: [...NAMESPACES],
+    resources,
     interpolation: { escapeValue: false },
     react: { transSupportBasicHtmlNodes: false },
     returnNull: false,

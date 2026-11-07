@@ -56,7 +56,7 @@ The following rules concern source imports, including type imports. Runtime call
 
 - `app`, `bootstrap`, module presentation and `shared/ui` may consume the public `shared/i18n` facade. Core layers remain translation-free; presentation maps outcomes to messages. Keep vendor imports, catalogs, device detection and language persistence in root `infrastructure/i18n`.
 - `shared/i18n/contracts.ts` and generated `app-messages.ts` are pure: no React, native, vendor or initialization dependencies. The shared React facade receives its implementation through provider props and never imports infrastructure or bootstrap.
-- **Isolated exception:** root `infrastructure/i18n/` may use `import type` directly from those two pure files. No infrastructure may import the shared barrel or React facade; the exception does not extend to other infrastructure directories.
+- **Isolated exceptions:** root `infrastructure/i18n/` may import directly from those two pure files (types and the `APP_LOCALES` registry), and `infrastructure/env/` may import `APP_LOCALES` from `contracts.ts` to validate the default locale. No infrastructure may import the shared barrel or React facade; the exceptions do not extend to other infrastructure directories.
 - Bootstrap constructs the implementation and mounts the provider. See [Internationalization](i18n.md) for rendering injection, lifecycle, catalog maintenance and platform details.
 
 ## Domain and application boundaries
@@ -103,12 +103,13 @@ The following rules concern source imports, including type imports. Runtime call
 
 - Use the vendor-independent `ErrorReporter` contract for technical reporting; keep Sentry imports and framework integration in `infrastructure/observability`. Inject reporting into consumers and keep domain telemetry-free. Application operations needing reporting define their own pure ports.
 - Initialize the crash SDK once at the client process boundary before React mounts; this SDK-specific lifetime is an exception to ordinary dependency lifetimes, not a global service locator. Skip server rendering and disable remote reporting without configuration or in debug builds.
-- Report once at the handling boundary, use fixed technical context, and avoid payloads, credentials and personal data. See [observability](observability.md) for privacy limits, native setup, source maps and activation.
+- Report once at the handling boundary, use fixed technical context, and avoid payloads, credentials and personal data. The root layout's `ErrorBoundary` is the handling boundary for render errors. See [observability](observability.md) for privacy limits, native setup, source maps and activation.
 
 ## Bootstrap: composition and startup
 
 - Bootstrap selects concrete adapters, injects operations and mounts providers through manual factories. Create composition/startup files only when needed; never export eager default instances or expose a global service locator.
-- Composition connects dependencies; startup coordinates required preparation and invokes module operations for business workflows. SDK initialization stays in infrastructure; module providers/hooks stay in module presentation.
+- The root `index.ts` imports `expo-router/entry` and then `bootstrap/unistyles.ts`, which registers the `shared/ui/theme.ts` themes and breakpoints with `StyleSheet.configure` before any route module creates styles. Keep this file limited to style configuration.
+- Composition connects dependencies; startup coordinates required preparation and invokes module operations for business workflows. `bootstrap/startup.ts` prepares what the first screen needs and returns the dependencies with a `dispose` for the subscriptions it created; `app-providers.tsx` runs it per mounted application, holds the splash screen until it settles, mounts providers and shows the shared error screen with retry on failure. SDK initialization stays in infrastructure; module providers/hooks stay in module presentation.
 - Modules, shared code and infrastructure must not import bootstrap. Routes mount composed providers/navigation and delegate substantial assembly to bootstrap; consumers receive operations through props or focused providers.
 - Give resources explicit app/session/feature lifetimes. Preserve instances across renders and release/reset them at lifecycle end. Use React lifecycle when needed.
 - Prepare only what the initial UI requires; avoid unrelated remote dependencies or eager SDK/module initialization. Define failure and retry behavior for required asynchronous startup.
@@ -130,6 +131,7 @@ The following rules concern source imports, including type imports. Runtime call
 - Keep UI state close to its consumers. Treat remote-data caching separately from business rules and workflow orchestration.
 - Hooks may connect application operations to React and manage request/UI lifecycle. Move business decisions out of hooks into domain or application.
 - Use platform-specific UI or adapter files where the platform requires different behavior. Do not spread device checks into the core.
+- Web builds are a single-page app (`web.output: "single"` in `app.json`) that any static host can serve with a rewrite to `index.html`; the template has no API routes or server rendering. Switching to `static` or `server` output renders routes in Node: decide it explicitly, configure Unistyles server rendering, and keep process-wide SDKs and per-request state out of render paths.
 - Add offline queues, persistence and synchronization only when required. Document consistency, retry and conflict behavior before introducing these responsibilities.
 
 ## Verification when implementing behavior

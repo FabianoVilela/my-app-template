@@ -1,10 +1,14 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
-import { isAppVariant, readAppVersions } from "./scripts/app-versions.cjs";
+import {
+  isAppVariant,
+  readAppVersions,
+  VARIANTS,
+} from "./scripts/app-versions.cjs";
 
 export default function appConfig({ config }: ConfigContext): ExpoConfig {
   const variant = process.env.APP_VARIANT ?? "development";
   if (!isAppVariant(variant)) {
-    throw new Error("APP_VARIANT must be development, staging or production");
+    throw new Error(`APP_VARIANT must be one of: ${VARIANTS.join(", ")}`);
   }
 
   const versions = readAppVersions();

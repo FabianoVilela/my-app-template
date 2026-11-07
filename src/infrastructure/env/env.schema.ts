@@ -1,4 +1,8 @@
 import * as z from "zod";
+import { APP_LOCALES } from "@/shared/i18n/contracts";
+
+/** Mirrors VARIANTS in scripts/app-versions.cjs; read-env.test.ts checks parity. */
+export const APP_VARIANTS = ["development", "staging", "production"] as const;
 
 export const envSchema = z.object({
   apiUrl: z.preprocess(
@@ -19,14 +23,17 @@ export const envSchema = z.object({
         return Boolean(
           url.username &&
             !url.password &&
-            /^\/\d+$/.test(url.pathname) &&
+            // Self-hosted Sentry may serve under a path prefix: /sentry/<id>.
+            /^(?:\/[^/]+)*\/\d+$/.test(url.pathname) &&
             !url.search &&
             !url.hash,
         );
       })
       .optional(),
   ),
-  defaultLocale: z.enum(["en", "pt-BR"]).catch("en"),
+  defaultLocale: z.enum(APP_LOCALES).catch(APP_LOCALES[0]),
+  // app.config.ts always sets the variant; test and tool contexts omit it.
+  appVariant: z.enum(APP_VARIANTS).default("development"),
 });
 
 export type Env = z.infer<typeof envSchema>;

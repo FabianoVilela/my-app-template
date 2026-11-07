@@ -18,15 +18,17 @@ const AppTranslationContext = createContext<{
   renderRichText: AppRichTextRenderer;
 } | null>(null);
 
+export type AppTranslationProviderProps = {
+  runtime: AppI18n;
+  renderRichText: AppRichTextRenderer;
+  children: ReactNode;
+};
+
 export function AppTranslationProvider({
   runtime,
   renderRichText,
   children,
-}: {
-  runtime: AppI18n;
-  renderRichText: AppRichTextRenderer;
-  children: ReactNode;
-}) {
+}: AppTranslationProviderProps) {
   return (
     <AppTranslationContext value={{ runtime, renderRichText }}>
       {children}
