@@ -26,7 +26,7 @@ The following additional rules are selected explicitly:
 | `nursery.noReactNativeRawText` | Error | Detect raw text outside recognized text containers |
 | `nursery.useReactNativePlatformComponents` | Error | Check platform-specific native component imports |
 | `nursery.useReactCompiler` | Warning | Report React Compiler diagnostics for inferred components and hooks |
-| `nursery.noReactNativeLiteralColors` | Off | Defer automated color-token enforcement until a theme policy exists |
+| `style.noReactNativeLiteralColors` | Error | Take colors from the Unistyles theme tokens instead of literals in styles |
 
 In the installed Biome 2.5.15, these React Native rules and the compiler rule
 belong to `nursery`. Selecting a recommended domain alone does not enable its
@@ -82,6 +82,15 @@ expressions or rewrite code automatically; remove `={true}` manually. Ordinary
 JavaScript object properties, strings and comments are outside its match.
 Verify its syntax-node pattern against the installed version when upgrading
 Biome.
+
+### Unistyles StyleSheet import
+
+The [`no-react-native-stylesheet.grit`](../../scripts/biome/no-react-native-stylesheet.grit)
+plugin reports `StyleSheet` imported from `react-native`. The Unistyles Babel
+plugin only makes `StyleSheet.create` reactive to themes and runtime changes when
+it comes from `react-native-unistyles`. The plugin matches named imports from the
+`react-native` specifier; it does not follow re-exports or detect a namespace
+import (`import * as RN`), which review must catch.
 
 ## VS Code integration
 

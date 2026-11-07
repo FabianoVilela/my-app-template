@@ -50,6 +50,10 @@ Use `.test.tsx` for React hook tests even if they contain no JSX. Never put test
 or fixtures in `src/app/`, where Expo Router treats files as routes. Cross-route
 tests and reusable testing setup belong in root `tests/`.
 
+The native project loads `react-native-unistyles/mocks` and then
+`bootstrap/unistyles.ts`; mocked styles always resolve with the light theme and
+zero runtime values, so do not assert computed theme styles in unit tests.
+
 Both projects clear mock call history and restore spies between tests. They
 resolve the existing `@/` and `@/assets/` aliases. Node tests use the Expo Babel
 transform without loading native setup. Only the ESM-only dependencies listed in

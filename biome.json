@@ -1,6 +1,9 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.6.5/schema.json",
-  "plugins": ["./scripts/biome/use-jsx-boolean-shorthand.grit"],
+  "plugins": [
+    "./scripts/biome/use-jsx-boolean-shorthand.grit",
+    "./scripts/biome/no-react-native-stylesheet.grit"
+  ],
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -62,7 +65,7 @@
       "style": {
         "useImportType": "error",
         "noNestedTernary": "error",
-        "noReactNativeLiteralColors": "off"
+        "noReactNativeLiteralColors": "error"
       },
       "nursery": {
         "useReactCompiler": {

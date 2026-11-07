@@ -158,7 +158,8 @@ The screen maps states to UI and messages. Write
 `presentation/screens/product-screen.tsx`:
 
 ```tsx
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { useAppTranslation } from "@/shared/i18n";
 import { useProduct } from "../hooks/use-product";
 
@@ -185,17 +186,18 @@ export function ProductScreen({ productId }: ProductScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: theme.colors.background,
   },
-});
+}));
 ```
 
-Follow the [styling rule](../conventions/AGENTS.md#typescript-components-and-styles)
-in force when you write the screen. Map failures to messages here; never render
+Follow the [styling rule](../conventions/AGENTS.md#typescript-components-and-styles):
+styles come from Unistyles theme tokens. Map failures to messages here; never render
 `HttpError`, Zod errors or their `cause`. To distinguish failures, such as
 not found and offline, define that meaning in the port's errors and translate it
 in the adapter.

@@ -108,6 +108,7 @@ The following rules concern source imports, including type imports. Runtime call
 ## Bootstrap: composition and startup
 
 - Bootstrap selects concrete adapters, injects operations and mounts providers through manual factories. Create composition/startup files only when needed; never export eager default instances or expose a global service locator.
+- The root `index.ts` imports `expo-router/entry` and then `bootstrap/unistyles.ts`, which registers the `shared/ui/theme.ts` themes and breakpoints with `StyleSheet.configure` before any route module creates styles. Keep this file limited to style configuration.
 - Composition connects dependencies; startup coordinates required preparation and invokes module operations for business workflows. SDK initialization stays in infrastructure; module providers/hooks stay in module presentation.
 - Modules, shared code and infrastructure must not import bootstrap. Routes mount composed providers/navigation and delegate substantial assembly to bootstrap; consumers receive operations through props or focused providers.
 - Give resources explicit app/session/feature lifetimes. Preserve instances across renders and release/reset them at lifecycle end. Use React lifecycle when needed.
@@ -130,7 +131,7 @@ The following rules concern source imports, including type imports. Runtime call
 - Keep UI state close to its consumers. Treat remote-data caching separately from business rules and workflow orchestration.
 - Hooks may connect application operations to React and manage request/UI lifecycle. Move business decisions out of hooks into domain or application.
 - Use platform-specific UI or adapter files where the platform requires different behavior. Do not spread device checks into the core.
-- Web builds are a single-page app (`web.output: "single"` in `app.json`) that any static host can serve with a rewrite to `index.html`; the template has no API routes or server rendering. Switching to `static` or `server` output renders routes in Node: decide it explicitly and keep process-wide SDKs and per-request state out of render paths.
+- Web builds are a single-page app (`web.output: "single"` in `app.json`) that any static host can serve with a rewrite to `index.html`; the template has no API routes or server rendering. Switching to `static` or `server` output renders routes in Node: decide it explicitly, configure Unistyles server rendering, and keep process-wide SDKs and per-request state out of render paths.
 - Add offline queues, persistence and synchronization only when required. Document consistency, retry and conflict behavior before introducing these responsibilities.
 
 ## Verification when implementing behavior

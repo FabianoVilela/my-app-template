@@ -38,6 +38,11 @@ module.exports = {
     {
       displayName: "native",
       preset: "jest-expo",
+      // Unistyles mocks first: they stub StyleSheet.configure for the config.
+      setupFiles: [
+        "react-native-unistyles/mocks",
+        "<rootDir>/src/bootstrap/unistyles.ts",
+      ],
       testMatch: [
         "<rootDir>/src/**/*.test.tsx",
         "<rootDir>/tests/**/*.test.tsx",

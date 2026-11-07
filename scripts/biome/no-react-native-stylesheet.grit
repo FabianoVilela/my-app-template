@@ -1,0 +1,10 @@
+// Unistyles replaces React Native's StyleSheet; its Babel plugin only
+// processes StyleSheet.create imported from react-native-unistyles.
+`import { $imports } from $source` where {
+  $source <: or {
+    `"react-native"`,
+    `'react-native'`
+  },
+  $imports <: contains `StyleSheet` as $name,
+  register_diagnostic(span=$name, message="Import StyleSheet from react-native-unistyles, not react-native.", severity="error")
+}
