@@ -2,7 +2,8 @@
 
 The template uses Husky, lint-staged and commitlint for local feedback. It keeps
 Biome as the existing formatter/linter and uses the existing TypeScript and test
-commands. No CI/CD workflow, release automation or remote merge policy is set up.
+commands. GitHub Actions CI (`.github/workflows/ci.yml`) repeats these checks
+remotely; no deployment, release automation or remote merge policy is set up.
 
 ## Setup
 

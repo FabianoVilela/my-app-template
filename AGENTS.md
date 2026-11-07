@@ -59,7 +59,7 @@ pnpm expo install <package>  # install SDK-compatible dependencies
 ```
 
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
-- Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI should run at least `pnpm check` and `pnpm typecheck`. Report failures or checks that could not run.
+- Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI (`.github/workflows/ci.yml`) runs these checks, the test suites and `pnpm expo install --check` on pushes to `main` and pull requests; keep it in sync when adding a required check. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
 - Add meaningful tests when implementing behavior. See the task references above for testing environments and additional commands; `package.json` defines the executable scripts.
 
@@ -69,7 +69,7 @@ pnpm expo install <package>  # install SDK-compatible dependencies
 - `commit-msg` validates Conventional Commits using `commitlint.config.cjs`. Read the resolved rules with `pnpm commitlint:check --print-config json` before writing a message when needed. Follow the [commit conventions](docs/conventions/AGENTS.md#commit-messages).
 - `pre-push` runs `pnpm check:push`: catalog freshness, TypeScript and application tests. Rename script tests run separately with `pnpm test:rename-app`. A failing command stops the push.
 - Fix rejected checks and retry. Do not bypass hooks with `--no-verify`, `HUSKY=0` or equivalent settings unless explicitly instructed by the user.
-- See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. CI/CD and remote merge policies are not configured by this workflow.
+- See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. Deployment and remote merge policies are not configured.
 
 ## Rules
 

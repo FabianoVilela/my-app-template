@@ -204,8 +204,9 @@ existing checkout, run `pnpm prepare` to reinstall them.
   Rename script tests run separately with `pnpm test:rename-app`.
 
 See the [Git workflow guide](docs/git-workflow.md) for commands, partial staging
-and troubleshooting. These hooks are local; CI/CD and remote merge policies are
-not configured. Commitizen is not required.
+and troubleshooting. These hooks are local; GitHub Actions CI
+(`.github/workflows/ci.yml`) repeats the checks on pushes to `main` and pull
+requests. Deployment and remote merge policies are not configured. Commitizen is not required.
 
 ## Learn more
 
