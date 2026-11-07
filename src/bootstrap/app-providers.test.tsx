@@ -16,7 +16,7 @@ function createReporter(): ErrorReporter {
 }
 
 async function createSession(): Promise<AppSession> {
-  const dependencies = await createI18nextAdapter({
+  const i18n = await createI18nextAdapter({
     storage: {
       getItem: () => null,
       setItem: () => undefined,
@@ -26,7 +26,7 @@ async function createSession(): Promise<AppSession> {
     onReadError: jest.fn(),
   });
 
-  return { dependencies, dispose: jest.fn() };
+  return { dependencies: { i18n }, dispose: jest.fn() };
 }
 
 function renderProviders(errorReporter = createReporter()) {

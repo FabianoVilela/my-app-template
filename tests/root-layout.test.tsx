@@ -23,15 +23,17 @@ test("the root boundary reports a screen render error and offers retry", async (
   jest.spyOn(console, "error").mockImplementation(() => undefined);
 
   jest.mocked(startup).mockResolvedValue({
-    dependencies: await createI18nextAdapter({
-      storage: {
-        getItem: () => null,
-        setItem: () => undefined,
-        removeItem: () => undefined,
-      },
-      getDeviceLocales: () => ["en-US"],
-      onReadError: jest.fn(),
-    }),
+    dependencies: {
+      i18n: await createI18nextAdapter({
+        storage: {
+          getItem: () => null,
+          setItem: () => undefined,
+          removeItem: () => undefined,
+        },
+        getDeviceLocales: () => ["en-US"],
+        onReadError: jest.fn(),
+      }),
+    },
     dispose: jest.fn(),
   });
 

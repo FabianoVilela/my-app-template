@@ -35,11 +35,11 @@ test("prepares translations and refreshes the device locale in the foreground", 
   const { errorReporter, changeAppState } = setup();
   const session = await startup({ errorReporter });
   const refresh = jest
-    .spyOn(session.dependencies.runtime, "refreshDeviceLocale")
+    .spyOn(session.dependencies.i18n.runtime, "refreshDeviceLocale")
     .mockResolvedValue();
 
   expect(errorReporter.addBreadcrumb).toHaveBeenCalledWith("app.startup");
-  expect(session.dependencies.runtime.getSnapshot().locale).toBe("en");
+  expect(session.dependencies.i18n.runtime.getSnapshot().locale).toBe("en");
 
   changeAppState("background");
   expect(refresh).not.toHaveBeenCalled();
@@ -54,7 +54,7 @@ test("reports a failed locale refresh at its handling boundary", async () => {
   const failure = new Error("refresh");
 
   jest
-    .spyOn(session.dependencies.runtime, "refreshDeviceLocale")
+    .spyOn(session.dependencies.i18n.runtime, "refreshDeviceLocale")
     .mockRejectedValue(failure);
   changeAppState("active");
   await Promise.resolve();

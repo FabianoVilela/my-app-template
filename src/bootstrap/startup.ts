@@ -5,7 +5,10 @@ import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
 import { createMmkvStorage } from "@/infrastructure/storage/mmkv-storage";
 
-export type AppDependencies = Awaited<ReturnType<typeof createI18nextAdapter>>;
+/** One entry per capability; providers receive their entry, never the whole set. */
+export type AppDependencies = {
+  i18n: Awaited<ReturnType<typeof createI18nextAdapter>>;
+};
 
 export type AppSession = {
   dependencies: AppDependencies;
@@ -25,7 +28,7 @@ export async function startup({
   errorReporter.addBreadcrumb("app.startup");
 
   const env = readEnv();
-  const dependencies = await createI18nextAdapter({
+  const i18n = await createI18nextAdapter({
     defaultLocale: env.defaultLocale,
     storage: createMmkvStorage({ id: "app-preferences" }),
     getDeviceLocales: () => getLocales().map((locale) => locale.languageTag),
@@ -39,12 +42,12 @@ export async function startup({
   const subscription = AppState.addEventListener("change", (state) => {
     if (state !== "active") return;
 
-    dependencies.runtime.refreshDeviceLocale().catch((error: unknown) =>
+    i18n.runtime.refreshDeviceLocale().catch((error: unknown) =>
       errorReporter.captureException(error, {
         operation: "i18n.refresh-device-locale",
       }),
     );
   });
 
-  return { dependencies, dispose: () => subscription.remove() };
+  return { dependencies: { i18n }, dispose: () => subscription.remove() };
 }

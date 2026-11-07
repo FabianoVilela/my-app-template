@@ -66,7 +66,7 @@ export function AppProviders({ children, errorReporter }: AppProvidersProps) {
   if (state.status === "loading") return null;
 
   return (
-    <AppTranslationProvider {...state.dependencies}>
+    <AppTranslationProvider {...state.dependencies.i18n}>
       {children}
     </AppTranslationProvider>
   );
