@@ -1,7 +1,8 @@
 # Biome configuration and overrides
 
-This guide explains the React checks, editor integration and four overrides in
-root [biome.json](../../biome.json), configured for Biome 2.5.15.
+This guide explains the React checks, editor integration, source overrides and
+layer import boundaries in root [biome.json](../../biome.json), configured for
+Biome 2.5.15.
 [Project conventions](AGENTS.md) define the project's
 naming and export policy; the configuration defines the checks Biome executes.
 Keep them aligned when either changes. Verification commands belong in the
@@ -105,6 +106,7 @@ The overrides refine the global configuration for selected source files:
 | `src/app/**` | Allow default exports for routes and layouts |
 | `src/infrastructure/**`, `src/modules/*/infrastructure/**` | Allow external casing for selected property declarations |
 | `src/app/**/\\[*.{ts,tsx}` | Validate dynamic route parameter filenames in `camelCase` |
+| One override per layer | Restrict imports across architectural layers; see [layer import boundaries](#layer-import-boundaries) |
 
 `**` spans directory levels; `*` matches within one path segment. The module
 pattern therefore works with any immediate module directory name. These rules
@@ -264,6 +266,86 @@ setting applies to the parameter filename. This override checks filenames,
 so a directory such as `[order_id]/index.tsx` still needs manual review of its
 parameter spelling.
 
+## Layer import boundaries
+
+The last overrides apply `style.noRestrictedImports` to each layer of the
+[application architecture](../architecture/AGENTS.md#responsibilities-and-allowed-dependencies).
+They turn the dependency table into lint errors, so a domain file importing
+React, Zod or an adapter fails `pnpm lint` instead of waiting for review. Each
+diagnostic message names the broken rule and links to the architecture.
+
+| Files | Rejected imports |
+| --- | --- |
+| `src/app/**` | Root infrastructure; module domain, application and infrastructure |
+| `src/bootstrap/**` | Routes |
+| `src/modules/*/domain/**` | Everything except relative files, `@/shared/lib` and other modules' public entry points; relative paths into the module's application, infrastructure or presentation |
+| `src/modules/*/application/**` | The same allowlist; relative paths into the module's infrastructure or presentation |
+| `src/modules/*/infrastructure/**` | Bootstrap, routes, other modules' internals, presentation, shared UI and the shared i18n facade |
+| `src/modules/*/presentation/**` | Bootstrap, routes, other modules' internals and any infrastructure |
+| `src/modules/*/presentation/**/*.test.tsx` | The same, except infrastructure |
+| `src/infrastructure/**` | Bootstrap, routes, modules, shared UI and the shared i18n facade |
+| `src/infrastructure/i18n/**` | The same, except `@/shared/i18n/contracts` and `@/shared/i18n/app-messages` |
+| `src/shared/**` | Bootstrap, routes, modules and infrastructure |
+| `src/shared/**/*.test.{ts,tsx}` | The same, except infrastructure |
+| `src/shared/lib/**` | Everything except relative files and `@/shared/lib` |
+| `src/shared/i18n/contracts.ts`, `app-messages.ts` | Everything except each other |
+
+Presentation and shared UI tests may import root infrastructure to build real
+test instances, such as the i18n adapter that the
+[testing guide](../testing.md#components-and-navigation) recommends. Domain,
+application and `shared/lib` tests keep their production restrictions and use
+fakes.
+
+Domain, application and `shared/lib` use an allowlist: the first `**` pattern
+rejects every specifier and later `!` patterns allow specific ones. The other
+layers use a denylist because they may depend on external libraries.
+
+### How the patterns match
+
+Patterns are gitignore-style globs matched against the import specifier as
+written, not against the resolved file. The last matching pattern wins, so a
+plain pattern after a `!` pattern rejects again. In domain code,
+`../application/ports/order-repository` matches `!../**` and then
+`../**/application/**`, so it is rejected.
+
+`@/modules/*/*/**` matches any path inside a module directory, such as
+`@/modules/orders/domain/order`. `@/modules/orders` and
+`@/modules/orders/contracts` remain allowed as public entry points. Inside a
+module, import its own files with relative paths; the alias form is rejected
+there because the pattern cannot tell the current module from another one.
+
+The rule checks static imports, `import type`, re-exports and dynamic
+`import()`.
+
+### Overlapping overrides
+
+When several overrides configure `noRestrictedImports` for one file, the last
+one replaces the earlier options; Biome does not merge their pattern lists. Keep
+the layer globs disjoint, or repeat the full pattern list in the more specific
+override, as `src/infrastructure/i18n/**`, `src/shared/lib/**` and the test
+overrides do. Verify
+a changed override with a temporary file that imports the specifiers in
+question, then delete the file.
+
+### Limits of the boundary checks
+
+- Relative paths are matched as text. A relative import that leaves its module
+  without passing through a layer directory name, such as
+  `../../other-module/x`, is not detected. Use `@/` aliases across source
+  directories as the [project conventions](AGENTS.md#imports-and-exports) require.
+- A public entry point such as `@/modules/orders` is allowed even when it
+  re-exports React UI or adapters. Core layers must import only pure entry points.
+- The type-only requirement of the
+  [i18n infrastructure exception](../architecture/AGENTS.md#shared-internationalization-boundary)
+  is not checked; use `import type`.
+- CommonJS `require()` calls are not checked.
+- Files in `src/modules/<name>/` outside the four layer directories, such as a
+  public entry point, and tests under root `tests/` have no layer restrictions.
+
+When a module adds a public entry point used by core layers, keep it pure and
+review its re-exports. Adding a new business module needs no configuration
+change because the globs match any module directory.
+
 ## Maintenance and coverage
 
 - Preserve explicit defaults for readability when editing the configuration.
@@ -274,9 +356,10 @@ parameter spelling.
   them also relaxes checks for unrelated code in the selected paths.
 - Use the root verification workflow. `check:fix` can apply supported fixes,
   but filename changes and default-export changes require manual work.
-- Review architectural layer/module imports, directory names, file placement,
-  semantic naming and intended public APIs separately. These four overrides do
-  not enforce architectural import boundaries.
+- Review directory names, file placement, semantic naming and intended public
+  APIs separately. Review the import cases listed in
+  [boundary limits](#limits-of-the-boundary-checks); the layer overrides do not
+  cover them.
 
 ## References
 
@@ -290,3 +373,4 @@ parameter spelling.
 - [noDefaultExport](https://biomejs.dev/linter/rules/no-default-export/)
 - [useFilenamingConvention](https://biomejs.dev/linter/rules/use-filenaming-convention/)
 - [useNamingConvention](https://biomejs.dev/linter/rules/use-naming-convention/)
+- [noRestrictedImports](https://biomejs.dev/linter/rules/no-restricted-imports/)

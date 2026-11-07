@@ -176,6 +176,389 @@
           }
         }
       }
+    },
+    {
+      "includes": ["src/app/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "@/infrastructure/**",
+                      "../**/infrastructure/**",
+                      "@/modules/*/domain/**",
+                      "@/modules/*/application/**",
+                      "@/modules/*/infrastructure/**"
+                    ],
+                    "message": "Routes may use module presentation, bootstrap and shared code; delegate assembly to bootstrap. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/bootstrap/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/modules/*/domain/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "**",
+                      "!./**",
+                      "!../**",
+                      "!@/shared/lib/**",
+                      "!@/modules/*",
+                      "!@/modules/*/*",
+                      "../**/application/**",
+                      "../**/infrastructure/**",
+                      "../**/presentation/**",
+                      "../**/bootstrap/**",
+                      "../**/app/**"
+                    ],
+                    "message": "The domain layer may import only its own module's core files, other modules' pure public entry points and @/shared/lib; inject other capabilities through ports. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/modules/*/application/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "**",
+                      "!./**",
+                      "!../**",
+                      "!@/shared/lib/**",
+                      "!@/modules/*",
+                      "!@/modules/*/*",
+                      "../**/infrastructure/**",
+                      "../**/presentation/**",
+                      "../**/bootstrap/**",
+                      "../**/app/**"
+                    ],
+                    "message": "The application layer may import only its own module's core files, other modules' pure public entry points and @/shared/lib; inject other capabilities through ports. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/modules/*/infrastructure/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/*/*/**"],
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": [
+                      "@/shared/ui/**",
+                      "@/shared/i18n",
+                      "@/shared/i18n/**",
+                      "../**/presentation/**"
+                    ],
+                    "message": "Module infrastructure must not depend on presentation, shared UI or the shared i18n facade. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/modules/*/presentation/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/*/*/**"],
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/infrastructure/**", "../**/infrastructure/**"],
+                    "message": "Presentation receives adapters through application contracts; it must not import infrastructure. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/modules/*/presentation/**/*.test.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/*/*/**"],
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/infrastructure/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/**", "../**/modules/**"],
+                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": [
+                      "@/shared/ui/**",
+                      "@/shared/i18n",
+                      "@/shared/i18n/**"
+                    ],
+                    "message": "Infrastructure must not import the shared i18n facade or shared UI. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/infrastructure/i18n/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/**", "../**/modules/**"],
+                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": [
+                      "@/shared/ui/**",
+                      "@/shared/i18n",
+                      "@/shared/i18n/**",
+                      "!@/shared/i18n/contracts",
+                      "!@/shared/i18n/app-messages"
+                    ],
+                    "message": "Root i18n infrastructure may import only the pure shared i18n contracts and generated messages. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/**", "../**/modules/**"],
+                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/infrastructure/**", "../**/infrastructure/**"],
+                    "message": "Shared code must not import infrastructure; receive implementations through parameters or provider props. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/**/*.test.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/**", "../**/modules/**"],
+                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/lib/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["**", "!./**", "!@/shared/lib/**"],
+                    "message": "Shared utilities must stay pure: import only other @/shared/lib files. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "src/shared/i18n/contracts.ts",
+        "src/shared/i18n/app-messages.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["**", "!./contracts", "!./app-messages"],
+                    "message": "Shared i18n contracts and generated messages must stay pure. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   ]
 }

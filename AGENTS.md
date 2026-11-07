@@ -17,6 +17,7 @@ Read applicable instructions once per task. Start with the affected code and tes
 
 | Task | Additional reference |
 | --- | --- |
+| New business module or feature | [Adding a business module](docs/architecture/add-module.md) |
 | HTTP endpoints or services | [HTTP client](docs/architecture/http-client.md) and [validation](docs/architecture/validation.md) |
 | Public environment configuration | [Validation](docs/architecture/validation.md#environment) |
 | App variants, launcher icons or environment/version display | [App variants](docs/app-variants.md), including the future visual differentiation proposal |

@@ -47,7 +47,7 @@ Rules such as `kebab-case`, named exports and handler names are project choices,
 ## Imports and exports
 
 - Use named exports in `src/`, with default component exports for Expo Router screens and layouts in `src/app/`. Preserve defaults required by tool configuration or external APIs; add a narrow Biome override if a source integration requires another exception.
-- Use existing `@/` aliases for imports across source directories and `@/assets/` for root assets; use relative imports for nearby files in the same directory or local subtree. Do not add alternative aliases for the same paths.
+- Use existing `@/` aliases for imports across source directories and `@/assets/` for root assets; use relative imports for nearby files in the same directory or local subtree. Inside a business module, import the module's own files with relative paths. Do not add alternative aliases for the same paths.
 - Follow the architecture's [module boundary rules](../architecture/AGENTS.md#module-boundaries-and-shared-code) for direct imports, public entry points and barrels.
 
 ## Expo Router filenames
@@ -120,5 +120,5 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 
 ## Automated checks and review
 
-- Biome checks source filename and basic identifier casing, type imports, named exports, explicit `any`, unused code and import cycles. TypeScript checks types in strict mode. See [Biome coverage](biome.md#maintenance-and-coverage) for exceptions and limits.
-- Review directory names, English terminology, semantic prefixes (`is`/`has`, `on`/`handle`), file placement, layer/module dependencies, public API intent and unnecessary abstractions. Follow the conventions even when automated checks accept additional forms.
+- Biome checks source filename and basic identifier casing, type imports, named exports, explicit `any`, unused code, import cycles and [layer import boundaries](biome.md#layer-import-boundaries). TypeScript checks types in strict mode. See [Biome coverage](biome.md#maintenance-and-coverage) for exceptions and limits.
+- Review directory names, English terminology, semantic prefixes (`is`/`has`, `on`/`handle`), file placement, [unchecked import cases](biome.md#limits-of-the-boundary-checks), public API intent and unnecessary abstractions. Follow the conventions even when automated checks accept additional forms.

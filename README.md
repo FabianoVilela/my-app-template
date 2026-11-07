@@ -1,36 +1,115 @@
-# Welcome to your Expo app 👋
+# my-app-template
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A reference template for Expo and React Native apps developed with AI coding
+agents. It provides a layered architecture, vendor-independent adapters,
+enforced conventions and agent instructions, so derived apps start from
+consistent patterns instead of improvised ones. Everything in the template is
+meant to be copied; it contains no business features.
+
+## What is included
+
+- Expo SDK 58, React Native, React Compiler, Expo Router with typed routes and
+  TypeScript in strict mode.
+- A [layered architecture](docs/architecture/AGENTS.md) with business modules,
+  whose import boundaries are enforced by Biome.
+- Adapters behind application-owned contracts: an [HTTP client](docs/architecture/http-client.md)
+  (Axios), [local and secure storage](docs/architecture/storage.md) (MMKV and
+  SecureStore), [dates](docs/architecture/date-adapter.md) (Day.js) and
+  [error reporting](docs/architecture/observability.md) (Sentry, optional).
+- Typed [internationalization](docs/architecture/i18n.md) in English and
+  Brazilian Portuguese, and [validated public configuration](docs/architecture/validation.md)
+  with Zod.
+- [App variants](docs/app-variants.md) (development, staging, production) with
+  independent identities, versions and build numbers.
+- [Tests](docs/testing.md) with Jest, Testing Library and MSW; Biome, Git hooks,
+  Conventional Commits and GitHub Actions CI.
+
+Not included yet: a styling and theme setup (Unistyles v3 is adopted but not
+installed; see the [styling rule](docs/conventions/AGENTS.md#typescript-components-and-styles)),
+state management, authentication, end-to-end tests and EAS Build or Update.
+
+## Requirements
+
+- Node.js in the range declared by `engines` in `package.json`, and pnpm at the
+  version in `packageManager`.
+- Xcode with an iOS simulator, or Android Studio with an emulator, to build and
+  run the app locally.
 
 ## Get started
 
-1. Install dependencies
+```bash
+pnpm install
+```
 
-   ```bash
-   pnpm install
-   ```
+```bash
+pnpm ios     # or: pnpm android
+```
 
-2. Build, install and run the app
-
-   ```bash
-   pnpm ios     # or: pnpm android
-   ```
-
-   This compiles a local debug build, installs it on an [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or device and starts Metro. Use the same command to start later sessions; it rebuilds native code incrementally.
+This compiles a local debug build, installs it on an [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or device and starts Metro. Use the same command to start later sessions; it rebuilds native code incrementally.
 
 > [!IMPORTANT]
 > Expo Go is not supported. The app imports native modules that Expo Go does not include, such as MMKV through Nitro Modules, so it fails at launch there with a NitroModules error. `expo-dev-client` is not installed, so `pnpm start` runs in Expo Go mode: do not open the app through its QR code or its `i`/`a` shortcuts.
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## New app checklist
 
-## Other setup steps
+Work through these steps when starting a product from the template:
 
-- Biome is already configured for linting, formatting and import organization. See the quality checks below.
-- Jest, Expo component/navigation testing and MSW HTTP mocking are configured. See the [testing guide](docs/testing.md).
-- MMKV persistence requires a development build on iOS and Android; see the [storage guide](docs/architecture/storage.md).
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+1. **Rename the app with your own identifiers.** Without explicit options, the
+   script keeps the template's `com.fabianovilela` namespace and changes only the
+   last segment. Preview first, then apply:
 
-## Rename the app
+   ```bash
+   pnpm rename-app "My App" --ios-bundle-id com.example.myapp --android-package com.example.myapp --dry-run
+   ```
+
+   ```bash
+   pnpm rename-app "My App" --ios-bundle-id com.example.myapp --android-package com.example.myapp
+   ```
+
+   See [renaming in detail](#renaming-in-detail) for the generated values and limits.
+2. **Replace the icons and splash screen.** Update `assets/expo.icon` (iOS),
+   the Android adaptive and monochrome images and `icon.png` in `assets/images/`,
+   `favicon.png`, `splash-icon.png` and the splash `backgroundColor` in `app.json`.
+   See [visual differentiation](docs/app-variants.md#future-visual-differentiation-not-implemented)
+   for per-variant icons.
+3. **Configure the environment.** Copy `.env.example` to
+   `.env.development.local` (and the staging or production equivalent) and set
+   the values you need. `EXPO_PUBLIC_` values are embedded in the app and public.
+   See [selecting configuration](docs/app-variants.md#selecting-configuration).
+4. **Decide on error reporting.** Set `EXPO_PUBLIC_SENTRY_DSN` and the build-only
+   Sentry variables to activate it, or leave them empty to keep it disabled. See
+   [observability](docs/architecture/observability.md#source-maps-and-activation).
+5. **Review locales and privacy.** Adjust the default locale and catalogs in the
+   [i18n guide](docs/architecture/i18n.md), and keep the iOS privacy manifest in
+   `app.json` accurate when you add SDKs that collect data.
+6. **Replace the placeholder modules.** Rename `src/modules/module-1` after your
+   first business capability, follow [adding a business module](docs/architecture/add-module.md),
+   and delete the unused `module-2` and `module-3`. Replace the home screen text
+   in `src/app/index.tsx`.
+7. **Regenerate and rebuild.** If `ios/` or `android/` exist, run
+   `pnpm expo:development prebuild --clean`, then `pnpm ios` or `pnpm android`.
+8. **Run the [quality checks](#quality-checks)** and commit.
+
+## Documentation
+
+| Topic | Document |
+| --- | --- |
+| Instructions for AI agents (start here) | [AGENTS.md](AGENTS.md) |
+| Layers, dependencies and module boundaries | [Application architecture](docs/architecture/AGENTS.md) |
+| Naming, organization, style and commits | [Project conventions](docs/conventions/AGENTS.md) |
+| Adding a feature end to end | [Adding a business module](docs/architecture/add-module.md) |
+| HTTP services and dependency composition | [HTTP client](docs/architecture/http-client.md) |
+| Schemas and public configuration | [Validation](docs/architecture/validation.md) |
+| Preferences and credentials | [Storage](docs/architecture/storage.md) |
+| Dates, UTC and time zones | [Date operations](docs/architecture/date-adapter.md) |
+| Translations and localized formatting | [Internationalization](docs/architecture/i18n.md) |
+| Error and crash reporting | [Observability](docs/architecture/observability.md) |
+| Variants, versions and local releases | [App variants](docs/app-variants.md) |
+| Test environments and patterns | [Testing](docs/testing.md) |
+| Lint rules and overrides | [Biome guide](docs/conventions/biome.md) |
+| Hooks, staging and troubleshooting | [Git workflow](docs/git-workflow.md) |
+
+## Renaming in detail
 
 Use a Node.js version allowed by `engines` in `package.json` and run from the repository root:
 
@@ -155,25 +234,6 @@ See the [versioning workflow](docs/app-variants.md#versions-and-release-preparat
 When switching an existing native project to another variant, first regenerate it
 with the matching `pnpm expo:<variant> prebuild --clean` command.
 
-## Project architecture
-
-- [Application architecture](docs/architecture/AGENTS.md)
-- [Project conventions](docs/conventions/AGENTS.md)
-- [HTTP client, module services and dependency composition](docs/architecture/http-client.md)
-- [Local preferences and secure credential storage](docs/architecture/storage.md)
-- [Dates, UTC and time-zone policy](docs/architecture/date-adapter.md#utc-and-device-display)
-- [Internationalization and localized formatting](docs/architecture/i18n.md)
-
-The JSON HTTP client is ready to use through an Axios adapter. API configuration
-is optional until a derived project connects a backend; see `.env.example` and
-the HTTP guide. The template does not create business services or contact an API
-at startup.
-
-Local storage is available through an MMKV adapter for preferences, settings and
-serialized state, and a SecureStore adapter for tokens and credentials. Both use
-library-independent contracts and explicit factories. State management with
-Zustand will be integrated separately.
-
 ## Quality checks
 
 ```bash
@@ -189,10 +249,10 @@ pnpm test:rename-app
 Run these before merging changes. `check` verifies lint, formatting and import
 organization; `lint` is available for lint-only checks. Biome keeps defaults
 explicit and checks import cycles (including type-only cycles), filename casing
-and named exports with route exceptions. Layer and module import boundaries
-still require review. See the [project conventions](docs/conventions/AGENTS.md)
-and [Biome override guide](docs/conventions/biome.md) for coverage, exceptions and
-examples.
+and named exports with route exceptions, and enforces layer and module import
+boundaries; relative paths that leave a module still require review. See the
+[project conventions](docs/conventions/AGENTS.md) and
+[Biome guide](docs/conventions/biome.md) for coverage, exceptions and examples.
 
 ## Local Git hooks
 
@@ -210,19 +270,3 @@ and troubleshooting. These hooks are local; GitHub Actions CI
 (`.github/workflows/ci.yml`) repeats the checks on pushes to `main` and pull
 requests. Deployment and remote merge policies are not configured. Commitizen
 is not required.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-Observability: optional Sentry error/crash reporting with an injected adapter. See [setup, privacy and verification](docs/architecture/observability.md).
