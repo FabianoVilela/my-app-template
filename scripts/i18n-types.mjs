@@ -104,11 +104,13 @@ const outputs = [
 if (process.argv.includes("--check")) {
   for (const [target, output] of outputs) {
     let current;
+
     try {
       current = readFileSync(target, "utf8");
     } catch {
       current = undefined;
     }
+
     if (current !== output)
       throw new Error("Translation types are stale. Run pnpm i18n:types.");
   }

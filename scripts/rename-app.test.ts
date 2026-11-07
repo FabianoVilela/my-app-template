@@ -184,19 +184,23 @@ for (const options of [
   test(`npm forwards preview options after the separator: ${options.join(" ")}`, (context) => {
     const { runNpm, read, files } = fixture(context);
     const result = runNpm(["--", "My App", ...options, "--dry-run"]);
+
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /"name": "My App"/);
     assert.match(result.stdout, /Would update/);
     assert.match(result.stdout, /app\.json/);
     assert.match(result.stdout, /package\.json/);
+
     if (options.length > 0) {
       assert.match(result.stdout, /"iosId": "com\.myapp"/);
       assert.match(result.stdout, /"androidId": "com\.myapp"/);
     }
+
     if (options.includes("--slug")) {
       assert.match(result.stdout, /"slug": "myapp-mobile"/);
       assert.match(result.stdout, /"scheme": "myapp"/);
     }
+
     for (const [path, content] of Object.entries(files)) {
       assert.equal(read(path), content, path);
     }
@@ -213,9 +217,12 @@ test("npm applies explicitly forwarded identifiers without dry-run", (context) =
     "--android-package",
     "com.myapp",
   ]);
+
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /Updated/);
+
   const { expo } = JSON.parse(read("app.json"));
+
   assert.equal(expo.name, "My App");
   assert.equal(expo.slug, "my-app");
   assert.equal(expo.ios.bundleIdentifier, "com.myapp");
@@ -226,12 +233,15 @@ test("npm applies explicitly forwarded identifiers without dry-run", (context) =
 test("supports consecutive renames without confusing a slug with a link scheme", (context) => {
   const { run, read } = fixture(context);
   assert.equal(run(["Alpha"]).status, 0);
+
   const result = run(["Beta Mobile"]);
+
   assert.equal(result.status, 0, result.stderr);
   assert.match(
     read("README.md"),
     /Beta Mobile \/ beta-mobile \/ betamobile:\/\/home/,
   );
+
   assert.equal(JSON.parse(read("package.json")).name, "beta-mobile");
   assert.match(read("app.json"), /com.example.betamobile/);
   const unchanged = run(["Beta Mobile"]);
@@ -255,8 +265,10 @@ test("supports explicit identifiers, non-Latin names and scoped package names", 
     "--android-package",
     "com.other.my_app",
   ]);
+
   assert.equal(result.status, 0, result.stderr);
   const { expo } = JSON.parse(read("app.json"));
+
   assert.equal(expo.name, "应用");
   assert.equal(expo.scheme, "my-app+test");
   assert.equal(expo.ios.bundleIdentifier, "com.other.my-app");
@@ -269,9 +281,12 @@ test("keeps native display-name overrides consistent when the old display name e
   const config = JSON.parse(read("app.json"));
   config.expo.name = "starter-app";
   config.expo.ios.infoPlist.CFBundleDisplayName = "starter-app";
+
   writeFileSync(join(root, "app.json"), JSON.stringify(config));
+
   const result = run(["My App"]);
   assert.equal(result.status, 0, result.stderr);
+
   const { expo } = JSON.parse(read("app.json"));
   assert.equal(expo.ios.infoPlist.CFBundleDisplayName, "My App");
 });
@@ -356,9 +371,11 @@ test("restores committed files and removes temporary files after a write failure
     result.stderr,
     /Simulated disk failure.*Original files restored/,
   );
+
   for (const [path, content] of Object.entries(files)) {
     assert.equal(read(path), content, path);
   }
+
   assert.equal(
     readdirSync(root, { recursive: true }).some((path) =>
       String(path).endsWith(".rename-tmp"),
@@ -373,8 +390,10 @@ test("renames the base identity with the supported variant config", (context) =>
     new URL("../app.config.ts", import.meta.url),
     "utf8",
   );
+
   writeFileSync(join(root, "app.config.ts"), config);
   const result = run(["New App"]);
+
   assert.equal(result.status, 0, result.stderr);
   assert.equal(read("app.config.ts"), config);
   assert.equal(
@@ -386,8 +405,10 @@ test("renames the base identity with the supported variant config", (context) =>
 test("preserves customized variant configuration while renaming the base", (context) => {
   const { root, run, read } = fixture(context);
   const config = `${readFileSync(new URL("../app.config.ts", import.meta.url), "utf8")}\n// customized\n`;
+
   writeFileSync(join(root, "app.config.ts"), config);
   const result = run(["New App"]);
+
   assert.equal(result.status, 0, result.stderr);
   assert.equal(read("app.config.ts"), config);
   assert.equal(JSON.parse(read("app.json")).expo.name, "New App");
@@ -397,6 +418,7 @@ test("rejects symlinked variant configuration before writing", (context) => {
   const { root, run, read, files } = fixture(context);
   symlinkSync(join(root, "package.json"), join(root, "app.config.ts"));
   const result = run(["New App"]);
+
   assert.equal(result.status, 1);
   assert.match(result.stderr, /without symlinks/);
   assert.equal(read("app.json"), files["app.json"]);
@@ -408,7 +430,9 @@ test("supports the template variant config with Windows line endings", (context)
     new URL("../app.config.ts", import.meta.url),
     "utf8",
   );
+
   writeFileSync(join(root, "app.config.ts"), config.replace(/\r?\n/g, "\r\n"));
+
   const result = run(["New App"]);
   assert.equal(result.status, 0, result.stderr);
 });

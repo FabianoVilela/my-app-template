@@ -20,6 +20,7 @@ export function AppTranslatedText<K extends AppTranslationKey>({
   ...props
 }: AppTranslatedTextProps<K>) {
   const { renderRichText } = useAppI18nContext();
+
   return (
     <Text {...props}>{renderRichText({ message, values, components })}</Text>
   );
