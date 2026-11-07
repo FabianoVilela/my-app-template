@@ -2,6 +2,10 @@
   "name": "my-app-template",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "packageManager": "pnpm@12.14.0",
+  "engines": {
+    "node": "^22.22.1 || ^24.3.0 || >=26.0.0"
+  },
   "dependencies": {
     "@expo/ui": "~58.0.27",
     "@sentry/react-native": "~8.28.0",
