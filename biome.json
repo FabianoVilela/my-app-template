@@ -356,6 +356,34 @@
       }
     },
     {
+      "includes": ["src/modules/*/presentation/**/*.test.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/*/*/**"],
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
       "includes": ["src/infrastructure/**"],
       "linter": {
         "rules": {
@@ -453,6 +481,34 @@
                   {
                     "group": ["@/infrastructure/**", "../**/infrastructure/**"],
                     "message": "Shared code must not import infrastructure; receive implementations through parameters or provider props. See docs/architecture/AGENTS.md."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["src/shared/**/*.test.{ts,tsx}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/bootstrap/**", "../**/bootstrap/**"],
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/app/**", "../**/app/**"],
+                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                  },
+                  {
+                    "group": ["@/modules/**", "../**/modules/**"],
+                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
                   }
                 ]
               }

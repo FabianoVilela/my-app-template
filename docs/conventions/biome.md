@@ -282,11 +282,19 @@ diagnostic message names the broken rule and links to the architecture.
 | `src/modules/*/application/**` | The same allowlist; relative paths into the module's infrastructure or presentation |
 | `src/modules/*/infrastructure/**` | Bootstrap, routes, other modules' internals, presentation, shared UI and the shared i18n facade |
 | `src/modules/*/presentation/**` | Bootstrap, routes, other modules' internals and any infrastructure |
+| `src/modules/*/presentation/**/*.test.tsx` | The same, except infrastructure |
 | `src/infrastructure/**` | Bootstrap, routes, modules, shared UI and the shared i18n facade |
 | `src/infrastructure/i18n/**` | The same, except `@/shared/i18n/contracts` and `@/shared/i18n/app-messages` |
 | `src/shared/**` | Bootstrap, routes, modules and infrastructure |
+| `src/shared/**/*.test.{ts,tsx}` | The same, except infrastructure |
 | `src/shared/lib/**` | Everything except relative files and `@/shared/lib` |
 | `src/shared/i18n/contracts.ts`, `app-messages.ts` | Everything except each other |
+
+Presentation and shared UI tests may import root infrastructure to build real
+test instances, such as the i18n adapter that the
+[testing guide](../testing.md#components-and-navigation) recommends. Domain,
+application and `shared/lib` tests keep their production restrictions and use
+fakes.
 
 Domain, application and `shared/lib` use an allowlist: the first `**` pattern
 rejects every specifier and later `!` patterns allow specific ones. The other
@@ -314,7 +322,8 @@ The rule checks static imports, `import type`, re-exports and dynamic
 When several overrides configure `noRestrictedImports` for one file, the last
 one replaces the earlier options; Biome does not merge their pattern lists. Keep
 the layer globs disjoint, or repeat the full pattern list in the more specific
-override, as `src/infrastructure/i18n/**` and `src/shared/lib/**` do. Verify
+override, as `src/infrastructure/i18n/**`, `src/shared/lib/**` and the test
+overrides do. Verify
 a changed override with a temporary file that imports the specifiers in
 question, then delete the file.
 
