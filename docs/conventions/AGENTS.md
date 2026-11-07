@@ -88,6 +88,7 @@ See [React Native platform-specific code](https://reactnative.dev/docs/platform-
 - React Compiler is enabled. Review Biome's compiler warnings; consult the [Biome guide](biome.md#react-and-react-native-checks) when changing compiler lint configuration.
 - Keep styles close to their component. Use descriptive `camelCase` style keys such as `container`, `headerTitle` and `submitButton`. Split into a nearby `<component>.styles.ts` only when it improves readability.
 - Reuse existing theme tokens and shared UI before adding repeated colors, spacing or typography. Follow the project's existing styling setup; do not introduce a styling library solely to apply these conventions.
+- Unistyles v3 is the adopted styling library, but it is not installed yet. Until its setup is complete, use React Native's `StyleSheet` and do not import or imitate Unistyles APIs, even when the `react-native-unistyles-v3` skill is triggered.
 - Give interactive controls meaningful accessible names, roles and states; add a label when visible content does not provide one. A `testID` does not replace accessibility semantics. Follow [React Native accessibility](https://reactnative.dev/docs/accessibility).
 - Follow the [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks): call hooks from React components or custom hooks, respecting their ordering rules rather than invoking them from event handlers or ordinary helpers.
 
