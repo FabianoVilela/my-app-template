@@ -54,7 +54,8 @@ reports. Revisit these when the corresponding capability is requested.
 
 ## Selecting configuration
 
-Use Node.js >= 22.13 and the package scripts from the repository root:
+Use a Node.js version allowed by `engines` in `package.json` and the package
+scripts from the repository root:
 
 ```bash
 pnpm start

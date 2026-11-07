@@ -59,7 +59,7 @@ pnpm expo install <package>  # install SDK-compatible dependencies
 ```
 
 - Always use `pnpm expo install <package>` when adding dependencies so Expo can resolve SDK-compatible versions.
-- Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI should run at least `pnpm check` and `pnpm typecheck`. Report failures or checks that could not run.
+- Run `pnpm lint`, `pnpm check` and `pnpm typecheck` before declaring a task done. CI (`.github/workflows/ci.yml`) runs these checks, the test suites and `pnpm expo install --check` on pushes to `main` and pull requests; keep it in sync when adding a required check. Report failures or checks that could not run.
 - Biome is already configured. Use the package scripts instead of introducing another linter with `expo lint`.
 - Add meaningful tests when implementing behavior. See the task references above for testing environments and additional commands; `package.json` defines the executable scripts.
 
@@ -69,12 +69,12 @@ pnpm expo install <package>  # install SDK-compatible dependencies
 - `commit-msg` validates Conventional Commits using `commitlint.config.cjs`. Read the resolved rules with `pnpm commitlint:check --print-config json` before writing a message when needed. Follow the [commit conventions](docs/conventions/AGENTS.md#commit-messages).
 - `pre-push` runs `pnpm check:push`: catalog freshness, TypeScript and application tests. Rename script tests run separately with `pnpm test:rename-app`. A failing command stops the push.
 - Fix rejected checks and retry. Do not bypass hooks with `--no-verify`, `HUSKY=0` or equivalent settings unless explicitly instructed by the user.
-- See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. CI/CD and remote merge policies are not configured by this workflow.
+- See the [Git workflow guide](docs/git-workflow.md) for setup, partial staging and troubleshooting. Deployment and remote merge policies are not configured.
 
 ## Rules
 
 - This template uses generated, Git-ignored `ios/` and `android/` directories (Continuous Native Generation). Configure native behavior in `app.json`, `app.config.ts` and config plugins; do not create or edit generated native files by hand, even when local builds have created those directories.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build. Use `pnpm ios` or `pnpm android` when a local build is requested.
+- Expo Go is not supported: the app imports native modules that Expo Go does not bundle, such as MMKV, and fails at launch there. Run and verify the app in a local debug build with `pnpm ios` or `pnpm android`, which also rebuild after native changes. `expo-dev-client` is not installed, so `pnpm start` runs in Expo Go mode; do not open the app through its QR code or `i`/`a` shortcuts. Do not suggest Expo Go or add Expo Go fallbacks.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
 
 ## Change verification

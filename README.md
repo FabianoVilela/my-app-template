@@ -10,18 +10,16 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    pnpm install
    ```
 
-2. Start the app
+2. Build, install and run the app
 
    ```bash
-   pnpm start
+   pnpm ios     # or: pnpm android
    ```
 
-In the output, you'll find options to open the app in a
+   This compiles a local debug build, installs it on an [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/), [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/) or device and starts Metro. Use the same command to start later sessions; it rebuilds native code incrementally.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+> [!IMPORTANT]
+> Expo Go is not supported. The app imports native modules that Expo Go does not include, such as MMKV through Nitro Modules, so it fails at launch there with a NitroModules error. `expo-dev-client` is not installed, so `pnpm start` runs in Expo Go mode: do not open the app through its QR code or its `i`/`a` shortcuts.
 
 You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
@@ -29,12 +27,12 @@ You can start developing by editing the files inside the **src/app** directory. 
 
 - Biome is already configured for linting, formatting and import organization. See the quality checks below.
 - Jest, Expo component/navigation testing and MSW HTTP mocking are configured. See the [testing guide](docs/testing.md).
-- MMKV persistence requires a development build when used on iOS or Android. Run `pnpm ios` or `pnpm android` to create one; see the [storage guide](docs/architecture/storage.md).
+- MMKV persistence requires a development build on iOS and Android; see the [storage guide](docs/architecture/storage.md).
 - Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
 
 ## Rename the app
 
-Use Node.js 22.13 or newer and run from the repository root:
+Use a Node.js version allowed by `engines` in `package.json` and run from the repository root:
 
 ```bash
 pnpm rename-app "Minha Aplicação" --dry-run
@@ -208,8 +206,10 @@ existing checkout, run `pnpm prepare` to reinstall them.
   Rename script tests run separately with `pnpm test:rename-app`.
 
 See the [Git workflow guide](docs/git-workflow.md) for commands, partial staging
-and troubleshooting. These hooks are local; CI/CD and remote merge policies are
-not configured. Commitizen is not required.
+and troubleshooting. These hooks are local; GitHub Actions CI
+(`.github/workflows/ci.yml`) repeats the checks on pushes to `main` and pull
+requests. Deployment and remote merge policies are not configured. Commitizen
+is not required.
 
 ## Learn more
 

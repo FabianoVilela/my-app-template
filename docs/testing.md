@@ -21,8 +21,9 @@ behavior and coverage. Reports are written to ignored `coverage/`, including
 `coverage/index.html` and `coverage/lcov.info`. Coverage includes application
 source, including files without tests; no arbitrary percentage threshold is set.
 
-Run `pnpm check`, `pnpm typecheck`, `pnpm test:ci` and `pnpm test:rename-app`
-in CI. Also run `pnpm test:variants` for dynamic configuration, environment isolation and
+CI (`.github/workflows/ci.yml`) runs `pnpm check`, `pnpm typecheck`,
+`pnpm i18n:check`, `pnpm test:ci` and every script test suite. Locally, run
+`pnpm test:variants` for dynamic configuration, environment isolation and
 CLI forwarding checks. Run `pnpm test:release-version` for independent version
 selection, version/build increments, previews, rejected requests and unchanged
 files on failure. The script tests use Node's built-in runner and are excluded from Jest.

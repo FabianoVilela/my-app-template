@@ -39,7 +39,7 @@ const HELP = `Usage: pnpm rename-app "App Name" [options]
   --android-package <id>    Override the Android reverse-domain identifier
   --help                    Show this help
 
-Run from the project root. Requires Node.js >= 22.13.
+Run from the project root. Requires the Node.js version in package.json engines.
 With npm, put -- after rename-app so options reach this script.
 Native identifiers keep their current namespace unless explicitly overridden.`;
 
