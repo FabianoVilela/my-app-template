@@ -1,0 +1,9 @@
+// Biome's noReactNativeLiteralColors only inspects React Native's StyleSheet.
+// Every StyleSheet here comes from react-native-unistyles, so check its
+// stylesheets too: color properties must read theme tokens.
+JsPropertyObjectMember(name=$name, value=$value) as $member where {
+  $name <: r"(?i).*color.*",
+  $value <: JsStringLiteralExpression(),
+  $member <: within `StyleSheet.create($_)`,
+  register_diagnostic(span=$value, message="Use a theme color token instead of a color literal in styles.", severity="error")
+}

@@ -26,7 +26,7 @@ The following additional rules are selected explicitly:
 | `nursery.noReactNativeRawText` | Error | Detect raw text outside recognized text containers |
 | `nursery.useReactNativePlatformComponents` | Error | Check platform-specific native component imports |
 | `nursery.useReactCompiler` | Warning | Report React Compiler diagnostics for inferred components and hooks |
-| `style.noReactNativeLiteralColors` | Error | Take colors from the Unistyles theme tokens instead of literals in styles |
+| `style.noReactNativeLiteralColors` | Error | Reject color literals in inline `style` props; the [Unistyles color plugin](#unistyles-stylesheet-import) covers stylesheets |
 
 In the installed Biome 2.5.15, these React Native rules and the compiler rule
 belong to `nursery`. Selecting a recommended domain alone does not enable its
@@ -91,6 +91,14 @@ plugin only makes `StyleSheet.create` reactive to themes and runtime changes whe
 it comes from `react-native-unistyles`. The plugin matches named imports from the
 `react-native` specifier; it does not follow re-exports or detect a namespace
 import (`import * as RN`), which review must catch.
+
+`style.noReactNativeLiteralColors` only inspects React Native's `StyleSheet`, so
+the [`no-unistyles-literal-colors.grit`](../../scripts/biome/no-unistyles-literal-colors.grit)
+plugin covers Unistyles stylesheets: it reports a string literal assigned to
+any property whose name contains `color` inside `StyleSheet.create(...)`,
+including variants and both the object and theme-function forms. It does not
+evaluate template literals, constants or values computed outside the
+stylesheet; take those from theme tokens as well.
 
 ## VS Code integration
 
