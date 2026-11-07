@@ -37,14 +37,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-example
-
 # generated native folders
 /ios
 /android
 .env
-
-/.harness-eval
 
 # Variant-specific environment values
 .env.development
