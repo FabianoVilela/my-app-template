@@ -33,6 +33,18 @@ export default function appConfig({ config }: ConfigContext): ExpoConfig {
     name: `${config.name}${label}`,
     slug: config.slug,
     version,
+    extra: { ...config.extra, appVariant: variant },
+    plugins: [
+      ...(config.plugins ?? []),
+      [
+        "@sentry/react-native/expo",
+        {
+          organization: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+          disableAutoUpload: !process.env.SENTRY_AUTH_TOKEN,
+        },
+      ],
+    ],
     scheme: `${config.scheme}${suffix}`,
     ios: {
       ...config.ios,

@@ -60,3 +60,26 @@ test("reads public Expo configuration explicitly", () => {
     process.env = previous;
   }
 });
+
+const validDsn = "https://public-key@o123.ingest.sentry.io/456";
+
+test.each([undefined, ""])(
+  "allows absent Sentry configuration (%j)",
+  (sentryDsn) => {
+    expect(parseEnv({ sentryDsn }).sentryDsn).toBeUndefined();
+  },
+);
+
+test("accepts a public DSN", () => {
+  expect(parseEnv({ sentryDsn: validDsn }).sentryDsn).toBe(validDsn);
+});
+
+test.each([
+  "malformed-private-dsn",
+  "https://example.test/123",
+  "https://key:secret@example.test/123",
+  "https://key@example.test/123?token=secret",
+])("rejects invalid DSNs without exposing their values", (sentryDsn) => {
+  expect(() => parseEnv({ sentryDsn })).toThrow("EXPO_PUBLIC_SENTRY_DSN");
+  expect(() => parseEnv({ sentryDsn })).not.toThrow(sentryDsn);
+});

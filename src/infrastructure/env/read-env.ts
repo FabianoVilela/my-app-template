@@ -1,6 +1,7 @@
 import { type Env, envSchema } from "./env.schema";
 
 const ENV_NAMES: Record<string, string> = {
+  sentryDsn: "EXPO_PUBLIC_SENTRY_DSN",
   apiUrl: "EXPO_PUBLIC_API_URL",
   defaultLocale: "EXPO_PUBLIC_DEFAULT_LOCALE",
 };
@@ -23,6 +24,7 @@ export function parseEnv(input: unknown): Env {
 
 export function readEnv(): Env {
   return parseEnv({
+    sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
     apiUrl: process.env.EXPO_PUBLIC_API_URL,
     defaultLocale: process.env.EXPO_PUBLIC_DEFAULT_LOCALE,
   });

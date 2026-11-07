@@ -46,8 +46,19 @@ for (const [variant, suffix, label] of [
     assert.equal(config.version, VERSIONS[variant].version);
     assert.equal(config.ios.buildNumber, String(VERSIONS[variant].build));
     assert.equal(config.android.versionCode, VERSIONS[variant].build);
-    assert.deepEqual(config.plugins, BASE.plugins);
+    assert.deepEqual(config.plugins.slice(0, -1), BASE.plugins);
+    assert.deepEqual(config.plugins.at(-1), [
+      "@sentry/react-native/expo",
+      {
+        organization: process.env.SENTRY_ORG,
+        project: process.env.SENTRY_PROJECT,
+        disableAutoUpload: !process.env.SENTRY_AUTH_TOKEN,
+      },
+    ]);
+    assert.equal(config.extra.appVariant, variant);
+    assert.deepEqual(config.ios.privacyManifests, BASE.ios.privacyManifests);
     assert.deepEqual(BASE, original);
+
     const renamed = appConfig({
       config: {
         ...BASE,
@@ -61,6 +72,7 @@ for (const [variant, suffix, label] of [
         android: { ...BASE.android, package: "com.example.renamed" },
       },
     });
+
     assert.equal(renamed.name, `Renamed${label}`);
     assert.equal(renamed.ios.bundleIdentifier, `com.example.renamed${suffix}`);
     assert.equal(renamed.ios.infoPlist.CFBundleDisplayName, `Renamed${label}`);
@@ -70,11 +82,14 @@ for (const [variant, suffix, label] of [
 
 test("defaults to development and rejects unknown or incomplete identities", (context) => {
   const previous = process.env.APP_VARIANT;
+
   context.after(() => {
     if (previous === undefined) delete process.env.APP_VARIANT;
     else process.env.APP_VARIANT = previous;
   });
+
   delete process.env.APP_VARIANT;
+
   assert.equal(appConfig({ config: BASE }).name, `${BASE.name} (Dev)`);
   process.env.APP_VARIANT = "typo";
   assert.throws(() => appConfig({ config: BASE }), /APP_VARIANT/);
@@ -84,7 +99,9 @@ test("defaults to development and rejects unknown or incomplete identities", (co
 
 function fixture(context) {
   const root = mkdtempSync(join(tmpdir(), "app-variants-"));
+
   context.after(() => rmSync(root, { recursive: true, force: true }));
+
   mkdirSync(join(root, "bin"));
   writeFileSync(
     join(root, "bin/pnpm"),
@@ -94,16 +111,19 @@ process.exit(Number(process.env.TEST_EXIT_CODE || 0));
 `,
     { mode: 0o755 },
   );
+
   if (process.platform === "win32") {
     writeFileSync(
       join(root, "bin/pnpm.cmd"),
       `@"${process.execPath}" "${join(root, "bin/pnpm")}" %*\r\n`,
     );
   }
+
   const env = {
     ...process.env,
     PATH: `${join(root, "bin")}${delimiter}${process.env.PATH}`,
   };
+
   delete env.EXPO_PUBLIC_API_URL;
   delete env.EXPO_PUBLIC_DEFAULT_LOCALE;
   const write = (file, content) => writeFileSync(join(root, file), content);
@@ -113,11 +133,13 @@ process.exit(Number(process.env.TEST_EXIT_CODE || 0));
       encoding: "utf8",
       env: { ...env, ...overrides },
     });
+
   return { write, run };
 }
 
 test("selects variant files independently of NODE_ENV and isolates production", (context) => {
   const { write, run } = fixture(context);
+
   write(".env", "EXPO_PUBLIC_API_URL=https://dev.example.test");
   write(".env.local", "EXPO_PUBLIC_DEFAULT_LOCALE=pt-BR");
   write(".env.staging", "EXPO_PUBLIC_API_URL=https://staging.example.test");
@@ -141,21 +163,27 @@ test("selects variant files independently of NODE_ENV and isolates production", 
     JSON.parse(run("development").stdout).api,
     "https://dev-local.example.test",
   );
+
   const staging = JSON.parse(run("staging").stdout);
+
   assert.equal(staging.api, "https://override.example.test");
   assert.equal(staging.locale, undefined);
   assert.equal(staging.variant, "staging");
   assert.equal(staging.noDotenv, "1");
   assert.deepEqual(staging.args, ["exec", "expo", "config", "--json"]);
+
   const production = JSON.parse(run("production").stdout);
+
   assert.equal(production.api, undefined);
   assert.equal(production.locale, "en");
+
   const explicit = JSON.parse(
     run("staging", {
       EXPO_PUBLIC_API_URL: "https://ci.example.test",
       APP_VARIANT: "production",
     }).stdout,
   );
+
   assert.equal(explicit.api, "https://ci.example.test");
   assert.equal(explicit.variant, "staging");
 });
@@ -167,6 +195,7 @@ test("starts without env files, rejects unknown variants, forwards arguments and
     "--configuration",
     "Release",
   ]);
+
   assert.equal(result.status, 0, result.stderr);
   assert.equal(JSON.parse(result.stdout).api, undefined);
   assert.deepEqual(JSON.parse(result.stdout).args, [
@@ -176,7 +205,33 @@ test("starts without env files, rejects unknown variants, forwards arguments and
     "--configuration",
     "Release",
   ]);
+
   assert.equal(run("typo").status, 1);
   assert.equal(run("development", {}, []).status, 1);
   assert.equal(run("staging", { TEST_EXIT_CODE: "7" }).status, 7);
+});
+
+test("source map upload is enabled with build credentials without exposing the token", (context) => {
+  const previous = { ...process.env };
+
+  context.after(() => {
+    process.env = previous;
+  });
+
+  process.env.SENTRY_AUTH_TOKEN = "private-build-token";
+  process.env.SENTRY_ORG = "example-org";
+  process.env.SENTRY_PROJECT = "example-project";
+
+  const config = appConfig({ config: BASE });
+
+  assert.deepEqual(config.plugins.at(-1), [
+    "@sentry/react-native/expo",
+    {
+      organization: "example-org",
+      project: "example-project",
+      disableAutoUpload: false,
+    },
+  ]);
+
+  assert.ok(!JSON.stringify(config).includes("private-build-token"));
 });

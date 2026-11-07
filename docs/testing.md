@@ -173,3 +173,7 @@ backend data. No Maestro flows or device tests are configured yet.
 ## Internationalization
 
 `tests/i18n.test.tsx` exercises isolated real translation instances with fake storage/device locales, shared facade hooks, rich text and locale-aware formatting. `catalogs.test.ts` validates logical messages, interpolation variables, markup and plural categories. Navigation integration checks language changes without losing the route. Type assertions in the i18n suite check the public translation contract during `pnpm typecheck`. Run `pnpm i18n:types` after catalog edits and `pnpm i18n:check` in CI; pre-push includes the freshness check. See the [i18n guide](architecture/i18n.md) for native and web limitations.
+
+## Observability
+
+Sentry adapter and bootstrap tests mock the SDK to verify disabled reporting, context isolation, filtering and failure containment without network traffic. Real release builds are needed for native delivery and source-map verification. See [observability](architecture/observability.md).

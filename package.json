@@ -4,6 +4,7 @@
   "main": "expo-router/entry",
   "dependencies": {
     "@expo/ui": "~58.0.27",
+    "@sentry/react-native": "~8.28.0",
     "axios": "^1.21.0",
     "dayjs": "^1.11.23",
     "expo": "~58.0.23",

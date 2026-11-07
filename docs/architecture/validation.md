@@ -10,7 +10,7 @@ only after measuring bundle constraints on the target platforms.
 `src/infrastructure/env/env.schema.ts` defines public configuration validation.
 `read-env.ts` exposes `readEnv()` for Expo and `parseEnv(input: unknown)` for
 explicit inputs and tests. Both return validated configuration with `apiUrl` and
-`defaultLocale`. No configuration is read or parsed at import time.
+`defaultLocale` and optional `sentryDsn`. No configuration is read or parsed at import time.
 
 `readEnv()` constructs its input from static `process.env.EXPO_PUBLIC_*`
 references, which Expo replaces in the JavaScript bundle. Dynamic property
@@ -67,3 +67,5 @@ are available; Jest does not establish Metro inlining or device behavior.
 
 References: [Zod](https://zod.dev/), [schema API](https://zod.dev/api),
 [Expo environment variables](https://docs.expo.dev/guides/environment-variables/).
+
+Optional `EXPO_PUBLIC_SENTRY_DSN` is validated as a public HTTP/HTTPS DSN without a password or query. See [observability](observability.md) for activation and privacy.

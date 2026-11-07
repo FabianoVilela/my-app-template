@@ -1,3 +1,11 @@
+jest.mock("@/bootstrap/observability", () => ({
+  initializeObservability: () => ({
+    captureException: jest.fn(),
+    addBreadcrumb: jest.fn(),
+  }),
+  withObservability: (component: unknown) => component,
+}));
+
 jest.mock("react-native-nitro-modules", () => ({}));
 
 import { act } from "@testing-library/react-native";

@@ -3,11 +3,14 @@ import { type ReactNode, useEffect, useState } from "react";
 import { AppState, Pressable, Text, View } from "react-native";
 import { readEnv } from "@/infrastructure/env/read-env";
 import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
+import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
 import { createMmkvStorage } from "@/infrastructure/storage/mmkv-storage";
 import { AppTranslationProvider } from "@/shared/i18n";
 
 type Dependencies = Awaited<ReturnType<typeof createI18nextAdapter>>;
-export function AppProviders({ children }: { children: ReactNode }) {
+type AppProvidersProps = { children: ReactNode; errorReporter: ErrorReporter };
+
+export function AppProviders({ children, errorReporter }: AppProvidersProps) {
   const [dependencies, setDependencies] = useState<Dependencies | null>(null);
   const [hasFailed, setHasFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -19,6 +22,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
     async function start() {
       try {
+        errorReporter.addBreadcrumb("app.startup");
         const env = readEnv();
         const dependencies = await createI18nextAdapter({
           defaultLocale: env.defaultLocale,
@@ -26,31 +30,37 @@ export function AppProviders({ children }: { children: ReactNode }) {
           getDeviceLocales: () =>
             getLocales().map((locale) => locale.languageTag),
           onReadError: (error) =>
-            console.warn("Unable to restore language preference", error),
+            errorReporter.captureException(error, {
+              operation: "i18n.restore-preference",
+            }),
         });
 
         if (!active) return;
         setDependencies(dependencies);
         subscription = AppState.addEventListener("change", (state) => {
           if (state === "active")
-            void dependencies.runtime
-              .refreshDeviceLocale()
-              .catch((error) =>
-                console.warn("Unable to refresh device language", error),
-              );
+            void dependencies.runtime.refreshDeviceLocale().catch((error) =>
+              errorReporter.captureException(error, {
+                operation: "i18n.refresh-device-locale",
+              }),
+            );
         });
       } catch (error: unknown) {
-        console.warn("Unable to initialize application", error);
+        errorReporter.captureException(error, { operation: "app.startup" });
+
+        if (__DEV__) console.warn("Unable to initialize application");
         if (active) setHasFailed(true);
       }
     }
     // Instance creation stays outside render and server requests never share it.
     void start();
+
     return () => {
       active = false;
       subscription?.remove();
     };
-  }, [attempt]);
+  }, [attempt, errorReporter]);
+
   if (hasFailed)
     return (
       <View>
@@ -61,12 +71,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
             setAttempt((value) => value + 1);
           }}
         >
-          <Text>Tentar novamente / Retry</Text>
+          <Text>Retry</Text>
         </Pressable>
       </View>
     );
 
   if (!dependencies) return null;
+
   return (
     <AppTranslationProvider {...dependencies}>
       {children}

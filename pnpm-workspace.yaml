@@ -23,3 +23,5 @@ allowBuilds:
   # Optional native accelerators have platform packages/fallbacks; no scripts needed.
   '@parcel/watcher': false
   unrs-resolver: false
+  # Sentry CLI installs/verifies the platform binary used for source maps.
+  '@sentry/cli': true
