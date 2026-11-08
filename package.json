@@ -63,6 +63,7 @@
     "check:fix": "biome check --write .",
     "check:staged": "lint-staged",
     "check:push": "pnpm i18n:check && pnpm typecheck && pnpm test",
+    "verify": "pnpm check && pnpm check:push",
     "commitlint:check": "commitlint",
     "format": "biome format --write .",
     "format:check": "biome format .",
