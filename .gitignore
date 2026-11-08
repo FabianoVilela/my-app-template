@@ -27,6 +27,11 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 
+# Claude Code local state
+.claude/worktrees/
+.claude/settings.local.json
+CLAUDE.local.md
+
 # macOS
 .DS_Store
 *.pem

@@ -1,7 +1,7 @@
 # Initial mobile architecture proposal (historical)
 
 This is a condensed English record of the initial Portuguese discussion.
-It is superseded by [Application architecture](../architecture/AGENTS.md) and
+It is superseded by [Application architecture](../../src/AGENTS.md) and
 [Project conventions](../conventions/AGENTS.md). It is background only: do not use
 its examples as implementation instructions or a list of files to create.
 The original discussion remains available in Git history.
