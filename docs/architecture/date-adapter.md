@@ -16,7 +16,7 @@ contract does not expose Day.js instances, types, format tokens or plugin APIs.
 
 The contract lives in `shared/lib` because it contains only framework-independent
 types. The implementation belongs to infrastructure. See
-[application architecture](AGENTS.md#date-operations) for dependency rules.
+[application architecture](../../src/AGENTS.md#technical-capabilities) for dependency rules.
 
 ## UTC and device display
 

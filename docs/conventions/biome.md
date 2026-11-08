@@ -228,7 +228,7 @@ export type ApiUser = {
 
 When conversion is useful, the owning adapter can expose an application-owned
 model with `userId` and `fullName`. See the architecture's
-[adapter responsibilities](../architecture/AGENTS.md#adapters-and-composition).
+[adapter responsibilities](../../src/AGENTS.md#adapters-and-composition).
 
 The exception is restricted to infrastructure because this layer owns external
 schemas. Domain, application, presentation and shared application code retain
@@ -287,7 +287,7 @@ parameter spelling.
 ## Layer import boundaries
 
 The last overrides apply `style.noRestrictedImports` to each layer of the
-[application architecture](../architecture/AGENTS.md#responsibilities-and-allowed-dependencies).
+[application architecture](../../src/AGENTS.md#responsibilities-and-allowed-dependencies).
 They turn the dependency table into lint errors, so a domain file importing
 React, Zod or an adapter fails `pnpm lint` instead of waiting for review. Each
 diagnostic message names the broken rule and links to the architecture.
@@ -355,7 +355,7 @@ question, then delete the file.
 - A public entry point such as `@/modules/orders` is allowed even when it
   re-exports React UI or adapters. Core layers must import only pure entry points.
 - The type-only requirement of the
-  [i18n infrastructure exception](../architecture/AGENTS.md#shared-internationalization-boundary)
+  [i18n infrastructure exception](../../src/AGENTS.md#shared-internationalization-boundary)
   is not checked; use `import type`.
 - CommonJS `require()` calls are not checked.
 - Files in `src/modules/<name>/` outside the four layer directories, such as a
@@ -368,6 +368,7 @@ change because the globs match any module directory.
 ## Maintenance and coverage
 
 - Preserve explicit defaults for readability when editing the configuration.
+  Add a narrowly scoped exception only when an integration genuinely requires one.
 - Update project conventions, this guide and the configuration together when
   intentionally changing a policy. Verify behavior against the installed Biome
   version when upgrading it.

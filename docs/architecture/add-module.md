@@ -5,7 +5,7 @@ This recipe walks through one feature from its port to its route, using the
 a screen that loads a product by id. It is a guide for a derived project. Do not
 add this module to the template.
 
-The [application architecture](AGENTS.md) owns the rules; this guide shows how
+The [application architecture](../../src/AGENTS.md) owns the rules; this guide shows how
 they connect. Biome rejects imports that cross layers the wrong way; see
 [layer import boundaries](../conventions/biome.md#layer-import-boundaries).
 

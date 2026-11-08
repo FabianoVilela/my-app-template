@@ -13,6 +13,7 @@
   "files": {
     "includes": [
       "src/**",
+      "!src/**/*.md",
       "*.json",
       "*.jsonc",
       "*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}",
@@ -198,7 +199,7 @@
                       "@/modules/*/application/**",
                       "@/modules/*/infrastructure/**"
                     ],
-                    "message": "Routes may use module presentation, bootstrap and shared code; delegate assembly to bootstrap. See docs/architecture/AGENTS.md."
+                    "message": "Routes may use module presentation, bootstrap and shared code; delegate assembly to bootstrap. See src/AGENTS.md."
                   }
                 ]
               }
@@ -218,7 +219,7 @@
                 "patterns": [
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   }
                 ]
               }
@@ -250,7 +251,7 @@
                       "../**/bootstrap/**",
                       "../**/app/**"
                     ],
-                    "message": "The domain layer may import only its own module's core files, other modules' pure public entry points and @/shared/lib; inject other capabilities through ports. See docs/architecture/AGENTS.md."
+                    "message": "The domain layer may import only its own module's core files, other modules' pure public entry points and @/shared/lib; inject other capabilities through ports. See src/AGENTS.md."
                   }
                 ]
               }
@@ -281,7 +282,7 @@
                       "../**/bootstrap/**",
                       "../**/app/**"
                     ],
-                    "message": "The application layer may import only its own module's core files, other modules' pure public entry points and @/shared/lib; inject other capabilities through ports. See docs/architecture/AGENTS.md."
+                    "message": "The application layer may import only its own module's core files, other modules' pure public entry points and @/shared/lib; inject other capabilities through ports. See src/AGENTS.md."
                   }
                 ]
               }
@@ -301,15 +302,15 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/*/*/**"],
-                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See src/AGENTS.md."
                   },
                   {
                     "group": [
@@ -318,7 +319,7 @@
                       "@/shared/i18n/**",
                       "../**/presentation/**"
                     ],
-                    "message": "Module infrastructure must not depend on presentation, shared UI or the shared i18n facade. See docs/architecture/AGENTS.md."
+                    "message": "Module infrastructure must not depend on presentation, shared UI or the shared i18n facade. See src/AGENTS.md."
                   }
                 ]
               }
@@ -338,19 +339,19 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/*/*/**"],
-                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/infrastructure/**", "../**/infrastructure/**"],
-                    "message": "Presentation receives adapters through application contracts; it must not import infrastructure. See docs/architecture/AGENTS.md."
+                    "message": "Presentation receives adapters through application contracts; it must not import infrastructure. See src/AGENTS.md."
                   }
                 ]
               }
@@ -370,15 +371,15 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/*/*/**"],
-                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See docs/architecture/AGENTS.md."
+                    "message": "Import another module only through its public entry point; inside a module, import its own files with relative paths. See src/AGENTS.md."
                   }
                 ]
               }
@@ -398,15 +399,15 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/**", "../**/modules/**"],
-                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                    "message": "Shared code and root infrastructure must not depend on business modules. See src/AGENTS.md."
                   },
                   {
                     "group": [
@@ -414,7 +415,7 @@
                       "@/shared/i18n",
                       "@/shared/i18n/**"
                     ],
-                    "message": "Infrastructure must not import the shared i18n facade or shared UI. See docs/architecture/AGENTS.md."
+                    "message": "Infrastructure must not import the shared i18n facade or shared UI. See src/AGENTS.md."
                   }
                 ]
               }
@@ -434,15 +435,15 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/**", "../**/modules/**"],
-                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                    "message": "Shared code and root infrastructure must not depend on business modules. See src/AGENTS.md."
                   },
                   {
                     "group": [
@@ -451,7 +452,7 @@
                       "@/shared/i18n/**",
                       "!@/shared/i18n/contracts"
                     ],
-                    "message": "Environment validation may import only the pure shared i18n contracts, for the supported locales. See docs/architecture/AGENTS.md."
+                    "message": "Environment validation may import only the pure shared i18n contracts, for the supported locales. See src/AGENTS.md."
                   }
                 ]
               }
@@ -471,15 +472,15 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/**", "../**/modules/**"],
-                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                    "message": "Shared code and root infrastructure must not depend on business modules. See src/AGENTS.md."
                   },
                   {
                     "group": [
@@ -489,7 +490,7 @@
                       "!@/shared/i18n/contracts",
                       "!@/shared/i18n/app-messages"
                     ],
-                    "message": "Root i18n infrastructure may import only the pure shared i18n contracts and generated messages. See docs/architecture/AGENTS.md."
+                    "message": "Root i18n infrastructure may import only the pure shared i18n contracts and generated messages. See src/AGENTS.md."
                   }
                 ]
               }
@@ -509,19 +510,19 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/**", "../**/modules/**"],
-                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                    "message": "Shared code and root infrastructure must not depend on business modules. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/infrastructure/**", "../**/infrastructure/**"],
-                    "message": "Shared code must not import infrastructure; receive implementations through parameters or provider props. See docs/architecture/AGENTS.md."
+                    "message": "Shared code must not import infrastructure; receive implementations through parameters or provider props. See src/AGENTS.md."
                   }
                 ]
               }
@@ -541,15 +542,15 @@
                 "patterns": [
                   {
                     "group": ["@/bootstrap/**", "../**/bootstrap/**"],
-                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See docs/architecture/AGENTS.md."
+                    "message": "Only routes may import bootstrap; receive dependencies through parameters, props or providers. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/app/**", "../**/app/**"],
-                    "message": "Routes are entry points; move reusable code outside src/app/. See docs/architecture/AGENTS.md."
+                    "message": "Routes are entry points; move reusable code outside src/app/. See src/AGENTS.md."
                   },
                   {
                     "group": ["@/modules/**", "../**/modules/**"],
-                    "message": "Shared code and root infrastructure must not depend on business modules. See docs/architecture/AGENTS.md."
+                    "message": "Shared code and root infrastructure must not depend on business modules. See src/AGENTS.md."
                   }
                 ]
               }
@@ -569,7 +570,7 @@
                 "patterns": [
                   {
                     "group": ["**", "!./**", "!@/shared/lib/**"],
-                    "message": "Shared utilities must stay pure: import only other @/shared/lib files. See docs/architecture/AGENTS.md."
+                    "message": "Shared utilities must stay pure: import only other @/shared/lib files. See src/AGENTS.md."
                   }
                 ]
               }
@@ -592,7 +593,7 @@
                 "patterns": [
                   {
                     "group": ["**", "!./contracts", "!./app-messages"],
-                    "message": "Shared i18n contracts and generated messages must stay pure. See docs/architecture/AGENTS.md."
+                    "message": "Shared i18n contracts and generated messages must stay pure. See src/AGENTS.md."
                   }
                 ]
               }

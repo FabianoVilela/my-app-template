@@ -24,7 +24,7 @@ does not infer time zones or automatically convert date fields.
 Only the Axios adapter imports the `axios` package. Domain and application do not
 import HTTP infrastructure. Presentation receives module capabilities through
 props or a focused module provider; it does not import concrete services or
-bootstrap. See [application architecture](AGENTS.md) for the full dependency rules.
+bootstrap. See [application architecture](../../src/AGENTS.md) for the full dependency rules.
 
 ## Transport contract
 

@@ -10,7 +10,7 @@ meant to be copied; it contains no business features.
 
 - Expo SDK 58, React Native, React Compiler, Expo Router with typed routes and
   TypeScript in strict mode.
-- A [layered architecture](docs/architecture/AGENTS.md) with business modules,
+- A [layered architecture](src/AGENTS.md) with business modules,
   whose import boundaries are enforced by Biome.
 - Adapters behind application-owned contracts: an [HTTP client](docs/architecture/http-client.md)
   (Axios), [local and secure storage](docs/architecture/storage.md) (MMKV and
@@ -98,7 +98,7 @@ Work through these steps when starting a product from the template:
 | Topic | Document |
 | --- | --- |
 | Instructions for AI agents (start here) | [AGENTS.md](AGENTS.md) |
-| Layers, dependencies and module boundaries | [Application architecture](docs/architecture/AGENTS.md) |
+| Layers, dependencies and module boundaries | [Application architecture](src/AGENTS.md) |
 | Naming, organization, style and commits | [Project conventions](docs/conventions/AGENTS.md) |
 | Adding a feature end to end | [Adding a business module](docs/architecture/add-module.md) |
 | HTTP services and dependency composition | [HTTP client](docs/architecture/http-client.md) |

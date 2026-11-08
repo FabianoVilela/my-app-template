@@ -17,8 +17,15 @@ hook files in POSIX shell syntax. No global installation of these tools is neede
 
 ## Checks
 
-Hook commands and required behavior are defined in the root
-[Local Git workflow](../AGENTS.md#local-git-workflow).
+- `pre-commit` checks staged files with Biome through lint-staged, without
+  changing files. Fix failures explicitly and stage the intended changes again.
+- `commit-msg` validates Conventional Commits using `commitlint.config.cjs`.
+- `pre-push` runs `pnpm check:push`: catalog freshness, TypeScript and application
+  tests. Rename script tests run separately with `pnpm test:rename-app`. A failing
+  command stops the push.
+
+Fix rejected checks and retry. Do not bypass hooks unless explicitly instructed
+by the user.
 
 Checks do not apply automatic fixes. Use `pnpm check:fix` explicitly when needed,
 review its changes and stage only the intended content. Files outside Biome's
