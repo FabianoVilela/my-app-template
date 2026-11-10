@@ -409,7 +409,7 @@ A factory that only connects dependencies needs no test of its own. Test
 - [ ] Domain and application import nothing beyond their own files and `@/shared/lib`.
 - [ ] The adapter validates requests and responses and maps external fields; no Zod, DTO or HTTP type crosses the port.
 - [ ] Presentation receives the service through props or a provider; it does not import infrastructure or bootstrap.
-- [ ] Every locale has the namespace with the same keys, the adapter registers it and `app-messages.ts` is regenerated.
+- [ ] Every locale has the namespace with the same keys, and `app-messages.ts` and `resources.ts` are regenerated.
 - [ ] Bootstrap creates the dependencies once, during startup, and the route stays thin.
 - [ ] Each layer has tests for its behavior, and the screen has accessible names and roles.
 - [ ] `pnpm check`, `pnpm typecheck`, `pnpm i18n:check` and `pnpm test` pass.
