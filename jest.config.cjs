@@ -38,6 +38,17 @@ module.exports = {
     {
       displayName: "native",
       preset: "jest-expo",
+      // lucide-react-native ships only ESM (.mjs): extend jest-expo's
+      // transform to .mjs and its ignore list to that package.
+      transform: {
+        ...expoPreset.transform,
+        "\\.[cm]?[jt]sx?$": expoPreset.transform["\\.[jt]sx?$"],
+      },
+      transformIgnorePatterns: [
+        "/node_modules/(?!(\\.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|@sentry/react-native|native-base|standard-navigation|lucide-react-native))",
+        "/node_modules/react-native-reanimated/plugin/",
+        "/node_modules/@react-native/babel-preset/",
+      ],
       // Unistyles mocks first: they stub StyleSheet.configure for the config.
       setupFiles: [
         "react-native-unistyles/mocks",

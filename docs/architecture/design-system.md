@@ -95,7 +95,7 @@ Spacing follows a 4 pt grid. The key is the multiple of 4: `spacing[1]` is 4, `s
 | `xxl` | 28 | Bottom sheets and large media |
 | `full` | 999 | Pills, badges, avatars and switches |
 
-`shadows.sm`, `shadows.md` and `shadows.lg` are `boxShadow` strings for resting controls, raised cards and floating layers. Cards in the dark theme rely on their border and drop the shadow.
+`shadows.sm`, `shadows.md` and `shadows.lg` are `boxShadow` strings for resting controls, raised cards and floating layers. Use `shadows.card` for cards: the dark theme sets it to a transparent shadow and relies on the card border. `shadows.knob` is the switch knob.
 
 ## Iconography
 
@@ -109,7 +109,7 @@ Icons come from [Lucide](https://lucide.dev) through `lucide-react-native`. Comp
 
 Shared components are touch-first and follow these rules:
 
-- **Pressed:** shift the tone, never scale. Filled variants switch to their `*Pressed` color, paint the border in the fill color and drop their shadow. Tonal and outline variants darken (light) or lighten (dark) slightly; ghost variants gain a `surfaceMuted` background.
+- **Pressed:** shift the tone, never scale. Filled variants switch to their `*Pressed` color (`primaryPressed`, `secondaryPressed`, `primarySoftPressed`, `dangerPressed`), paint the border in the fill color and drop their shadow. Outline and ghost variants gain a `surfaceMuted` background.
 - **Hover:** none. Hover styles would mask the pressed state on touch devices.
 - **Focus:** a 2 px `focus` outline; focused inputs add a 4 px `focusRing` halo.
 - **Loading:** keep the variant color at `state.loadingOpacity` (0.7), show a spinner and ignore presses. Loading is not disabled.
@@ -126,8 +126,20 @@ Shared components are touch-first and follow these rules:
 | `motion.duration.slow` | 320 ms | Expanding content, such as a Collapse |
 | `motion.easing` | `[0.2, 0.8, 0.2, 1]` | Pass to `Easing.bezier` for every non-linear transition |
 
-Respect the OS reduced-motion setting: skip size and position animations when it is enabled.
+Respect the OS reduced-motion setting: skip size and position animations when it is enabled. `useReducedMotion` in `shared/ui` follows that setting. Animations use React Native's `Animated`; Reanimated is not installed, so add it deliberately when a gesture-driven or UI-thread animation needs it.
 
 ## Components
 
-Shared components live in `src/shared/ui/` and consume only these tokens. The planned base set is Text, Button, Input (including password and search), Checkbox, RadioButton, Switch, Divider, Screen, Icon, Badge and Collapse. Document a component's props and variants beside it when it is added; this guide keeps only rules that span components.
+Shared components live in `src/shared/ui/` and consume only these tokens. Their props are documented in their source; this guide keeps only rules that span components.
+
+| Component | File | Notes |
+| --- | --- | --- |
+| `Text` | `text.tsx` | `variant` picks a typography token, `color` a color role; heading variants get the header role |
+| `Screen` | `screen.tsx` | Background, 20 pt side padding and safe areas; pass `edges={["bottom"]}` under a navigator header; `isScrollable` for long content |
+| `Divider` | `divider.tsx` | 1 px `border` line, optionally with a centered label |
+| `Checkbox`, `RadioButton`, `Switch` | `checkbox.tsx`, `radio-button.tsx`, `switch.tsx` | Controlled; the whole row, label included, is the touch target and carries the role and checked state. Wrap radio sets in a `radiogroup` view |
+| `Badge` | `badge.tsx` | Non-interactive status pill in one of seven tones, with an optional dot |
+| `Icon` | `icon.tsx` | Renders a Lucide icon at a token size, stroke and color role; decorative unless given an accessibility label |
+| `Button` | `button.tsx` | Variants `primary`, `secondary`, `soft`, `outline`, `ghost`, `danger` and `ghostDanger`; sizes `sm`, `md` and `lg`; leading or trailing icons; `isLoading`, `isDisabled` and `isBlock`. Pass `icon` and a required `accessibilityLabel` for an icon-only button |
+| `Input` | `input.tsx` | Labeled field with helper and error text; `type="password"` adds a show/hide toggle and `type="search"` a pill with a clear button. Toggle and clear labels come from the `ui` translation namespace |
+| `CollapseGroup`, `Collapse` | `collapse.tsx` | A card of disclosure rows. `isSingleExpand` on the group keeps one item open; each item takes any children and `hasContentPadding` (default `true`) |

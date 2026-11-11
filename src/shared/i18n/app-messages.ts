@@ -4,4 +4,7 @@ export type AppMessages = {
   "common:items": "{{count}} items";
   "common:learnMore": "Read <action>more information</action>.";
   "navigation:home": "Home";
+  "ui:clearSearch": "Clear search";
+  "ui:hidePassword": "Hide password";
+  "ui:showPassword": "Show password";
 };

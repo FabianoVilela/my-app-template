@@ -132,6 +132,7 @@ export const lightTheme = {
     primaryPressed: "#0F9688",
     onPrimary: "#FFFFFF",
     primarySoft: "#E6F8F6",
+    primarySoftPressed: "#D4E4E2",
     onPrimarySoft: "#0A6B62",
     link: "#0B7D72",
     focus: "#0B7D72",
@@ -146,6 +147,7 @@ export const lightTheme = {
     warning: "#A15C00",
     warningSoft: "#FFF5DB",
     danger: "#D92D48",
+    dangerPressed: "#C82942",
     dangerSoft: "#FDEAED",
     onDanger: "#FFFFFF",
     info: "#2563EB",
@@ -160,6 +162,10 @@ export const lightTheme = {
     sm: "0 1px 2px rgba(31, 36, 51, 0.06)",
     md: "0 1px 2px rgba(31, 36, 51, 0.04), 0 8px 20px -6px rgba(31, 36, 51, 0.12)",
     lg: "0 2px 6px rgba(31, 36, 51, 0.05), 0 28px 56px -16px rgba(31, 36, 51, 0.24)",
+    /** Cards; the dark theme relies on the card border instead. */
+    card: "0 1px 2px rgba(31, 36, 51, 0.06)",
+    /** Switch knob; the same in both themes. */
+    knob: "0 1px 3px rgba(11, 14, 31, 0.3)",
   },
   ...shared,
 };
@@ -181,6 +187,7 @@ export const darkTheme = {
     primaryPressed: "#2CC5B6",
     onPrimary: "#FFFFFF",
     primarySoft: "#1F4A4C",
+    primarySoftPressed: "#235355",
     onPrimarySoft: "#7FE3D6",
     link: "#2EC4B6",
     focus: "#2EC4B6",
@@ -195,6 +202,7 @@ export const darkTheme = {
     warning: "#FCC85A",
     warningSoft: "#463D2C",
     danger: "#FF7A8C",
+    dangerPressed: "#FF899D",
     dangerSoft: "#4A2E3E",
     onDanger: "#2A0810",
     info: "#7AA7FF",
@@ -208,6 +216,8 @@ export const darkTheme = {
     sm: "0 1px 2px rgba(0, 0, 0, 0.35)",
     md: "0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 24px -8px rgba(0, 0, 0, 0.5)",
     lg: "0 2px 6px rgba(0, 0, 0, 0.35), 0 28px 56px -16px rgba(0, 0, 0, 0.6)",
+    card: "0 0 0 0 rgba(0, 0, 0, 0)",
+    knob: "0 1px 3px rgba(11, 14, 31, 0.3)",
   },
   ...shared,
 } satisfies typeof lightTheme;
