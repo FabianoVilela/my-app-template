@@ -19,7 +19,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: theme.spacing.md,
+    padding: theme.spacing[4],
     backgroundColor: theme.colors.background,
   },
   text: {

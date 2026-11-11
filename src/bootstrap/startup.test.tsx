@@ -9,6 +9,7 @@ jest.mock("@/infrastructure/storage/mmkv-storage", () => ({
 import { AppState, type AppStateStatus } from "react-native";
 import * as env from "@/infrastructure/env/read-env";
 import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
+import * as fonts from "@/shared/ui/fonts";
 import { startup } from "./startup";
 
 function setup() {
@@ -61,6 +62,18 @@ test("reports a failed locale refresh at its handling boundary", async () => {
 
   expect(errorReporter.captureException).toHaveBeenCalledWith(failure, {
     operation: "i18n.refresh-device-locale",
+  });
+});
+
+test("reports a font failure and starts with the system font", async () => {
+  const { errorReporter } = setup();
+  const failure = new Error("font");
+
+  jest.spyOn(fonts, "loadFonts").mockRejectedValue(failure);
+
+  await expect(startup({ errorReporter })).resolves.toBeDefined();
+  expect(errorReporter.captureException).toHaveBeenCalledWith(failure, {
+    operation: "fonts.load",
   });
 });
 

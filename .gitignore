@@ -51,3 +51,6 @@ CLAUDE.local.md
 .env.development
 .env.staging
 .env.production
+
+.agents
+.harness-eval
