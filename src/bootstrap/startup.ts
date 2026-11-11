@@ -4,6 +4,7 @@ import { readEnv } from "@/infrastructure/env/read-env";
 import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
 import { createMmkvStorage } from "@/infrastructure/storage/mmkv-storage";
+import { loadFonts } from "@/shared/ui/fonts";
 
 /** One entry per capability; providers receive their entry, never the whole set. */
 export type AppDependencies = {
@@ -28,6 +29,10 @@ export async function startup({
   errorReporter.addBreadcrumb("app.startup");
 
   const env = readEnv();
+  // Text renders in the system font if loading fails, so it never blocks.
+  const fonts = loadFonts().catch((error: unknown) =>
+    errorReporter.captureException(error, { operation: "fonts.load" }),
+  );
   const i18n = await createI18nextAdapter({
     defaultLocale: env.defaultLocale,
     storage: createMmkvStorage({ id: "app-preferences" }),
@@ -37,6 +42,8 @@ export async function startup({
         operation: "i18n.restore-preference",
       }),
   });
+
+  await fonts;
 
   // The device language can change while the app is in the background.
   const subscription = AppState.addEventListener("change", (state) => {

@@ -15,6 +15,7 @@ Read applicable instructions once per task. Start with the affected code and tes
 | Task | Additional reference |
 | --- | --- |
 | New business module or feature | [Adding a business module](docs/architecture/add-module.md) |
+| Theme tokens, shared UI components, fonts or icons | [Design system](docs/architecture/design-system.md) |
 | HTTP endpoints or services | [HTTP client](docs/architecture/http-client.md) and [validation](docs/architecture/validation.md) |
 | Public environment configuration | [Validation](docs/architecture/validation.md#environment) |
 | App variants, launcher icons, versions or release preparation | [App variants](docs/app-variants.md) |
