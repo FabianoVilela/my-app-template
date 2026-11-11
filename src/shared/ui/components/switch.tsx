@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Animated, Easing, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useReducedMotion } from "../use-reduced-motion";
 import { OptionRow } from "./option-row";
-import { useReducedMotion } from "./use-reduced-motion";
 
 export type SwitchProps = {
   label: string;

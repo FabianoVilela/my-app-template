@@ -1,7 +1,7 @@
 import type { LucideIcon } from "lucide-react-native";
 import { useUnistyles } from "react-native-unistyles";
+import type { lightTheme } from "../theme";
 import type { TextColor } from "./text";
-import type { lightTheme } from "./theme";
 
 export type IconSize = keyof (typeof lightTheme)["icon"]["size"];
 

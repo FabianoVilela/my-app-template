@@ -99,7 +99,7 @@ Spacing follows a 4 pt grid. The key is the multiple of 4: `spacing[1]` is 4, `s
 
 ## Iconography
 
-Icons come from [Lucide](https://lucide.dev) through `lucide-react-native`. Components render them through a shared `Icon` component in `shared/ui`, never by importing Lucide directly, so size and stroke stay consistent.
+Icons come from [Lucide](https://lucide.dev) through `lucide-react-native`. Components render them through the shared `Icon` component in `shared/ui/components/`, never by importing Lucide directly, so size and stroke stay consistent.
 
 - Sizes: `icon.size.sm` (16), `md` (20, default) and `lg` (24).
 - Stroke: `icon.strokeWidth` (1.75), with round caps and joins.
@@ -130,7 +130,9 @@ Respect the OS reduced-motion setting: skip size and position animations when it
 
 ## Components
 
-Shared components live in `src/shared/ui/` and consume only these tokens. Their props are documented in their source; this guide keeps only rules that span components.
+Shared components live in `src/shared/ui/components/`, one file per component with its test beside it, and consume only these tokens. Tokens, fonts and hooks such as `useReducedMotion` stay in `src/shared/ui/`. Props are documented in each component's source; this guide keeps only rules that span components.
+
+File names below are relative to `src/shared/ui/components/`.
 
 | Component | File | Notes |
 | --- | --- | --- |
@@ -143,3 +145,4 @@ Shared components live in `src/shared/ui/` and consume only these tokens. Their 
 | `Button` | `button.tsx` | Variants `primary`, `secondary`, `soft`, `outline`, `ghost`, `danger` and `ghostDanger`; sizes `sm`, `md` and `lg`; leading or trailing icons; `isLoading`, `isDisabled` and `isBlock`. Pass `icon` and a required `accessibilityLabel` for an icon-only button |
 | `Input` | `input.tsx` | Labeled field with helper and error text; `type="password"` adds a show/hide toggle and `type="search"` a pill with a clear button. Toggle and clear labels come from the `ui` translation namespace |
 | `CollapseGroup`, `Collapse` | `collapse.tsx` | A card of disclosure rows. `isSingleExpand` on the group keeps one item open; each item takes any children and `hasContentPadding` (default `true`) |
+| `ErrorScreen` | `error-screen.tsx` | Full-screen startup and render failure fallback with fixed bilingual text, used by bootstrap |

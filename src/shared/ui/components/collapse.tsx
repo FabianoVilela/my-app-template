@@ -12,10 +12,10 @@ import {
 } from "react";
 import { Animated, Easing, Pressable, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useReducedMotion } from "../use-reduced-motion";
 import { Divider } from "./divider";
 import { Icon } from "./icon";
 import { Text } from "./text";
-import { useReducedMotion } from "./use-reduced-motion";
 
 type GroupContextValue = {
   isSingleExpand: boolean;

@@ -3,7 +3,7 @@ import {
   type TextProps as NativeTextProps,
 } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import type { lightTheme } from "./theme";
+import type { lightTheme } from "../theme";
 
 type Theme = typeof lightTheme;
 

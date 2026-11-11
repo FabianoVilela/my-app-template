@@ -2,7 +2,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { type ReactNode, useEffect, useState } from "react";
 import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
 import { AppTranslationProvider } from "@/shared/i18n";
-import { ErrorScreen } from "@/shared/ui/error-screen";
+import { ErrorScreen } from "@/shared/ui/components/error-screen";
 import { type AppDependencies, startup } from "./startup";
 
 export type AppProvidersProps = {

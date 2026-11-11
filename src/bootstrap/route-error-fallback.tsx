@@ -1,7 +1,7 @@
 import type { ErrorBoundaryProps } from "expo-router";
 import { useEffect } from "react";
 import type { ErrorReporter } from "@/infrastructure/observability/error-reporter";
-import { ErrorScreen } from "@/shared/ui/error-screen";
+import { ErrorScreen } from "@/shared/ui/components/error-screen";
 
 export type RouteErrorFallbackProps = ErrorBoundaryProps & {
   errorReporter: ErrorReporter;
