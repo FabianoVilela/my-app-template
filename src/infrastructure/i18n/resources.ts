@@ -2,20 +2,24 @@
 import type { AppLocale } from "@/shared/i18n/contracts";
 import enCommon from "./locales/en/common.json";
 import enNavigation from "./locales/en/navigation.json";
+import enUi from "./locales/en/ui.json";
 import ptBrCommon from "./locales/pt-br/common.json";
 import ptBrNavigation from "./locales/pt-br/navigation.json";
+import ptBrUi from "./locales/pt-br/ui.json";
 
-export const NAMESPACES = ["common", "navigation"] as const;
+export const NAMESPACES = ["common", "navigation", "ui"] as const;
 
 // satisfies fails type checking when APP_LOCALES and locale directories differ.
 export const resources = {
   en: {
     common: enCommon,
     navigation: enNavigation,
+    ui: enUi,
   },
   "pt-BR": {
     common: ptBrCommon,
     navigation: ptBrNavigation,
+    ui: ptBrUi,
   },
 } satisfies Record<
   AppLocale,
