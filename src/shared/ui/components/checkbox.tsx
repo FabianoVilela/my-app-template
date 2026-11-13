@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { OptionRow } from "./option-row";
+import { OptionLabel, OptionRow } from "./option-row";
 
 export type CheckboxProps = {
   label: string;
@@ -25,12 +25,12 @@ export function Checkbox({
       isChecked={isChecked}
       isDisabled={isDisabled}
       onPress={() => onCheckedChange(!isChecked)}
-      control={
-        <View style={styles.box}>
-          {isChecked ? <View style={styles.checkmark} /> : null}
-        </View>
-      }
-    />
+    >
+      <View style={styles.box}>
+        {isChecked ? <View style={styles.checkmark} /> : null}
+      </View>
+      <OptionLabel isDisabled={isDisabled}>{label}</OptionLabel>
+    </OptionRow>
   );
 }
 
@@ -38,8 +38,8 @@ const styles = StyleSheet.create((theme) => ({
   box: {
     alignItems: "center",
     justifyContent: "center",
-    width: 22,
-    height: 22,
+    width: theme.size.selectionControl,
+    height: theme.size.selectionControl,
     borderWidth: 1.5,
     borderRadius: theme.radius.xs,
     variants: {

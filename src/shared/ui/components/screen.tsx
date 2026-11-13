@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
-import { ScrollView, View } from "react-native";
+import { HeaderHeightContext } from "expo-router/react-navigation";
+import { type ReactNode, use } from "react";
+import { KeyboardAvoidingView, ScrollView, View } from "react-native";
 import { StyleSheet, withUnistyles } from "react-native-unistyles";
 
 /** Safe-area edges the screen pads. Omit `top` under a navigator header. */
@@ -16,8 +17,8 @@ export type ScreenProps = {
 const UniScrollView = withUnistyles(ScrollView);
 
 /**
- * Screen container: theme background, 20 pt horizontal padding and the
- * device safe areas for the requested edges.
+ * Screen container: theme background, 20 pt horizontal padding, the device
+ * safe areas for the requested edges, and room for the keyboard.
  */
 export function Screen({
   children,
@@ -29,19 +30,29 @@ export function Screen({
     bottom: edges.includes("bottom"),
   });
 
-  if (isScrollable) {
-    return (
-      <UniScrollView
-        style={styles.background}
-        contentContainerStyle={styles.content}
-        keyboardShouldPersistTaps="handled"
-      >
-        {children}
-      </UniScrollView>
-    );
-  }
+  // Under a navigator header the keyboard offset must include its height.
+  const headerHeight = use(HeaderHeightContext) ?? 0;
 
-  return <View style={[styles.background, styles.content]}>{children}</View>;
+  return (
+    // Expo apps are edge-to-edge, so the Android window no longer resizes for
+    // the keyboard: both platforms need `padding`.
+    <KeyboardAvoidingView
+      behavior="padding"
+      keyboardVerticalOffset={headerHeight}
+      style={styles.background}
+    >
+      {isScrollable ? (
+        <UniScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+        >
+          {children}
+        </UniScrollView>
+      ) : (
+        <View style={styles.content}>{children}</View>
+      )}
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create((theme, rt) => ({

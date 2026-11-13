@@ -98,8 +98,22 @@ const icon = {
   strokeWidth: 1.75,
 } as const;
 
-/** Durations in ms; `easing` is a cubic-bezier for `Easing.bezier`. */
-const motion = {
+/** Control dimensions in points; the same in every theme. */
+export const size = {
+  /** Minimum touch target for anything pressable. */
+  touchTarget: 44,
+  /** Checkbox and radio indicators. */
+  selectionControl: 22,
+  /** Heights shared by buttons and text fields. */
+  control: { sm: 36, md: 48, lg: 56 },
+} as const;
+
+/**
+ * Durations in ms; `easing` is a cubic-bezier for `Easing.bezier`. Exported
+ * because motion is the same in every theme: animation code imports it
+ * instead of subscribing to theme changes.
+ */
+export const motion = {
   duration: { fast: 120, base: 200, slow: 320 },
   easing: [0.2, 0.8, 0.2, 1],
 } as const;
@@ -110,7 +124,7 @@ const state = {
   loadingOpacity: 0.7,
 } as const;
 
-const shared = { spacing, radius, typography, icon, motion, state };
+const shared = { spacing, radius, typography, icon, size, motion, state };
 
 export const lightTheme = {
   colors: {
@@ -136,7 +150,6 @@ export const lightTheme = {
     onPrimarySoft: "#0A6B62",
     link: "#0B7D72",
     focus: "#0B7D72",
-    focusRing: "rgba(23, 181, 166, 0.28)",
     secondary: "#232B3E",
     secondaryPressed: "#161C2B",
     onSecondary: "#FFFFFF",
@@ -164,6 +177,8 @@ export const lightTheme = {
     lg: "0 2px 6px rgba(31, 36, 51, 0.05), 0 28px 56px -16px rgba(31, 36, 51, 0.24)",
     /** Cards; the dark theme relies on the card border instead. */
     card: "0 1px 2px rgba(31, 36, 51, 0.06)",
+    /** Removes a resting shadow, as pressed buttons do. */
+    none: "0 0 0 0 rgba(0, 0, 0, 0)",
     /** Switch knob; the same in both themes. */
     knob: "0 1px 3px rgba(11, 14, 31, 0.3)",
   },
@@ -191,7 +206,6 @@ export const darkTheme = {
     onPrimarySoft: "#7FE3D6",
     link: "#2EC4B6",
     focus: "#2EC4B6",
-    focusRing: "rgba(23, 181, 166, 0.35)",
     secondary: "#3D4863",
     secondaryPressed: "#4A5571",
     onSecondary: "#FFFFFF",
@@ -217,6 +231,7 @@ export const darkTheme = {
     md: "0 1px 2px rgba(0, 0, 0, 0.35), 0 10px 24px -8px rgba(0, 0, 0, 0.5)",
     lg: "0 2px 6px rgba(0, 0, 0, 0.35), 0 28px 56px -16px rgba(0, 0, 0, 0.6)",
     card: "0 0 0 0 rgba(0, 0, 0, 0)",
+    none: "0 0 0 0 rgba(0, 0, 0, 0)",
     knob: "0 1px 3px rgba(11, 14, 31, 0.3)",
   },
   ...shared,

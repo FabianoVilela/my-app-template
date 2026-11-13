@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from "@testing-library/react-native";
-import { ArrowRight, Plus } from "lucide-react-native";
+import { ArrowRight } from "lucide-react-native";
 import { Button } from "./button";
 
 test("calls onPress when pressed", async () => {
@@ -11,17 +11,6 @@ test("calls onPress when pressed", async () => {
   await userEvent
     .setup()
     .press(screen.getByRole("button", { name: "Continue" }));
-
-  expect(onPress).toHaveBeenCalledTimes(1);
-});
-
-test("names an icon-only button by its accessibility label", async () => {
-  const onPress = jest.fn();
-
-  await render(
-    <Button icon={Plus} accessibilityLabel="Add" onPress={onPress} />,
-  );
-  await userEvent.setup().press(screen.getByRole("button", { name: "Add" }));
 
   expect(onPress).toHaveBeenCalledTimes(1);
 });

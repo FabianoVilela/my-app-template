@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Animated, Easing, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
+import { motion } from "../theme";
 import { useReducedMotion } from "../use-reduced-motion";
-import { OptionRow } from "./option-row";
+import { OptionLabel, OptionRow } from "./option-row";
 
 export type SwitchProps = {
   label: string;
@@ -20,7 +21,6 @@ export function Switch({
   onValueChange,
   isDisabled = false,
 }: SwitchProps) {
-  const { theme } = useUnistyles();
   const isReducedMotion = useReducedMotion();
   const [offset] = useState(() => new Animated.Value(isOn ? KNOB_TRAVEL : 0));
 
@@ -29,15 +29,15 @@ export function Switch({
   useEffect(() => {
     const animation = Animated.timing(offset, {
       toValue: isOn ? KNOB_TRAVEL : 0,
-      duration: isReducedMotion ? 0 : theme.motion.duration.base,
-      easing: Easing.bezier(...theme.motion.easing),
+      duration: isReducedMotion ? 0 : motion.duration.base,
+      easing: Easing.bezier(...motion.easing),
       useNativeDriver: true,
     });
 
     animation.start();
 
     return () => animation.stop();
-  }, [isOn, isReducedMotion, offset, theme.motion]);
+  }, [isOn, isReducedMotion, offset]);
 
   return (
     <OptionRow
@@ -45,16 +45,15 @@ export function Switch({
       label={label}
       isChecked={isOn}
       isDisabled={isDisabled}
-      isControlTrailing
       onPress={() => onValueChange(!isOn)}
-      control={
-        <View style={styles.track}>
-          <Animated.View
-            style={[styles.knob, { transform: [{ translateX: offset }] }]}
-          />
-        </View>
-      }
-    />
+    >
+      <OptionLabel isDisabled={isDisabled}>{label}</OptionLabel>
+      <View style={styles.track}>
+        <Animated.View
+          style={[styles.knob, { transform: [{ translateX: offset }] }]}
+        />
+      </View>
+    </OptionRow>
   );
 }
 

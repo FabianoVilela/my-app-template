@@ -1,25 +1,24 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { OptionRow } from "./option-row";
+import { OptionLabel, OptionRow } from "./option-row";
+import { useRadioGroup } from "./radio-group";
 
 export type RadioButtonProps = {
+  /** Identifies this option within its `RadioGroup`. */
+  value: string;
   label: string;
-  isSelected: boolean;
-  /** Called when an unselected option is pressed; selection never clears. */
-  onSelect: () => void;
   isDisabled?: boolean;
 };
 
-/**
- * One option of a mutually exclusive set. Wrap the set in a view with
- * `accessibilityRole="radiogroup"` and keep the selected value in the parent.
- */
+/** One option of a `RadioGroup`; pressing it never clears the selection. */
 export function RadioButton({
+  value,
   label,
-  isSelected,
-  onSelect,
   isDisabled = false,
 }: RadioButtonProps) {
+  const { state, actions } = useRadioGroup();
+  const isSelected = state.value === value;
+
   styles.useVariants({ isSelected, isDisabled });
 
   return (
@@ -29,14 +28,14 @@ export function RadioButton({
       isChecked={isSelected}
       isDisabled={isDisabled}
       onPress={() => {
-        if (!isSelected) onSelect();
+        if (!isSelected) actions.select(value);
       }}
-      control={
-        <View style={styles.circle}>
-          {isSelected ? <View style={styles.dot} /> : null}
-        </View>
-      }
-    />
+    >
+      <View style={styles.circle}>
+        {isSelected ? <View style={styles.dot} /> : null}
+      </View>
+      <OptionLabel isDisabled={isDisabled}>{label}</OptionLabel>
+    </OptionRow>
   );
 }
 
@@ -44,8 +43,8 @@ const styles = StyleSheet.create((theme) => ({
   circle: {
     alignItems: "center",
     justifyContent: "center",
-    width: 22,
-    height: 22,
+    width: theme.size.selectionControl,
+    height: theme.size.selectionControl,
     borderWidth: 1.5,
     borderRadius: theme.radius.full,
     variants: {
