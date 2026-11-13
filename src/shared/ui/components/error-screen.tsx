@@ -1,5 +1,7 @@
-import { Pressable, Text, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Button } from "./button";
+import { Text } from "./text";
 
 export type ErrorScreenProps = {
   onRetry: () => void;
@@ -15,17 +17,15 @@ const RETRY = "Try again · Tentar novamente";
 export function ErrorScreen({ onRetry }: ErrorScreenProps) {
   return (
     <View style={styles.container}>
-      <Text accessibilityRole="header" style={styles.title}>
+      <Text variant="h2" style={styles.centered}>
         {TITLE}
       </Text>
-      <Text style={styles.message}>{MESSAGE}</Text>
-      <Pressable
-        accessibilityRole="button"
-        onPress={onRetry}
-        style={styles.button}
-      >
-        <Text style={styles.buttonText}>{RETRY}</Text>
-      </Pressable>
+      <Text color="textMuted" style={styles.centered}>
+        {MESSAGE}
+      </Text>
+      <View style={styles.action}>
+        <Button label={RETRY} onPress={onRetry} />
+      </View>
     </View>
   );
 }
@@ -41,26 +41,10 @@ const styles = StyleSheet.create((theme, rt) => ({
     paddingRight: rt.insets.right + theme.spacing[6],
     backgroundColor: theme.colors.background,
   },
-  title: {
-    ...theme.typography.h2,
-    color: theme.colors.text,
+  centered: {
     textAlign: "center",
   },
-  message: {
-    ...theme.typography.body,
-    color: theme.colors.textMuted,
-    textAlign: "center",
-  },
-  button: {
-    alignSelf: "center",
-    justifyContent: "center",
-    minHeight: 48,
-    paddingHorizontal: theme.spacing[6],
-    borderRadius: theme.radius.md,
-    backgroundColor: theme.colors.primary,
-  },
-  buttonText: {
-    ...theme.typography.button,
-    color: theme.colors.onPrimary,
+  action: {
+    alignItems: "center",
   },
 }));

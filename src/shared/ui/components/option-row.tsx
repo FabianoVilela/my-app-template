@@ -5,31 +5,27 @@ import { Text } from "./text";
 
 export type OptionRowProps = {
   role: "checkbox" | "radio" | "switch";
+  /** Accessible name of the whole row. */
   label: string;
   isChecked: boolean;
   isDisabled: boolean;
-  /** The visual control: a box, a circle or a track. */
-  control: ReactNode;
-  /** Places the control after the label, as settings rows do for switches. */
-  isControlTrailing?: boolean;
   onPress: () => void;
+  /** The control and an `OptionLabel`, in visual order. */
+  children: ReactNode;
 };
 
 /**
  * Pressable row shared by selection controls: the whole row is the touch
- * target (at least 44 pt tall) and carries the role and checked state.
+ * target and carries the role and checked state.
  */
 export function OptionRow({
   role,
   label,
   isChecked,
   isDisabled,
-  control,
-  isControlTrailing = false,
   onPress,
+  children,
 }: OptionRowProps) {
-  styles.useVariants({ isControlTrailing });
-
   return (
     <Pressable
       accessibilityRole={role}
@@ -39,11 +35,22 @@ export function OptionRow({
       onPress={onPress}
       style={styles.row}
     >
-      {control}
-      <Text color={isDisabled ? "onDisabled" : "text"} style={styles.label}>
-        {label}
-      </Text>
+      {children}
     </Pressable>
+  );
+}
+
+export type OptionLabelProps = {
+  children: string;
+  isDisabled: boolean;
+};
+
+/** Row label; it grows so a trailing control sits at the row's end. */
+export function OptionLabel({ children, isDisabled }: OptionLabelProps) {
+  return (
+    <Text color={isDisabled ? "onDisabled" : "text"} style={styles.label}>
+      {children}
+    </Text>
   );
 }
 
@@ -52,18 +59,9 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing[3],
-    minHeight: 44,
-    variants: {
-      isControlTrailing: {
-        true: { flexDirection: "row-reverse" },
-      },
-    },
+    minHeight: theme.size.touchTarget,
   },
   label: {
-    variants: {
-      isControlTrailing: {
-        true: { flex: 1 },
-      },
-    },
+    flex: 1,
   },
 }));

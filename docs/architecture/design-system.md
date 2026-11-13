@@ -42,7 +42,7 @@ Colors are named by role, not hue. Pair each fill with its `on*` color for conte
 | Primary | `primary`, `primaryPressed`, `onPrimary`, `primarySoft`, `onPrimarySoft` | Main actions and selected controls; soft variants for tonal buttons and badges |
 | Secondary | `secondary`, `secondaryPressed`, `onSecondary` | Strong neutral actions |
 | Inverse | `inverse`, `onInverse` | Toasts and selected chips |
-| Interaction | `link`, `focus`, `focusRing` | Inline links, focus outlines and focused input halos |
+| Interaction | `link`, `focus` | Inline links, focus outlines and focused input borders |
 | Status | `success`, `warning`, `danger`, `info`, each with `*Soft`; `onDanger` | Feedback, validation, alerts and badges |
 | Highlight | `highlight`, `onHighlight` | Promotional or "new" emphasis, in purple to stay distinct from status colors |
 | Disabled | `disabled`, `onDisabled` | Fill and content of any disabled control |
@@ -95,7 +95,17 @@ Spacing follows a 4 pt grid. The key is the multiple of 4: `spacing[1]` is 4, `s
 | `xxl` | 28 | Bottom sheets and large media |
 | `full` | 999 | Pills, badges, avatars and switches |
 
-`shadows.sm`, `shadows.md` and `shadows.lg` are `boxShadow` strings for resting controls, raised cards and floating layers. Use `shadows.card` for cards: the dark theme sets it to a transparent shadow and relies on the card border. `shadows.knob` is the switch knob.
+`shadows.sm`, `shadows.md` and `shadows.lg` are `boxShadow` strings for resting controls, raised cards and floating layers. Use `shadows.card` for cards: the dark theme sets it to a transparent shadow and relies on the card border. `shadows.knob` is the switch knob, and `shadows.none` removes a resting shadow, as pressed buttons do.
+
+Rounded surfaces also set `borderCurve: "continuous"` for the smoother iOS corner.
+
+| Size | Value | Use |
+| --- | --- | --- |
+| `size.touchTarget` | 44 | Minimum touch target; smaller controls add `hitSlop` up to it |
+| `size.selectionControl` | 22 | Checkbox and radio indicators |
+| `size.control.sm` / `md` / `lg` | 36 / 48 / 56 | Button heights; text fields use `md` |
+
+`size` and `motion` are the same in every theme, so `theme.ts` also exports them for code that runs outside a stylesheet, such as `hitSlop` and animation timing.
 
 ## Iconography
 
@@ -111,10 +121,10 @@ Shared components are touch-first and follow these rules:
 
 - **Pressed:** shift the tone, never scale. Filled variants switch to their `*Pressed` color (`primaryPressed`, `secondaryPressed`, `primarySoftPressed`, `dangerPressed`), paint the border in the fill color and drop their shadow. Outline and ghost variants gain a `surfaceMuted` background.
 - **Hover:** none. Hover styles would mask the pressed state on touch devices.
-- **Focus:** a 2 px `focus` outline; focused inputs add a 4 px `focusRing` halo.
+- **Focus:** a 2 px `focus` outline; focused inputs switch their border to `focus`, with no halo.
 - **Loading:** keep the variant color at `state.loadingOpacity` (0.7), show a spinner and ignore presses. Loading is not disabled.
 - **Disabled:** `disabled` fill with `onDisabled` content, no shadow, and the control announces its disabled state.
-- **Error:** `danger` border with a `dangerSoft` halo and a `helper` message in `danger`.
+- **Error:** `danger` border, with no halo, and a `helper` message in `danger`.
 - **Minimum touch target:** 44 × 44 points, even when the visible control is smaller.
 
 ## Motion
@@ -126,23 +136,27 @@ Shared components are touch-first and follow these rules:
 | `motion.duration.slow` | 320 ms | Expanding content, such as a Collapse |
 | `motion.easing` | `[0.2, 0.8, 0.2, 1]` | Pass to `Easing.bezier` for every non-linear transition |
 
-Respect the OS reduced-motion setting: skip size and position animations when it is enabled. `useReducedMotion` in `shared/ui` follows that setting. Animations use React Native's `Animated`; Reanimated is not installed, so add it deliberately when a gesture-driven or UI-thread animation needs it.
+Animate only `transform` and `opacity`, with `Animated` and `useNativeDriver: true`. Never animate size or position frame by frame: when content appears, disappears or resizes, render the final layout and call `LayoutAnimation.configureNext` just before the state change, so the native layer animates it. Collapse does this with `motion.duration.slow`.
+
+Respect the OS reduced-motion setting: skip `LayoutAnimation` and use a zero duration when it is enabled. `useReducedMotion` in `shared/ui` follows that setting. Reanimated is not installed; add it deliberately when a gesture-driven or UI-thread animation needs it.
 
 ## Components
 
-Shared components live in `src/shared/ui/components/`, one file per component with its test beside it, and consume only these tokens. Tokens, fonts and hooks such as `useReducedMotion` stay in `src/shared/ui/`. Props are documented in each component's source; this guide keeps only rules that span components.
+Shared components live in `src/shared/ui/components/`, one file per component with its test beside it, and consume only these tokens. Prefer explicit components and composition over mode props: a new behavior gets its own component built from shared parts (as `PasswordInput` reuses `field.tsx`), and grouped controls share state through a parent that provides a `{ state, actions }` context read with `use()`. Tokens, fonts and hooks such as `useReducedMotion` stay in `src/shared/ui/`. Props are documented in each component's source; this guide keeps only rules that span components.
 
 File names below are relative to `src/shared/ui/components/`.
 
 | Component | File | Notes |
 | --- | --- | --- |
 | `Text` | `text.tsx` | `variant` picks a typography token, `color` a color role; heading variants get the header role |
-| `Screen` | `screen.tsx` | Background, 20 pt side padding and safe areas; pass `edges={["bottom"]}` under a navigator header; `isScrollable` for long content |
+| `Screen` | `screen.tsx` | Background, 20 pt side padding, safe areas and keyboard avoidance (offset by the navigator header); pass `edges={["bottom"]}` under a header; `isScrollable` for long content |
 | `Divider` | `divider.tsx` | 1 px `border` line, optionally with a centered label |
-| `Checkbox`, `RadioButton`, `Switch` | `checkbox.tsx`, `radio-button.tsx`, `switch.tsx` | Controlled; the whole row, label included, is the touch target and carries the role and checked state. Wrap radio sets in a `radiogroup` view |
+| `Checkbox`, `Switch` | `checkbox.tsx`, `switch.tsx` | Controlled; the whole row, label included, is the touch target and carries the role and checked state. Both compose the private `OptionRow` and `OptionLabel` in `option-row.tsx` |
+| `RadioGroup`, `RadioButton` | `radio-group.tsx`, `radio-button.tsx` | The group owns `value` and `onValueChange` and has the `radiogroup` role; each `RadioButton` takes a `value` and must render inside a group |
 | `Badge` | `badge.tsx` | Non-interactive status pill in one of seven tones, with an optional dot |
 | `Icon` | `icon.tsx` | Renders a Lucide icon at a token size, stroke and color role; decorative unless given an accessibility label |
-| `Button` | `button.tsx` | Variants `primary`, `secondary`, `soft`, `outline`, `ghost`, `danger` and `ghostDanger`; sizes `sm`, `md` and `lg`; leading or trailing icons; `isLoading`, `isDisabled` and `isBlock`. Pass `icon` and a required `accessibilityLabel` for an icon-only button |
-| `Input` | `input.tsx` | Labeled field with helper and error text; `type="password"` adds a show/hide toggle and `type="search"` a pill with a clear button. Toggle and clear labels come from the `ui` translation namespace |
-| `CollapseGroup`, `Collapse` | `collapse.tsx` | A card of disclosure rows. `isSingleExpand` on the group keeps one item open; each item takes any children and `hasContentPadding` (default `true`) |
+| `Button` | `button.tsx` | Variants `primary`, `secondary`, `soft`, `outline`, `ghost`, `danger` and `ghostDanger`; sizes `sm`, `md` and `lg`; leading or trailing icons; `isLoading`, `isDisabled` and `isBlock`. The pressed tone comes from Pressable's style callback, with no state |
+| `IconButton` | `icon-button.tsx` | Square, icon-only button with the same variants, sizes and states; `accessibilityLabel` is required. Shares `button.styles.ts` with `Button` |
+| `Input`, `PasswordInput`, `SearchInput` | `input.tsx`, `password-input.tsx`, `search-input.tsx` | Labeled text fields with helper and error text, composed from the private parts in `field.tsx` and `use-field-focus.ts`. `PasswordInput` adds a show/hide toggle; `SearchInput` is a pill with no visible label and a clear button. Toggle and clear labels come from the `ui` translation namespace |
+| `CollapseGroup`, `Collapse` | `collapse.tsx` | A card of disclosure rows. The group owns which items are open: `expandMode` (`multiple` by default, or `single`) and `defaultExpanded`. Each item takes a `value`, any children and `hasContentPadding` (default `true`); outside a group it keeps its own state |
 | `ErrorScreen` | `error-screen.tsx` | Full-screen startup and render failure fallback with fixed bilingual text, used by bootstrap |
