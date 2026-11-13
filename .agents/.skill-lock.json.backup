@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "skills": {
+    "react-native-expert": {
+      "name": "react-native-expert",
+      "source": "local",
+      "contentHash": "9da108258c0a93cd04b57d94a5a7788e6c37c704ca4322ca9b6bedce8e3ff683",
+      "installedAt": "2026-11-12T23:47:48.654Z",
+      "updatedAt": "2026-11-12T23:47:48.661Z",
+      "agents": [
+        "cursor",
+        "claude-code",
+        "windsurf"
+      ],
+      "method": "copy",
+      "global": false
+    },
+    "react-composition-patterns": {
+      "name": "react-composition-patterns",
+      "source": "local",
+      "contentHash": "171c6a35a0a74a6b37facf2a6e3883a02f53e3f2d429e6aa5834412c65d38dc7",
+      "installedAt": "2026-11-12T23:48:02.053Z",
+      "updatedAt": "2026-11-12T23:48:02.059Z",
+      "agents": [
+        "cursor",
+        "claude-code"
+      ],
+      "method": "copy",
+      "global": false
+    }
+  }
+}
