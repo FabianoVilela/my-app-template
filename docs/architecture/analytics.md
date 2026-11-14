@@ -80,10 +80,34 @@ groups are dropped and dynamic segments keep their placeholder, so
 `/(tabs)/items/42` reports `/items/[id]`. Route parameters and query strings never
 reach analytics.
 
+Screen names are typed as `AppScreen` in `bootstrap/analytics-events.ts`, which
+is Expo Router's `RoutePath`: the route patterns that typed routes
+(`experiments.typedRoutes`) generate into `.expo/types/router.d.ts` when the dev
+server starts. That file is Git-ignored, so on a fresh checkout, including CI,
+`RoutePath` widens to `string` until `pnpm start` regenerates it.
+
+## Event catalog
+
+`AppAnalyticsEvents` in `bootstrap/analytics-events.ts` is the list of every event
+the app may log. Each entry maps an event name to its parameters, or to `undefined`
+when it takes none:
+
+```ts
+export type AppAnalyticsEvents = {
+  share: { content_type: string; method: string };
+  tutorial_complete: undefined;
+};
+```
+
+Bootstrap binds the catalog and `AppScreen` into `AppAnalyticsTracker`, so an
+unknown name, a missing or extra parameter, or a concrete path fails type checking.
+The infrastructure contract stays generic and knows no events. The template
+defines none, so `logEvent` accepts no name until a derived app adds an entry.
+
 Business events belong to their module. An application operation that needs one
-defines a capability-named port in `application/ports/`, and bootstrap adapts the
-`AnalyticsTracker` to it. Domain, application and presentation code never import
-the tracker or Firebase. The template defines no business events.
+defines a capability-named port in `application/ports/`. Bootstrap adds the event
+to the catalog and adapts the tracker to that port. Domain, application and
+presentation code never import the tracker or Firebase.
 
 ## Event rules
 
@@ -112,7 +136,8 @@ requires.
 ## Verification
 
 Adapter tests cover the disabled mode, consent mapping with advertising signals
-denied, screen and event forwarding, and contained SDK failures. Bootstrap tests
+denied, screen and event forwarding, catalog typing through `@ts-expect-error`
+checks, and contained SDK failures. Bootstrap tests
 cover selection, debug builds and process lifetime. `toRoutePattern` and the
 navigation test cover route-pattern screen names.
 `scripts/firebase-config.test.mjs` covers the build selection, file validation,

@@ -1,11 +1,11 @@
 import { Stack } from "expo-router";
 import { useUnistyles } from "react-native-unistyles";
-import type { AnalyticsTracker } from "@/infrastructure/analytics/analytics-tracker";
 import { useAppTranslation } from "@/shared/i18n";
+import type { AppAnalyticsTracker } from "./analytics-events";
 import { useScreenTracking } from "./screen-tracking";
 
 export type AppNavigationProps = {
-  analytics: AnalyticsTracker;
+  analytics: AppAnalyticsTracker;
 };
 
 /** Root navigator, outside src/app/ so tests can mount it without the layout. */

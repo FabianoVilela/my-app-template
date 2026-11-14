@@ -71,7 +71,7 @@ Keep each vendor import inside its concrete adapter, and vendor types out of pub
 | Dates | `DateAdapter` in `shared/lib/date-adapter.ts` (dayjs in `infrastructure/date/`) | Exchange and persist instants in UTC; display in the device zone unless business rules differ; preserve calendar-only values and IANA zones of location-bound schedules | [Dates](../docs/architecture/date-adapter.md) |
 | Storage | `LocalStorage`, `SecureStorage` in `infrastructure/storage/` (MMKV, SecureStore) | Credentials use SecureStore, preferences use MMKV; neither is a database; consumers own serialization, keys and migrations; adapters do not discard failed writes | [Storage](../docs/architecture/storage.md) |
 | Error reporting | `ErrorReporter` in `infrastructure/observability/` (Sentry or Crashlytics, one per build) | Domain stays telemetry-free; report once at the handling boundary with fixed technical context; no payloads, credentials or personal data | [Observability](../docs/architecture/observability.md) |
-| Analytics | `AnalyticsTracker` in `infrastructure/analytics/` (Firebase Analytics) | Nothing is collected before consent; screen names are route patterns; modules emit events through their own ports; no personal data, user input or URLs in parameters | [Analytics](../docs/architecture/analytics.md) |
+| Analytics | `AnalyticsTracker` in `infrastructure/analytics/` (Firebase Analytics) | Nothing is collected before consent; screen names are route patterns; events are declared in `bootstrap/analytics-events.ts` and modules emit them through their own ports; no personal data, user input or URLs in parameters | [Analytics](../docs/architecture/analytics.md) |
 
 ## Bootstrap: composition and startup
 
