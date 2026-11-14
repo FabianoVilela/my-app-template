@@ -53,3 +53,8 @@ CLAUDE.local.md
 .env.production
 
 .harness-eval
+
+# Firebase app config files, supplied per variant through GOOGLE_SERVICES_JSON
+# and GOOGLE_SERVICE_INFO_PLIST
+google-services*.json
+GoogleService-Info*.plist

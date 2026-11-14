@@ -154,6 +154,10 @@ test("Expo config reads independent versions and querying it never increments bu
     new URL("./app-versions.cjs", import.meta.url),
     join(root, "scripts/app-versions.cjs"),
   );
+  copyFileSync(
+    new URL("./firebase-config.cjs", import.meta.url),
+    join(root, "scripts/firebase-config.cjs"),
+  );
   const { default: appConfig } = await import(
     pathToFileURL(join(root, "app.config.ts")).href
   );

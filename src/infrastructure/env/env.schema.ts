@@ -34,6 +34,10 @@ export const envSchema = z.object({
   defaultLocale: z.enum(APP_LOCALES).catch(APP_LOCALES[0]),
   // app.config.ts always sets the variant; test and tool contexts omit it.
   appVariant: z.enum(APP_VARIANTS).default("development"),
+  // Build-time selection from app.config.ts; native SDKs are linked only when true.
+  firebase: z
+    .object({ analytics: z.boolean(), crashlytics: z.boolean() })
+    .default({ analytics: false, crashlytics: false }),
 });
 
 export type Env = z.infer<typeof envSchema>;

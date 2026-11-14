@@ -12,6 +12,7 @@ import {
 } from "@/infrastructure/observability/sentry-error-reporter";
 
 let reporter: ErrorReporter | undefined;
+let isSentryActive = false;
 
 /** Process lifetime SDK setup; call before mounting React, never per render. */
 export function initializeObservability(): ErrorReporter {
@@ -23,14 +24,25 @@ export function initializeObservability(): ErrorReporter {
 
   try {
     const env = readEnv();
-    reporter = createSentryErrorReporter({
-      dsn: env.sentryDsn,
-      environment: env.appVariant,
-      isEnabled: !__DEV__,
-      isNativeEnabled:
-        Platform.OS !== "web" &&
-        Constants.executionEnvironment !== ExecutionEnvironment.StoreClient,
-    });
+
+    // app.config.ts guarantees Crashlytics and a Sentry DSN are exclusive.
+    if (env.firebase.crashlytics && Platform.OS !== "web") {
+      // Load lazily: React Native Firebase throws at import time when its
+      // native module is not linked, which is the case unless selected.
+      const { createCrashlyticsErrorReporter } =
+        require("@/infrastructure/observability/crashlytics-error-reporter") as typeof import("@/infrastructure/observability/crashlytics-error-reporter");
+      reporter = createCrashlyticsErrorReporter({ isEnabled: !__DEV__ });
+    } else {
+      reporter = createSentryErrorReporter({
+        dsn: env.sentryDsn,
+        environment: env.appVariant,
+        isEnabled: !__DEV__,
+        isNativeEnabled:
+          Platform.OS !== "web" &&
+          Constants.executionEnvironment !== ExecutionEnvironment.StoreClient,
+      });
+      isSentryActive = reporter !== noopErrorReporter;
+    }
   } catch {
     // Required configuration is still validated by normal startup and its retry UI.
     reporter = noopErrorReporter;
@@ -42,7 +54,5 @@ export function initializeObservability(): ErrorReporter {
 export function withObservability<P extends Record<string, unknown>>(
   component: ComponentType<P>,
 ): ComponentType<P> {
-  return reporter && reporter !== noopErrorReporter
-    ? withSentryRoot(component)
-    : component;
+  return isSentryActive ? withSentryRoot(component) : component;
 }

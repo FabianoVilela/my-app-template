@@ -6,6 +6,7 @@ const ENV_NAMES: Record<keyof Env, string> = {
   apiUrl: "EXPO_PUBLIC_API_URL",
   defaultLocale: "EXPO_PUBLIC_DEFAULT_LOCALE",
   appVariant: "APP_VARIANT",
+  firebase: "FIREBASE_SERVICES",
 };
 
 function isEnvField(value: unknown): value is keyof Env {
@@ -36,5 +37,7 @@ export function readEnv(): Env {
     defaultLocale: process.env.EXPO_PUBLIC_DEFAULT_LOCALE,
     // Set by app.config.ts from APP_VARIANT; not an EXPO_PUBLIC_ variable.
     appVariant: Constants.expoConfig?.extra?.appVariant,
+    // Set by app.config.ts from FIREBASE_SERVICES; not an EXPO_PUBLIC_ variable.
+    firebase: Constants.expoConfig?.extra?.firebase,
   });
 }

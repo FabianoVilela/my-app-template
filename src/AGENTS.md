@@ -15,7 +15,7 @@ src/
 │   ├── application/ports/
 │   ├── infrastructure/
 │   └── presentation/   # screens/, components/, hooks/ as needed
-├── infrastructure/     # date, env, http, i18n, storage, observability
+├── infrastructure/     # analytics, date, env, http, i18n, storage, observability
 └── shared/             # i18n (pure contracts, injected facade), ui, lib
 ```
 
@@ -57,7 +57,7 @@ These rules cover source imports, including type imports. Runtime calls to an in
 - Module-specific endpoints, external payloads, persistence details and conversions stay in that module's infrastructure.
 - Translate external formats and errors at the adapter boundary when needed. Core contracts must not expose vendor-specific response or error types.
 - Share technical mechanisms in root infrastructure only when actually reused; business-specific adapters stay with their module.
-- Place a shared, vendor-independent contract by who consumes it. If domain or application may depend on it, keep it pure in `shared/lib/` with adapters in root infrastructure (`DateAdapter`). If only infrastructure, bootstrap and presentation consume it, keep it beside its adapters in root `infrastructure/` (`HttpClient`, `LocalStorage`, `SecureStorage`, `ErrorReporter`). A core operation needing one of these defines its own port, and an outer layer adapts the shared contract to it.
+- Place a shared, vendor-independent contract by who consumes it. If domain or application may depend on it, keep it pure in `shared/lib/` with adapters in root infrastructure (`DateAdapter`). If only infrastructure, bootstrap and presentation consume it, keep it beside its adapters in root `infrastructure/` (`HttpClient`, `LocalStorage`, `SecureStorage`, `ErrorReporter`, `AnalyticsTracker`). A core operation needing one of these defines its own port, and an outer layer adapts the shared contract to it.
 
 ## Technical capabilities
 
@@ -70,7 +70,8 @@ Keep each vendor import inside its concrete adapter, and vendor types out of pub
 | Environment | `infrastructure/env/read-env.ts`, static Expo dot notation | Bootstrap validates before initialization and injects the locale; never expose values or payloads in errors | [Environment](../docs/architecture/validation.md#environment) |
 | Dates | `DateAdapter` in `shared/lib/date-adapter.ts` (dayjs in `infrastructure/date/`) | Exchange and persist instants in UTC; display in the device zone unless business rules differ; preserve calendar-only values and IANA zones of location-bound schedules | [Dates](../docs/architecture/date-adapter.md) |
 | Storage | `LocalStorage`, `SecureStorage` in `infrastructure/storage/` (MMKV, SecureStore) | Credentials use SecureStore, preferences use MMKV; neither is a database; consumers own serialization, keys and migrations; adapters do not discard failed writes | [Storage](../docs/architecture/storage.md) |
-| Error reporting | `ErrorReporter` in `infrastructure/observability/` (Sentry) | Domain stays telemetry-free; report once at the handling boundary with fixed technical context; no payloads, credentials or personal data | [Observability](../docs/architecture/observability.md) |
+| Error reporting | `ErrorReporter` in `infrastructure/observability/` (Sentry or Crashlytics, one per build) | Domain stays telemetry-free; report once at the handling boundary with fixed technical context; no payloads, credentials or personal data | [Observability](../docs/architecture/observability.md) |
+| Analytics | `AnalyticsTracker` in `infrastructure/analytics/` (Firebase Analytics) | Nothing is collected before consent; screen names are route patterns; modules emit events through their own ports; no personal data, user input or URLs in parameters | [Analytics](../docs/architecture/analytics.md) |
 
 ## Bootstrap: composition and startup
 

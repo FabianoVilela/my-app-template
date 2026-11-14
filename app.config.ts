@@ -4,6 +4,11 @@ import {
   readAppVersions,
   VARIANTS,
 } from "./scripts/app-versions.cjs";
+import {
+  assertFirebaseFilesMatch,
+  FIREBASE_PACKAGES,
+  readFirebaseConfig,
+} from "./scripts/firebase-config.cjs";
 
 export default function appConfig({ config }: ConfigContext): ExpoConfig {
   const variant = process.env.APP_VARIANT ?? "development";
@@ -32,12 +37,38 @@ export default function appConfig({ config }: ConfigContext): ExpoConfig {
     throw new Error("app.json must define the base app identity");
   }
 
+  const iosBundleIdentifier = `${config.ios.bundleIdentifier}${suffix}`;
+  const androidPackage = `${config.android.package}${suffix}`;
+  const firebase = readFirebaseConfig();
+  assertFirebaseFilesMatch(firebase, { androidPackage, iosBundleIdentifier });
+  const { analytics, crashlytics } = firebase;
+  const isFirebaseEnabled = analytics || crashlytics;
+  const firebasePlugins: NonNullable<ExpoConfig["plugins"]> = [];
+  if (isFirebaseEnabled) {
+    firebasePlugins.push(
+      FIREBASE_PACKAGES.app,
+      // Firebase Apple SDK 13+ is SPM-only and requires dynamic frameworks.
+      ["expo-build-properties", { ios: { useFrameworks: "dynamic" } }],
+    );
+  }
+  if (crashlytics) firebasePlugins.push(FIREBASE_PACKAGES.crashlytics);
+  if (analytics) {
+    firebasePlugins.push([
+      FIREBASE_PACKAGES.analytics,
+      { ios: { withoutAdIdSupport: true } },
+    ]);
+  }
+
   return {
     ...config,
     name: `${config.name}${label}`,
     slug: config.slug,
     version,
-    extra: { ...config.extra, appVariant: variant },
+    extra: {
+      ...config.extra,
+      appVariant: variant,
+      firebase: { analytics, crashlytics },
+    },
     plugins: [
       ...(config.plugins ?? []),
       [
@@ -48,12 +79,14 @@ export default function appConfig({ config }: ConfigContext): ExpoConfig {
           disableAutoUpload: !process.env.SENTRY_AUTH_TOKEN,
         },
       ],
+      ...firebasePlugins,
     ],
     scheme: `${config.scheme}${suffix}`,
     ios: {
       ...config.ios,
       buildNumber: String(build),
-      bundleIdentifier: `${config.ios.bundleIdentifier}${suffix}`,
+      bundleIdentifier: iosBundleIdentifier,
+      ...(isFirebaseEnabled ? { googleServicesFile: firebase.iosFile } : {}),
       ...(config.ios.infoPlist?.CFBundleDisplayName
         ? {
             infoPlist: {
@@ -66,7 +99,19 @@ export default function appConfig({ config }: ConfigContext): ExpoConfig {
     android: {
       ...config.android,
       versionCode: build,
-      package: `${config.android.package}${suffix}`,
+      package: androidPackage,
+      ...(isFirebaseEnabled
+        ? { googleServicesFile: firebase.androidFile }
+        : {}),
+      // Analytics never reads the advertising ID; drop the SDK's merged permission.
+      ...(analytics
+        ? {
+            blockedPermissions: [
+              ...(config.android.blockedPermissions ?? []),
+              "com.google.android.gms.permission.AD_ID",
+            ],
+          }
+        : {}),
     },
   };
 }

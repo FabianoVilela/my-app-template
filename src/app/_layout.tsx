@@ -1,5 +1,6 @@
 import type { ErrorBoundaryProps } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { initializeAnalytics } from "@/bootstrap/analytics";
 import { AppNavigation } from "@/bootstrap/app-navigation";
 import { AppProviders } from "@/bootstrap/app-providers";
 import {
@@ -12,6 +13,7 @@ import { RouteErrorFallback } from "@/bootstrap/route-error-fallback";
 void SplashScreen.preventAutoHideAsync();
 
 const errorReporter = initializeObservability();
+const analytics = initializeAnalytics();
 
 export function ErrorBoundary(props: ErrorBoundaryProps) {
   return <RouteErrorFallback {...props} errorReporter={errorReporter} />;
@@ -20,7 +22,7 @@ export function ErrorBoundary(props: ErrorBoundaryProps) {
 function RootLayout() {
   return (
     <AppProviders errorReporter={errorReporter}>
-      <AppNavigation />
+      <AppNavigation analytics={analytics} />
     </AppProviders>
   );
 }
