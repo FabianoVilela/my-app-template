@@ -199,4 +199,4 @@ screen to confirm its `ErrorBoundary` export catches and reports it.
 
 ## Observability
 
-Sentry adapter and bootstrap tests mock the SDK to verify disabled reporting, context isolation, filtering and failure containment without network traffic. Real release builds are needed for native delivery and source-map verification. See [observability](architecture/observability.md).
+Sentry and Crashlytics adapter tests and the bootstrap tests mock the SDKs. They verify disabled reporting, context isolation, filtering, provider selection and failure containment without network traffic. Analytics adapter and bootstrap tests mock `@react-native-firebase/analytics` in the same way. `pnpm test:variants` also runs `scripts/firebase-config.test.mjs`, which covers the Firebase build selection, file validation and autolinking exclusion. Real release builds are needed for native delivery, symbolication and DebugView checks. See [observability](architecture/observability.md) and [analytics](architecture/analytics.md).

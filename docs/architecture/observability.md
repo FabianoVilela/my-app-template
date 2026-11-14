@@ -1,10 +1,22 @@
 # Observability
 
-The template uses `@sentry/react-native` behind the vendor-independent
-`ErrorReporter` contract in `infrastructure/observability/error-reporter.ts`.
-It supports exception reporting with an operation identifier and bounded technical
-breadcrumbs. It deliberately does not mirror the Sentry SDK or provide analytics,
-tracing, replay, remote logs, or a global service locator.
+The template reports errors through the vendor-independent `ErrorReporter`
+contract in `infrastructure/observability/error-reporter.ts`, implemented by
+`@sentry/react-native` (default) or Firebase Crashlytics (optional). It supports
+exception reporting with an operation identifier and bounded technical
+breadcrumbs. It deliberately does not mirror either SDK or provide tracing,
+replay, remote logs, or a global service locator. Product analytics is a separate
+capability; see [Analytics](analytics.md).
+
+## Provider selection
+
+Each build uses one crash reporter. Both SDKs install native crash handlers and a
+global JavaScript error handler, so two reporters in one build would compete for
+the same crashes. Selecting `crashlytics` in `FIREBASE_SERVICES` while
+`EXPO_PUBLIC_SENTRY_DSN` is set fails app configuration. Bootstrap uses
+Crashlytics when `env.firebase.crashlytics` is true and Sentry otherwise. Sentry's
+native SDK stays linked but is never initialized when Crashlytics is selected.
+Analytics is independent and works with either reporter.
 
 ## Composition and lifetime
 
@@ -58,10 +70,44 @@ before enabling a real project; keep error messages safe at their origin.
 The iOS privacy manifest declares crash/diagnostic data and SDK required-reason
 APIs through CNG config. Derived apps must review their complete collection policy.
 
+## Crashlytics
+
+Select it with `FIREBASE_SERVICES=crashlytics` plus the variant's Firebase app
+config files; see [Analytics activation](analytics.md#activation) for the shared
+build-time variables, file validation, conditional native linking and the dynamic
+frameworks Firebase requires on iOS. The adapter in
+`infrastructure/observability/crashlytics-error-reporter.ts` maps the contract
+onto the modular API:
+
+- `captureException` sets the `operation` custom key, then calls `recordError`.
+  Non-`Error` values become a generic error and are never serialized. Custom keys
+  are sticky in Crashlytics: the key holds the last reported operation, unlike
+  Sentry's per-event tag.
+- `addBreadcrumb` writes the operation to the Crashlytics log.
+- User IDs and other attributes are never set. Every SDK call swallows failures.
+
+`firebase.json` keeps Crashlytics disabled in debug builds
+(`crashlytics_debug_enabled: false`), and the adapter is also a no-op under
+`__DEV__`. JavaScript handler chaining is disabled
+(`crashlytics_javascript_exception_handler_chaining_enabled: false`). React Native
+Firebase recommends this to avoid a duplicate native crash without a JavaScript
+stack. The Crashlytics config plugin adds dSYM upload on iOS and the Gradle
+plugin on Android. Crashlytics does not apply JavaScript source maps: JavaScript
+stacks in release builds stay minified. Prefer Sentry when readable JavaScript
+stacks matter. The root component is not wrapped.
+
+Verify with a real Firebase project: set the staging variables, run
+`pnpm expo:staging prebuild --clean` and `pnpm ios:staging` or
+`pnpm android:staging`, temporarily call `crash()` from
+`@react-native-firebase/crashlytics`, then relaunch so the report uploads. Confirm
+the variant's bundle identifier, version and symbolicated native frames in the
+Firebase console, then remove the test trigger.
+
 ## Source maps and activation
 
-Metro uses `getSentryExpoConfig` to generate Debug IDs. The Expo config plugin
-configures native build uploads without editing generated native projects.
+This section applies to Sentry. Metro uses `getSentryExpoConfig` to generate
+Debug IDs. The Expo config plugin configures native build uploads without
+editing generated native projects.
 Set `SENTRY_ORG`, `SENTRY_PROJECT` and build-only `SENTRY_AUTH_TOKEN` in the selected
 variant environment or CI. Never put the auth token in `EXPO_PUBLIC_*`, `extra`,
 plugin options, or Git. The plugin disables automatic uploads without a token,
@@ -80,13 +126,15 @@ following Sentry's Expo guide. Native build uploads do not cover later OTA bundl
 ## Verification
 
 Adapter tests cover disabled mode, per-event context, privacy hooks, unknown
-exceptions, technical breadcrumbs and SDK failures. Bootstrap tests check debug
-startup, startup failures reported once per attempt and failed locale refreshes;
-navigation tests mount the navigator without the root layout, so they do
-not initialize telemetry.
+exceptions, technical breadcrumbs and SDK failures for Sentry, and the matching
+cases for Crashlytics. Bootstrap tests check that Crashlytics replaces Sentry
+when selected, debug startup, startup failures reported once per attempt and
+failed locale refreshes. Navigation tests mount the navigator without the root
+layout, so they do not initialize telemetry.
 Run the normal lint/check/typecheck/test scripts and variant configuration tests.
 Real-device checks are required to validate native crash delivery, offline caches,
 source maps and privacy manifest aggregation.
 
 References: [Sentry Expo setup](https://docs.sentry.io/platforms/react-native/guides/expo/),
-[Expo guide](https://docs.expo.dev/guides/using-sentry/).
+[Expo guide](https://docs.expo.dev/guides/using-sentry/),
+[React Native Firebase Crashlytics](https://rnfirebase.io/crashlytics/usage).

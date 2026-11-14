@@ -1,6 +1,13 @@
 jest.mock("expo-constants", () => ({
   __esModule: true,
-  default: { expoConfig: { extra: { appVariant: "staging" } } },
+  default: {
+    expoConfig: {
+      extra: {
+        appVariant: "staging",
+        firebase: { analytics: true, crashlytics: false },
+      },
+    },
+  },
 }));
 
 import { APP_VARIANTS } from "./env.schema";
@@ -10,6 +17,7 @@ test.each([undefined, ""])("allows an absent API URL (%j)", (apiUrl) => {
   expect(parseEnv({ apiUrl })).toEqual({
     defaultLocale: "en",
     appVariant: "development",
+    firebase: { analytics: false, crashlytics: false },
   });
 });
 
@@ -65,6 +73,7 @@ test("reads public Expo configuration explicitly", () => {
       apiUrl: "http://localhost:3000",
       defaultLocale: "pt-BR",
       appVariant: "staging",
+      firebase: { analytics: true, crashlytics: false },
     });
   } finally {
     process.env = previous;
@@ -119,3 +128,9 @@ test.each(["", "qa", "Production"])(
     );
   },
 );
+
+test("rejects a malformed Firebase selection", () => {
+  expect(() => parseEnv({ firebase: { analytics: "yes" } })).toThrow(
+    "FIREBASE_SERVICES",
+  );
+});

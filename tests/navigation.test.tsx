@@ -3,6 +3,7 @@ import { renderRouter, screen } from "expo-router/testing-library";
 import type { ReactNode } from "react";
 import Index from "@/app/index";
 import { AppNavigation } from "@/bootstrap/app-navigation";
+import type { AnalyticsTracker } from "@/infrastructure/analytics/analytics-tracker";
 import { createI18nextAdapter } from "@/infrastructure/i18n/i18next-adapter";
 import { AppTranslationProvider } from "@/shared/i18n";
 
@@ -22,12 +23,21 @@ test("keeps the home URL while its content changes language", async () => {
       {children}
     </AppTranslationProvider>
   );
+  const analytics: AnalyticsTracker = {
+    setCollectionConsent: jest.fn(),
+    logScreenView: jest.fn(),
+    logEvent: jest.fn(),
+  };
   const result = await renderRouter(
-    { _layout: AppNavigation, index: Index },
+    {
+      _layout: () => <AppNavigation analytics={analytics} />,
+      index: Index,
+    },
     { initialUrl: "/", wrapper },
   );
 
   expect(result.getPathname()).toBe("/");
+  expect(analytics.logScreenView).toHaveBeenCalledWith("/");
   expect(
     screen.getByText("Edit src/app/index.tsx to edit this screen."),
   ).toBeOnTheScreen();

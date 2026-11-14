@@ -23,6 +23,7 @@ Read applicable instructions once per task. Start with the affected code and tes
 | Translations, locale or localized formatting | [Internationalization](docs/architecture/i18n.md) |
 | Preferences or credentials | [Storage](docs/architecture/storage.md) |
 | Error reporting or crash SDK | [Observability](docs/architecture/observability.md) |
+| Analytics, screen tracking or consent | [Analytics](docs/architecture/analytics.md) |
 | Adding or changing tests | [Testing](docs/testing.md) |
 | Biome configuration or diagnostics | [Biome guide](docs/conventions/biome.md) |
 | Git hooks or commit troubleshooting | [Git workflow](docs/git-workflow.md) |

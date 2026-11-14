@@ -15,7 +15,9 @@ meant to be copied; it contains no business features.
 - Adapters behind application-owned contracts: an [HTTP client](docs/architecture/http-client.md)
   (Axios), [local and secure storage](docs/architecture/storage.md) (MMKV and
   SecureStore), [dates](docs/architecture/date-adapter.md) (Day.js) and
-  [error reporting](docs/architecture/observability.md) (Sentry, optional).
+  [error reporting](docs/architecture/observability.md) (Sentry or Firebase
+  Crashlytics, optional) and [analytics](docs/architecture/analytics.md)
+  (Google Analytics for Firebase, optional).
 - Typed [internationalization](docs/architecture/i18n.md) in English and
   Brazilian Portuguese, and [validated public configuration](docs/architecture/validation.md)
   with Zod.
@@ -79,9 +81,13 @@ Work through these steps when starting a product from the template:
    `.env.development.local` (and the staging or production equivalent) and set
    the values you need. `EXPO_PUBLIC_` values are embedded in the app and public.
    See [selecting configuration](docs/app-variants.md#selecting-configuration).
-4. **Decide on error reporting.** Set `EXPO_PUBLIC_SENTRY_DSN` and the build-only
-   Sentry variables to activate it, or leave them empty to keep it disabled. See
-   [observability](docs/architecture/observability.md#source-maps-and-activation).
+4. **Decide on error reporting and analytics.** Set `EXPO_PUBLIC_SENTRY_DSN` and the
+   build-only Sentry variables to activate Sentry. To use Firebase instead, set
+   `FIREBASE_SERVICES` (`crashlytics`, `analytics` or both) and the variant's
+   Firebase config files. Crashlytics and Sentry are exclusive. Leave everything
+   empty to keep both disabled. See
+   [observability](docs/architecture/observability.md#provider-selection) and
+   [analytics](docs/architecture/analytics.md#activation).
 5. **Review locales and privacy.** Adjust the default locale and catalogs in the
    [i18n guide](docs/architecture/i18n.md), and keep the iOS privacy manifest in
    `app.json` accurate when you add SDKs that collect data.
@@ -107,6 +113,7 @@ Work through these steps when starting a product from the template:
 | Dates, UTC and time zones | [Date operations](docs/architecture/date-adapter.md) |
 | Translations and localized formatting | [Internationalization](docs/architecture/i18n.md) |
 | Error and crash reporting | [Observability](docs/architecture/observability.md) |
+| Product analytics and consent | [Analytics](docs/architecture/analytics.md) |
 | Variants, versions and local releases | [App variants](docs/app-variants.md) |
 | Test environments and patterns | [Testing](docs/testing.md) |
 | Lint rules and overrides | [Biome guide](docs/conventions/biome.md) |

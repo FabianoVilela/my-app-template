@@ -4,3 +4,7 @@ allowBuilds:
   unrs-resolver: false
   # Sentry CLI installs/verifies the platform binary used for source maps.
   '@sentry/cli': true
+  # Firebase web auto-init config (App Hosting) and a protobufjs version warning;
+  # React Native Firebase uses the native SDKs and needs neither.
+  '@firebase/util': false
+  protobufjs: false

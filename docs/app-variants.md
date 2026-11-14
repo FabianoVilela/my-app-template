@@ -103,6 +103,13 @@ and are embedded into the bundle; changes require reloading/rebuilding it. Keep
 credentials outside public variables. Existing startup validation still validates
 URLs and locale; it does not validate CI or require a backend.
 
+Optional Firebase services are also selected per variant, with the build-time
+`FIREBASE_SERVICES`, `GOOGLE_SERVICES_JSON` and `GOOGLE_SERVICE_INFO_PLIST`
+variables. Register each variant's bundle identifier and package name in its own
+Firebase project; configuration rejects files registered for another variant.
+Changing the selection changes native linking, so run `prebuild --clean` afterwards.
+See [analytics](architecture/analytics.md#activation).
+
 ## Switching native variants
 
 Existing native directories retain the previously generated identity. Before
