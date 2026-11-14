@@ -1,14 +1,12 @@
 import { Platform } from "react-native";
-import {
-  type AnalyticsTracker,
-  noopAnalyticsTracker,
-} from "@/infrastructure/analytics/analytics-tracker";
+import { noopAnalyticsTracker } from "@/infrastructure/analytics/analytics-tracker";
 import { readEnv } from "@/infrastructure/env/read-env";
+import type { AppAnalyticsTracker } from "./analytics-events";
 
-let tracker: AnalyticsTracker | undefined;
+let tracker: AppAnalyticsTracker | undefined;
 
 /** Process lifetime SDK access; call before mounting React, never per render. */
-export function initializeAnalytics(): AnalyticsTracker {
+export function initializeAnalytics(): AppAnalyticsTracker {
   // Firebase Analytics is native-only here; web keeps the no-op tracker.
   if (Platform.OS === "web") return noopAnalyticsTracker;
 

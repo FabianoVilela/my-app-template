@@ -6,6 +6,7 @@ import {
   setConsent,
 } from "@react-native-firebase/analytics";
 import {
+  type AnalyticsEventMap,
   type AnalyticsTracker,
   noopAnalyticsTracker,
 } from "./analytics-tracker";
@@ -28,9 +29,10 @@ type FirebaseAnalyticsTrackerOptions = {
  * firebase.json starts collection disabled with every consent type denied.
  * Advertising signals stay denied even after the user grants analytics.
  */
-export function createFirebaseAnalyticsTracker(
-  options: FirebaseAnalyticsTrackerOptions,
-): AnalyticsTracker {
+export function createFirebaseAnalyticsTracker<
+  Events extends AnalyticsEventMap,
+  Screen extends string,
+>(options: FirebaseAnalyticsTrackerOptions): AnalyticsTracker<Events, Screen> {
   if (!options.isEnabled) return noopAnalyticsTracker;
 
   let analytics: ReturnType<typeof getAnalytics>;
@@ -56,8 +58,9 @@ export function createFirebaseAnalyticsTracker(
         logScreenView(analytics, { screen_name: screen, screen_class: screen }),
       );
     },
-    logEvent(name, params) {
-      ignoreFailure(() => logEvent(analytics, name, params));
+    logEvent(name, ...[params]) {
+      // The bound catalog types names; the SDK's per-event overloads need literals.
+      ignoreFailure(() => logEvent(analytics, name as string, params));
     },
   };
 }
