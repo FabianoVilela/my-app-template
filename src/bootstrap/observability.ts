@@ -2,6 +2,7 @@ import Constants, { ExecutionEnvironment } from "expo-constants";
 import type { ComponentType } from "react";
 import { Platform } from "react-native";
 import { readEnv } from "@/infrastructure/env/read-env";
+import { createConsoleErrorReporter } from "@/infrastructure/observability/console-error-reporter";
 import {
   type ErrorReporter,
   noopErrorReporter,
@@ -21,6 +22,12 @@ export function initializeObservability(): ErrorReporter {
     return noopErrorReporter;
 
   if (reporter) return reporter;
+
+  // Debug builds never reach a crash SDK; they print to the Metro terminal.
+  if (__DEV__) {
+    reporter = createConsoleErrorReporter();
+    return reporter;
+  }
 
   try {
     const env = readEnv();

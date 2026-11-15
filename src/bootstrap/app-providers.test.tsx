@@ -51,7 +51,6 @@ test("renders the application after startup and hides the splash screen", async 
 });
 
 test("reports a failed startup once per attempt and retries", async () => {
-  jest.spyOn(console, "warn").mockImplementation(() => undefined);
   const failure = new Error("Invalid environment configuration");
   const reporter = createReporter();
   startupMock

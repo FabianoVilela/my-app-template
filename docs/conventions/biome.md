@@ -120,10 +120,11 @@ The overrides refine the global configuration for selected source files:
 
 | Match | Purpose |
 | --- | --- |
-| `src/**` | Named exports, file naming and identifier naming |
+| `src/**` | Named exports, file naming, identifier naming and [console use](#console-use) |
 | `src/app/**` | Allow default exports for routes and layouts |
 | `src/infrastructure/**`, `src/modules/*/infrastructure/**` | Allow external casing for selected property declarations |
 | `src/app/**/\\[*.{ts,tsx}` | Validate dynamic route parameter filenames in `camelCase` |
+| `src/infrastructure/observability/console-error-reporter.ts` | Allow the console in the development error reporter |
 | One override per layer | Restrict imports across architectural layers; see [layer import boundaries](#layer-import-boundaries) |
 
 `**` spans directory levels; `*` matches within one path segment. The module
@@ -283,6 +284,15 @@ Identifier naming inside the file still uses `strictCase: false`; the stricter
 setting applies to the parameter filename. This override checks filenames,
 so a directory such as `[order_id]/index.tsx` still needs manual review of its
 parameter spelling.
+
+## Console use
+
+The global `noConsole` rule allows `assert`, `info`, `warn` and `error`, which
+scripts outside `src/` use for command output. The `src/**` override allows only
+`console.assert`. Application code reports failures through the `ErrorReporter`;
+in debug builds bootstrap selects the console reporter, the only source file
+with `noConsole` off. Do not add other console exceptions; see
+[Observability](../architecture/observability.md#configuration-and-mobile-behavior).
 
 ## Layer import boundaries
 

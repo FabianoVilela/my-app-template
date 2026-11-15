@@ -40,8 +40,14 @@ do not import root infrastructure into the core.
 
 ## Configuration and mobile behavior
 
+- Debug builds never initialize Sentry or Crashlytics. Bootstrap selects the
+  console reporter instead: `captureException` prints `[error] <operation>` with
+  the error through `console.error`, which also raises a LogBox notification, and
+  `addBreadcrumb` prints `[breadcrumb] <operation>` through `console.info`. Output
+  stays on the developer machine. This is the only place application code may use
+  the console; see [console use](../conventions/biome.md#console-use).
 - `EXPO_PUBLIC_SENTRY_DSN`: optional public client key, validated by `readEnv`.
-  Empty disables the SDK. Debug builds never initialize or send to Sentry.
+  Empty disables the SDK.
 - Environment is the app variant validated by `readEnv`. Release/dist
   are detected by the SDK from installed native metadata; do not substitute
   package.json versions, which may differ from the installed binary.
@@ -128,7 +134,7 @@ following Sentry's Expo guide. Native build uploads do not cover later OTA bundl
 Adapter tests cover disabled mode, per-event context, privacy hooks, unknown
 exceptions, technical breadcrumbs and SDK failures for Sentry, and the matching
 cases for Crashlytics. Bootstrap tests check that Crashlytics replaces Sentry
-when selected, debug startup, startup failures reported once per attempt and
+when selected, console reporting in debug startup, startup failures reported once per attempt and
 failed locale refreshes. Navigation tests mount the navigator without the root
 layout, so they do not initialize telemetry.
 Run the normal lint/check/typecheck/test scripts and variant configuration tests.
