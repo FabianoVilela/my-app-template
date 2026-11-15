@@ -103,6 +103,14 @@
       "includes": ["src/**"],
       "linter": {
         "rules": {
+          "suspicious": {
+            "noConsole": {
+              "level": "error",
+              "options": {
+                "allow": ["assert"]
+              }
+            }
+          },
           "style": {
             "noDefaultExport": "error",
             "useFilenamingConvention": {
@@ -598,6 +606,18 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "src/infrastructure/observability/console-error-reporter.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
           }
         }
       }

@@ -27,8 +27,7 @@ jest.mock("expo-constants", () => ({
   },
 }));
 
-import * as Sentry from "@sentry/react-native";
-import { initializeObservability } from "./observability";
+import type * as Sentry from "@sentry/react-native";
 
 function Root() {
   return null;
@@ -42,15 +41,30 @@ afterEach(() => {
   else process.env.EXPO_PUBLIC_SENTRY_DSN = previousDsn;
 });
 
-test("development startup is idempotent and never initializes the remote SDK", () => {
+test("development startup prints to the console and never initializes a remote SDK", () => {
+  const consoleError = jest
+    .spyOn(console, "error")
+    .mockImplementation(() => undefined);
   process.env.EXPO_PUBLIC_SENTRY_DSN = "https://key@example.test/123";
-  const first = initializeObservability();
+  mockExtra.firebase = { analytics: false, crashlytics: true };
+  const failure = new Error("test");
 
-  expect(initializeObservability()).toBe(first);
-  first.captureException(new Error("test"), { operation: "app.startup" });
+  jest.isolateModules(() => {
+    const sentry = require("@sentry/react-native") as typeof Sentry;
+    const crashlytics = require("@react-native-firebase/crashlytics");
+    const { initializeObservability: initialize, withObservability } =
+      require("./observability") as typeof import("./observability");
+    const first = initialize();
 
-  expect(Sentry.init).not.toHaveBeenCalled();
-  expect(Sentry.captureException).not.toHaveBeenCalled();
+    expect(initialize()).toBe(first);
+    first.captureException(failure, { operation: "app.startup" });
+
+    expect(consoleError).toHaveBeenCalledWith("[error] app.startup", failure);
+    expect(sentry.init).not.toHaveBeenCalled();
+    expect(sentry.captureException).not.toHaveBeenCalled();
+    expect(crashlytics.getCrashlytics).not.toHaveBeenCalled();
+    expect(withObservability(Root)).toBe(Root);
+  });
 });
 
 test("release startup initializes once with the selected variant", () => {

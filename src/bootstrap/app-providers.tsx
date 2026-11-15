@@ -38,7 +38,6 @@ export function AppProviders({ children, errorReporter }: AppProvidersProps) {
       (error: unknown) => {
         errorReporter.captureException(error, { operation: "app.startup" });
 
-        if (__DEV__) console.warn("Unable to initialize application");
         if (isActive) setState({ status: "failed" });
       },
     );
