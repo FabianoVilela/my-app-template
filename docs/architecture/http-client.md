@@ -18,7 +18,7 @@ does not infer time zones or automatically convert date fields.
 | `src/infrastructure/http/http-error.ts` | Library-independent failure kinds and response metadata. |
 | `src/infrastructure/http/axios-http-client.ts` | Axios configuration, JSON serialization, request execution, response parsing and error normalization. |
 | A module's `application/ports/product-service.ts` | Operations and data required by its consumers, without HTTP or Axios imports. |
-| A module's `infrastructure/product-service.ts` | Endpoints, external payloads, validation, mapping and endpoint-specific error handling. |
+| A module's `infrastructure/product-service.ts` | Endpoints, external payloads, validation, mapping and endpoint-specific error handling. Paths move to `infrastructure/product-endpoints.ts` when [shared within the module](#endpoint-paths). |
 | `src/bootstrap/create-dependencies.ts`, when needed | Select the default HTTP implementation, accept overrides and assemble real module services. |
 
 Only the Axios adapter imports the `axios` package. Domain and application do not
@@ -192,6 +192,40 @@ The factory connects HTTP once and returns a service whose methods retain that
 dependency. Calling `getProductById` does not require injecting HTTP again. Add
 related endpoints to the service as needed; do not generate a gateway object, a
 pass-through use case or a generic CRUD base class for each endpoint.
+
+## Endpoint paths
+
+Endpoint paths belong to the module that calls them. Do not create a global
+endpoints file: it couples unrelated modules and gives every API change a shared
+merge point.
+
+Keep a path inline when one service method uses it. When a service has several
+endpoints or reuses a path, define them in
+`modules/products/infrastructure/product-endpoints.ts`:
+
+```ts
+export const productEndpoints = {
+  list: "/products",
+  byId: (id: string) => `/products/${encodeURIComponent(id)}`,
+  review: (productId: string, reviewId: string) =>
+    `/products/${encodeURIComponent(productId)}/reviews/${encodeURIComponent(reviewId)}`,
+} as const;
+```
+
+- Use a constant for a fixed path and a typed function for a path with
+  parameters. Encode each dynamic segment inside the function so callers cannot
+  omit it.
+- The file holds relative paths only. Query parameters stay in `request.query`,
+  the method stays in the service and the base URL stays in client configuration.
+- Do not add a generic `:param` template helper; a function per path is typed
+  without one.
+
+A shared constant prevents inconsistent spellings, not wrong paths. Service tests
+are the check against the backend contract: write MSW handler URLs as literals
+from the API documentation instead of importing the module's endpoints, so a
+wrong path fails the test instead of being repeated in it. When the backend
+publishes an OpenAPI contract, prefer generated path and payload types over
+hand-written paths, and keep validating responses with Zod at runtime.
 
 ## Default client and overrides
 
