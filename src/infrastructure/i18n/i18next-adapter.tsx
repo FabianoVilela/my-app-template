@@ -98,7 +98,7 @@ export async function createI18nextAdapter({
 
   const runtime: AppI18n = {
     translate: ((key: string, values?: Record<string, string | number>) =>
-      instance.t(key, values)) as AppTranslate,
+      instance.t(key, values ?? {})) as AppTranslate,
     getSnapshot: () => snapshot,
     subscribe(listener) {
       listeners.add(listener);
